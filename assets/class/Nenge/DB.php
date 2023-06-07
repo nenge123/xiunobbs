@@ -490,7 +490,7 @@ class DB
 				$query['param'][] = $value;
 			}
 		}
-		$query['sql'] .= 'WHERE ' . rtrim($sql, $cstr);
+		if(!empty($sql))$query['sql'] .= 'WHERE ' . rtrim($sql, $cstr);
 		return $query;
 	}
 	private function prepare_filter_order($query)
@@ -499,9 +499,9 @@ class DB
 			$sql = '';
 			foreach ($query['order'] as $k => $v) {
 				if (is_numeric($k)) {
-					$sql .= self::quote($v, 0, $query['pre_table']) . 'DESC,';
+					$sql .= self::quote($v, 0) . 'DESC,';
 				} else {
-					$quote_key = self::quote($k, 0, $query['pre_table']); 
+					$quote_key = self::quote($k, 0); 
 					if (!$v || $v == 'desc' || $v == 'DESC') {
 						$sql .= $quote_key . 'DESC,';
 					} else {

@@ -31,11 +31,12 @@ class table_thread extends base
     {
         $myapp = \Nenge\APP::app();
         if (empty($page)) $page = 1;
+        $where = array();
         $threads = array(
             'top'=>array(),
             'list'=>array()
         );
-        $where = array('fid'=>$forumlist);
+        if(!empty($forumlist))$where['fid'] = $forumlist;
         $uids = [];
         #隐藏 非置顶1 2 级
         //$where = array('!:top' => array(1, 2, 3));

@@ -32,7 +32,7 @@ const Nenge = new class NengeCores {
         T.docload(e => T.triger(document, 'NengeReady', {
             detail: T
         }));
-        this.serviceWorker = navigator.serviceWorker.register('sw.js');
+        if('serviceWorker' in navigator)this.serviceWorker = navigator.serviceWorker.register('sw.js');
     }
     get date() {
         return new Date();

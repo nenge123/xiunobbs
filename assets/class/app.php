@@ -461,10 +461,8 @@ class APP implements \ArrayAccess
                 }
             }
         }
-        $this->data['user'] = array(
-            'uid' => 0,
-            'gid' => 0,
-        );
+        $this->data['uid'] = 0;
+        $this->data['gid'] = 0;
         if (!empty($this->data['settings']['timezone'])) {
             #设置时区
             ini_set('date.timezone', $this->data['settings']['timezone']);
@@ -501,24 +499,27 @@ class APP implements \ArrayAccess
                             $this->session_tokens($this->data['user']);
                         }
                     }
-                    $this->data['gid'] = $this->data['user']['gid'];
+                    $this->data['gid'] = $this->data['user']['gid']?:0;
+                    $this->data['uid'] = $this->data['user']['uid']?:0;
                     $this->data['access'] = $this->data['grouplist'][$this->data['gid']];
-                } else {
-                    $this->data['gid'] = 0;
-                    $this->data['access'] = $this->data['grouplist'][0];
                 }
             }
+        }
+        if(empty($this->data['uid'])){
+            $this->data['gid'] = 0;
+            $this->data['access'] = $this->data['grouplist'][0];
+            $this->data['user'] = array('uid'=>0,'gid'=>0);
         }
     }
     public function allowforum()
     {
+        $data = $this->data;
         if (!isset($this->data['allowforum'])) {
-            foreach ($this->data['forumlist'] as $k => $v) {
-                if (!empty($data['forum_access'][$v['fid']][$this->data['gid']])) {
-                    if (!empty($data['forum_access'][$v['fid']][$this->data['gid']])) {
-                        $this->data['allowforum'][] = $v['fid'];
-                    }
-                } else if (!empty($this->data['access']['allowread'])) {
+            $this->data['allowforum'] = array();
+            foreach ($data['forumlist'] as $k => $v) {
+                if (isset($data['forum_access'][$v['fid']])&&isset($data['forum_access'][$v['fid']][$data['gid']])) {
+                    if(!empty($data['forum_access'][$v['fid']][$data['gid']]['allowread']))$this->data['allowforum'][] = $v['fid'];
+                } else if (!empty($data['access']['allowread'])) {
                     $this->data['allowforum'][] = $v['fid'];
                 }
             }
@@ -618,7 +619,7 @@ class APP implements \ArrayAccess
     }
     public function error_text($errfile, $errline, $errstr, $level = "WARNING")
     {
-        return '<span style="display:inline-block;background:#f95543;color:#000;border:1px solid #313131;font-size:12px;border-radius:.25rem;padding:1px;position:absolute;"><b>' . $level . ':</b>' . $errfile . '(' . $errline . ')<b style="color:#fff;">' . $errstr . '</b></span>';
+        return '<span style="display:inline-block;background:#f95543;color:#000;border:1px solid #313131;font-size:12px;border-radius:.25rem;padding:1px;"><b>' . $level . ':</b>' . $errfile . '(' . $errline . ')<b style="color:#fff;">' . $errstr . '</b></span>';
     }
     public function exception_handler($exception)
     {
