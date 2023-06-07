@@ -1,0 +1,2 @@
+<?php
+ namespace League\CommonMark\Extension\TableOfContents; use League\CommonMark\Block\Element\AbstractBlock; use League\CommonMark\Block\Renderer\BlockRendererInterface; use League\CommonMark\ElementRendererInterface; final class TableOfContentsPlaceholderRenderer implements BlockRendererInterface { public function render(AbstractBlock $block, ElementRendererInterface $htmlRenderer, bool $inTightList = false) { return '<!-- table of contents -->'; } } 

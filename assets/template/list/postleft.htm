@@ -1,0 +1,108 @@
+                    <table class="post-content{if empty($post['isfirst'])&&!empty($post['pid'])} post-content-{$post['pid']}{/if}">
+                        <tr>
+                            <th class="post-poster" xn-action="showPostInfo" rowspan="2">
+                                <div class="container">
+                                    <p class="avatar"><img alt="{$post['username']}" src="<!--{echo $myapp->avatar($post['user'])}-->"></p>
+                                    <!--{if $post['uid']}-->
+                                    <div class="status">
+                                        <li>
+                                            <p><a href="{url user-$post['uid'] show=threads}">{echo $myapp->F('humannum',$post['user']['threads'])}</a></p>
+                                            <p>{lang thread}</p>
+                                        </li>
+                                        <li>
+                                            <p><a href="{url user-$post['uid'] show=posts}">{echo $myapp->F('humannum',$post['user']['posts'])}</a></p>
+                                            <p>{lang post}</p>
+                                        </li>
+                                        <li>
+                                            <p>{echo $myapp->F('humannum',$post['user']['credits'])}</p>
+                                            <p>{lang credits}</p>
+                                        </li>
+                                    </div>
+                                    <p class="group">{echo $myapp->F('get_groupname',$post['user']['gid'])}</p>
+                                    <dl class="count">
+                                        <dt>{lang date_year}</dt>
+                                        <dd><!--{echo $myapp->F('date_size',$post['user']['create_date'])}--></dd>
+                                        <dt>{lang golds}</dt>
+                                        <dd>{$post['user']['golds']}</dd>
+                                        <dt>{lang rmbs}</dt>
+                                        <dd>{$post['user']['rmbs']}</dd>
+                                        <dt>{lang date_login}</dt>
+                                        <dd><!--{echo $myapp->F('date_format_local',$post['user']['login_date'])}--></dd>
+                                        <dt>{lang date_post}</dt>
+                                        <dd><!--{echo $myapp->F('date_format_local',$post['create_date'])}--></dd>
+                                    </dl>
+                                    <!--{if !empty($_GET['only'])&&($_GET['only']==$post['uid']||$post['isfirst'])}-->
+                                    <p class="itemHref"><a href="{url thread-$thread['tid']-$page}">{lang all_poster}</a></p>
+                                    <!--{else}-->
+                                    <p class="itemHref">
+                                        <i class="i-see">&#61715;</i>
+                                        <a href="{url(thread-$thread['tid'],only=$post['uid'])}">{lang only_poster}</a>
+                                    </p>
+                                    <!--{/if}-->
+                                    <p class="itemHref">
+                                        <i class="i-edit">&#61504;</i>
+                                        <a href="{url edit-$post['pid']}">{lang edit}</a>
+                                    </p>
+                                    <p class="itemHref">
+                                        <i class="i-remove">&#61944;</i>
+                                    <!--{if $post['isfirst']}-->
+                                        <a href="#" data-post="thread-{$thread['tid']}-delete" data-hash="{$myapp['hash']}" ajax="deleteThread">{lang delete_thread}</a></p>
+                                    <!--{else}-->
+                                        <a href="#" data-post="post-{$post['pid']}-delete" data-hash="{$myapp['hash']}" ajax="deleteThread">{lang delete_post}</a>
+                                    <!--{/if}-->
+                                    </p>
+                                <!--{if !empty($myapp['settings']['showip'])&&!empty($post['user']['login_ip'])}-->
+                                    <p class="ip"><span>&#61446;{lang ip_form}:</span><app-ip action="{url user-$post['uid']}" mode="$myapp['settings']['showip']"><!--{echo $myapp->hideIp($post['user']['login_ip'])}-->&#61442;{lang ip_click_view}</app-ip></p>
+                                <!--{/if}-->
+                                <!--{/if}-->
+                                </div>
+                            </th>
+                            <td class="post-message{if empty($post['isfirst'])&&!empty($post['pid'])} post-message-{$post['pid']}{/if}">
+                                <!--{if empty($post['isfirst'])}-->
+                                <div class="container-top">
+                                    <div class="poster">
+                                        <a href="{url user-$post['uid']}">{$post['username']}</a>
+                                        <i>{lang post_by}</i>
+                                        <time><!--{echo $myapp->F('date_format_local',$post['create_date'])}--></time>
+                                    </div>
+                                    <div class="floor"><!--{if !empty($post['floor'])}-->#{$post['floor']}{lang floor}<!--{/if}--></div>
+                                </div>
+                                <!--{/if}-->
+                                <div class="container-body"><!--{echo $myapp->F('message_format',$post['message'])}--></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="post-footer">
+                                <!--{if !empty($post['files'])}-->
+                                <div class="post-attach">
+                                    <!--{if !empty($postAttach[$post['pid']])}-->
+                                    <h3><span class="i-down">&#61465;</span>&nbsp;{lang attach_list}</h3>
+                                    <ul>
+                                        <!--{loop $postAttach[$post['pid']] $k $v}-->
+                                        <li><a href="{url attach-$v['aid']}">{$v['orgfilename']}</a></li>
+                                        <!--{/loop}-->
+                                    </ul>
+                                    <!--{else}-->
+                                    {lang insufficient_privilege_to_download}
+                                    <!--{/if}-->
+                                </div>
+                                <!--{/if}-->
+                                <!--{if empty($thread['closed'])}-->
+                                <div class="post-under">
+                                    <!--{if $post['isfirst']}-->
+                                    <form class="quick-post" method="post" action="{url thread-$thread_id}" ajax="quickSend">
+                                        <input type="hidden" name="hash" value="{$myapp['hash']}">
+                                        <input type="hidden" name="pid" value="0">
+                                        <input type="hidden" name="attachpid" value="">
+                                        <h6>{lang reply}</h6>
+                                        <textarea rows="2" class="post-textarea"></textarea>
+                                        <ul class="upload-attach"></ul>
+                                        <p><button type="submit">{lang submit}</button></p>
+                                    </form>
+                                    <!--{/if}-->
+                                    <a class="quick-post-href" href="#" xn-action="qickPostBtn" xn-pid="{$post['pid']}">{lang reply}</a>
+                                </div>
+                                <!--{/if}-->
+                            </td>
+                        </tr>
+                    </table>

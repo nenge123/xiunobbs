@@ -1,0 +1,2 @@
+<?php
+ declare(strict_types=1); namespace League\CommonMark; class MarkdownConverter extends Converter { protected $environment; public function __construct(EnvironmentInterface $environment) { $this->environment = $environment; parent::__construct(new DocParser($environment), new HtmlRenderer($environment)); } public function getEnvironment(): EnvironmentInterface { return $this->environment; } } 

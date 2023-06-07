@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="<!--{$myapp->conf['lang'] ?? $sitelink['images']}-->">
+<head>
+	<meta charset="utf-8">
+	<meta name="keywords" content="<!--{$myapp['keywords']}-->" />
+	<meta name="description" content="<!--{$myapp['keywords']}-->" />
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" >
+	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no,width=device-width">
+	<title><!--{$myapp['title']}--> - {$myapp['settings']['site_name']}</title>
+	<meta name="hash" content="{$myapp['hash']}">
+	<link rel="shortcut icon" href="<!--{$sitelink['images']}-->favicon.ico" />
+	<link rel="icon" sizes="32x32" href="<!--{$sitelink['images']}-->favicon.ico">
+	<link rel="Bookmark" href="<!--{$sitelink['images']}-->favicon.ico" />
+	<link rel="stylesheet" href="common.scss">
+	<link rel="stylesheet" href="origin.scss">
+</head>
+<body class="module-{echo $myapp['router'][0]}{if !empty($myapp['mobile'])} mobile{/if}">
+<header id="header">
+	<div class="top-navbar">
+		<a href="{$myapp['site']['root']}" class="logo"><img src="{$myapp['site']['images']}logo.png" alt="{lang index_page}"></a>
+		<ul class="nav-center">
+				<li class="nav-item"><a href="{$myapp['site']['root']}" class="icon-home">{lang index_page}</a></li>
+				<li class="nav-item">
+					<span class="icon-bbs">{lang bbs}</span>
+					<!--{if $allowforum = $myapp->allowforum()}-->
+					<nav>
+						<!--{loop $allowforum $fid}-->
+						<a href="{url 'forum-'.$fid}"><img src="{echo $myapp->forumimg($fid)}" alt="{$myapp['forumlist'][$fid]['name']}">{$myapp['forumlist'][$fid]['name']}</a>
+						<!--{/loop}-->
+					</nav>
+					<!--{/if}-->
+				</li>
+				<li>
+					<form action="{url search}" method="post">
+						<input type="text">
+						<button type="submit">{lang search}</button>
+					</form>
+				</li>
+			</ul>
+		<div class="nav-right"></div>
+	</div>
+</header>

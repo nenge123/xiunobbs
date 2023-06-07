@@ -1,0 +1,2 @@
+<?php
+ namespace League\CommonMark\Reference; interface ReferenceMapInterface { public function addReference(ReferenceInterface $reference): void; public function contains(string $label): bool; public function getReference(string $label): ?ReferenceInterface; public function listReferences(): iterable; } 

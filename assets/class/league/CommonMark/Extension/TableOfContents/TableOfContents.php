@@ -1,0 +1,2 @@
+<?php
+ namespace League\CommonMark\Extension\TableOfContents; use League\CommonMark\Block\Element\ListBlock; use League\CommonMark\Extension\TableOfContents\Node\TableOfContents as NewTableOfContents; if (!class_exists(NewTableOfContents::class)) { @trigger_error(sprintf('TableOfContents has moved to a new namespace; use %s instead', NewTableOfContents::class), \E_USER_DEPRECATED); } \class_alias(NewTableOfContents::class, TableOfContents::class); if (false) { final class TableOfContents extends ListBlock { } } 

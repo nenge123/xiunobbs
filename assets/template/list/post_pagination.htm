@@ -1,0 +1,14 @@
+                <!--{if !empty($_GET['only'])}-->
+                <ul class="pagination only">
+                    <li><a ajax="getPostList" class="prev" href="{echo $myapp->url('thread-'.$thread_id.'-'.($page-1),'only='.$_GET['only'])}"{if $page==1} hidden{/if}>{lang page_btn_prev}</a></li>
+                    <li><a ajax="getPostList" class="next" href="{echo $myapp->url('thread-'.$thread_id.'-'.($page+1),'only='.$_GET['only'])}">{lang page_btn_next}</a></li>
+                </ul>
+                <!--{else}-->
+                <!--{if !empty($pagination = $myapp->F('pagination',$page,$thread['posts'],$myapp['settings']['post_size']))}-->
+                <ul class="pagination">
+                    <!--{loop $pagination $k $v}-->
+                    <li><a ajax="getPostList" href="<!--{url thread-$thread_id-$v[page]}-->" <!--{if $v['page'] == $page||$page==0&&$v['page']==1}-->class="active"<!--{/if}-->>{$v['name']}</a></li>
+                    <!--{/loop}-->
+                </ul>
+                <!--{/if}-->
+                <!--{/if}-->

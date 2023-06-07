@@ -1,0 +1,70 @@
+<!--{if empty($_GET['inajax'])}--><!--{template admin:common/header.htm}--><!--{/if}-->
+<div class="content">
+    <form method="post" action="{url admin-forum-$forum['fid']}" ajax="basePost">
+        <div class="box-editforum">
+            <div class="box-header">
+                <h2 class="box-title">{$forum['name']}</h2>
+            </div>
+            <div class="box-body">
+                <ul>
+                    <li>
+                        <label>
+                            <span>{lang forum_name}:</span>
+                            <input type="text" name="name" value="{$forum['name']}">
+                        </label>
+                    </li>
+                    <li>
+                        <label>
+                            <span>{lang forum_rank}:</span>
+                            <input type="text" name="rank" value="{$forum['rank']}">
+                        </label>
+                    </li>
+                    <li>
+                        <label>
+                            <span>{lang forum_orderby}:</span>
+                            <select name="orderby">
+                                <option value="0"{if $forum['orderby']=='0'} selected{/if}>{lang forum_orderby_0}</option>
+                                <option value="1"{if $forum['orderby']=='1'} selected{/if}>{lang forum_orderby_1}</option>
+                                <option value="2"{if $forum['orderby']=='2'} selected{/if}>{lang forum_orderby_2}</option>
+                                <option value="3"{if $forum['orderby']=='3'} selected{/if}>{lang forum_orderby_3}</option>
+                                <option value="4"{if $forum['orderby']=='4'} selected{/if}>{lang forum_orderby_4}</option>
+                            </select>
+                        </label>
+                    </li>
+                    <li>
+                        <label>
+                            <span>{lang forum_brief}:</span>
+                            <textarea name="brief" rows="4">{echo htmlentities($forum['brief'])}</textarea>
+                        </label>
+                    </li>
+                    <li>
+                        <label>
+                            <span>{lang forum_announcement}:</span>
+                            <textarea name="announcement" rows="4">{echo htmlentities($forum['announcement'])}</textarea>
+                        </label>
+                    </li>
+                    <li>
+                        <label>
+                            <span>{lang forum_moduids}:</span>
+                            <input type="text" name="moduids" value="{$forum['moduids']}">
+                        </label>
+                    </li>
+                    <li>
+                        <label>
+                            <span>{lang forum_seo_title}:</span>
+                            <input type="text" name="seo_title" value="{$forum['seo_title']}">
+                        </label>
+                    </li>
+                    <li>
+                        <label>
+                            <span>{lang forum_seo_keywords}:</span>
+                            <input type="text" name="seo_keywords" value="{$forum['seo_keywords']}">
+                        </label>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </form>
+</div>
+<!--{template admin:common/status.htm}-->
+<!--{if empty($_GET['inajax'])}--><!--{template admin:common/footer.htm}--><!--{/if}-->

@@ -1,0 +1,28 @@
+
+@function space_width($width) {
+    @return unquote("calc(100% - "+$width+")");
+}
+@function space_width_half($width) {
+    @return unquote("calc(50% - "+$width/2+")");
+}
+@function space_width_var($width,$maxwidth) {
+    @if not $maxwidth or $maxwidth== '' {
+        $maxwidth: 100%;
+    }
+    @return unquote("calc("+$maxwidth+" - "+$width+")");
+}
+@function space_width_var_half($width,$maxwidth) {
+    @if not $maxwidth or $maxwidth== '' {
+        $maxwidth: 100%;
+    }
+    @return unquote("calc("+$maxwidth+"/2 - "+$width/2+")");
+}
+
+@function fontPath($src) {
+    /* 定义字体文件路径函数 */
+    @return $fonts+$src;
+}
+@function cssPath($src) {
+    /* 定义字体文件路径函数 */
+    @return $css+$src;
+}

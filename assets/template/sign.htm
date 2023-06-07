@@ -1,0 +1,117 @@
+<!--{if empty($_GET['inajax'])}-->
+<!--{template header.htm}-->
+<main class="xn-sign">
+	<div class="container">
+<!--{/if}-->
+		<div class="box-sign">
+			<div class="box-header">
+				<div class="box-title">{$myapp['title']}</div>
+			</div>
+			<div class="box-body">
+				<!--{if $myapp->router->act=='up'}-->
+				<form action="{url sign-up}" method="post" ajax="onLogin">
+					<input type="hidden" name="hash" value="{$myapp['hash']}">
+					<div class="group">
+						<label class="email email2" tabindex="-1">
+							<input type="text" placeholder="<!--{lang placeholder_email}-->" name="email" value="" autocomplete="email"/>
+						</label>
+					</div>
+					<div class="group">
+						<label class="username" tabindex="-1">
+							<input type="text" placeholder="<!--{lang placeholder_username}-->" name="username" value="" autocomplete="username" maxlength="10"/>
+						</label>
+					</div>
+					<div class="group">
+						<label class="password" tabindex="-1">
+							<input type="password" placeholder="<!--{lang password}-->" name="password" value="" autocomplete="password" xn-action="clearNewPassword"/>
+						</label>
+					</div>
+					<div class="group">
+						<label class="new-password" tabindex="-1">
+							<input type="password" placeholder="<!--{lang password_repeat}-->" name="new-password" value="" autocomplete="new-password"/>
+						</label>
+					</div>
+					<!--{if !empty($myapp->data['settings']['verify_email'])&&!empty($myapp->data['settings']['smtp'][0])}-->
+					<div class="group email-code">
+						<label class="code" tabindex="-1">
+							<input type="text" placeholder="<!--{lang submit_to_get_email_verify_code}-->" name="code" value="" autocomplete="true"/>
+						</label>
+					</div>
+					<!--{/if}-->
+					<div class="submit">
+						<button type="submit"><!--{lang register}--></button>
+					</div>
+				</form>
+				<!--{elseif $myapp->router->act=='in'}-->
+				<form action="{url sign-in}" method="post" ajax="onLogin">
+					<input type="hidden" name="hash" value="{$myapp['hash']}">
+					<div class="group">
+						<label class="email" tabindex="-1">
+							<input type="text" placeholder="<!--{lang email_or_username}-->" name="email" value="" autocomplete="email"/>
+						</label>
+					</div>
+					<div class="group">
+						<label class="password" tabindex="-1">
+							<input type="password" placeholder="<!--{lang password}-->" name="password" value="" autocomplete="current-password"/>
+						</label>
+					</div>
+					<div class="submit">
+						<label>
+							<input type="checkbox" name="argee_cookies" value="1">
+							<span>{lang argee_cookies}</span>
+						</label>
+						<button type="submit"><!--{lang login}--></button>
+					</div>
+				</form>
+				<!--{elseif $myapp->router->act=='reset'}-->
+				<!--{if !empty($myapp['settings']['password_reset'])}-->
+				<form action="{url sign-reset}" method="post" ajax="onLogin">
+					<input type="hidden" name="hash" value="{$myapp['hash']}">
+					<div class="group">
+						<label class="email" tabindex="-1">
+							<input type="text" placeholder="<!--{lang email}-->" name="email" value="" autocomplete="email"/>
+						</label>
+					</div>
+					<div class="group email-code">
+						<label class="code" tabindex="-1">
+							<input type="text" placeholder="<!--{lang submit_to_get_email_verify_code}-->" name="code" value="" autocomplete="true"/>
+						</label>
+					</div>
+					<div class="group">
+						<label class="password" tabindex="-1">
+							<input type="password" placeholder="<!--{lang password}-->" name="password" value="" autocomplete="current-password"/>
+						</label>
+					</div>
+					<div class="submit">
+						<button type="submit"><!--{lang submit}--></button>
+					</div>
+				</form>
+				<!--{else}-->
+				<p class="center">{lang resetpw_not_on}</p>
+				<!--{/if}-->
+				<!--{elseif $myapp->router->act=='out'}-->
+				<p class="center">
+					<a href="{$sitelink['root']}">{lang logout_successfully}</a>
+				</p>
+				<!--{else}-->
+				{lang unknow_action_txt}
+				<!--{/if}-->
+				<p class="msg-feedback"></p>
+			</div>
+			<div class="box-footer">
+				<!--{if $myapp->router->act!='up'}-->
+				<a href="{url sign-up}">{lang user_create}</a>
+				<!--{/if}-->
+				<!--{if $myapp->router->act!='in'}-->
+				<a href="{url sign-in}">{lang user_login}</a>
+				<!--{/if}-->
+				<!--{if $myapp->router->act!='reset'}-->
+				<a href="{url sign-reset}">{lang user_resetpw}</a>
+				<!--{/if}-->
+			</div>
+		</div>
+<!--{if empty($_GET['inajax'])}-->
+	</div>
+</main>
+<!--{template footer.htm}-->
+<!--{/if}-->

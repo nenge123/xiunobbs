@@ -1,0 +1,74 @@
+<!--{if empty($_GET['inajax'])}--><!--{template admin:common/header.htm}--><!--{/if}-->
+<div class="content">
+    <script type="text/template">
+        <div class="box-forum">
+            <div class="box-header">
+                <h3 class="box-title">{lang forum_new}</h3>
+            </div>
+            <div class="box-body">
+                <div>
+                    <label>
+                        <span>{lang forum_name}:</span>
+                        <input type="text" name="newforum[]" value="">
+                    </label>
+                </div>
+            </div>
+        </div>
+    </script>
+    <form method="post" action="{url admin-forum}" ajax="basePost">
+        <div><button xn-action="addForum">{lang forum_add}</button></div>
+        <!--{loop $myapp['forumlist'] $k $v}-->
+        <!--{if empty($v['fup']) || !empty($v['subforum'])}-->
+        <div class="box-forum">
+            <div class="box-header">
+                <h3 class="box-title">{$v['name']}</h3>
+                <div>
+                    <a href="{url admin-forum-$k}" ajax="getPage">{lang edit}</a>
+                    <a href="{url admin-forum}" ajax="deleteForum" data-fid="{$k}">{lang delete}</a>
+                </div>
+            </div>
+            <div class="box-body">
+                <div>
+                    <label>
+                        <span>{lang forum_name}:</span>
+                        <input type="text" name="forum[{$k}][name]" value="{$v['name']}">
+                    </label>
+                    <label>
+                        <span>{lang forum_rank}:</span>
+                    <input type="text" name="forum[{$k}][rank]" value="{$v['rank']}">
+                    </label>
+                </div>
+                <!--{if !empty($v['subforum'])}-->
+                <h6>{lang subforum}</h6>
+                <ul>
+                <!--{loop $v['subforum'] $f $fv}-->
+                    <!--{if empty($myapp['forumlist'][$f]['subforum'])}-->
+                    <li>
+                        <div class="left">
+                            <label>
+                                <span>{lang forum_name}:</span>
+                                <input type="text" name="forum[{$f}][name]" value="{$fv}">
+                            </label>
+                            <label>
+                                <span>{lang forum_rank}:</span>
+                            <input type="text" name="forum[{$f}][rank]" value="{$myapp['forumlist'][$f]['rank']}">
+                            </label>
+                        </div>
+                        <div class="right">
+                            <a href="{url admin-forum-$f}" ajax="getPage">{lang edit}</a>
+                            <a href="{url admin-forum}" ajax="deleteForum" data-fid="{$f}">{lang delete}</a>
+                        </div>
+                    </li>
+                    <!--{/if}-->
+                <!--{/loop}-->
+                </ul>
+                <!--{/if}-->
+            </div>
+        </div>
+        <div><button type="submit">{lang submit}</button></div>
+        <!--{/if}-->
+        <!--{/loop}-->
+    </form>
+</div>
+<!--{template admin:common/status.htm}-->
+<!--{if empty($_GET['inajax'])}--><!--{template admin:common/footer.htm}--><!--{/if}-->

@@ -1,0 +1,2 @@
+<?php
+ namespace League\CommonMark\Block\Element; use League\CommonMark\Cursor; class ThematicBreak extends AbstractBlock { public function canContain(AbstractBlock $block): bool { return false; } public function isCode(): bool { return false; } public function matchesNextLine(Cursor $cursor): bool { return false; } } 

@@ -1,0 +1,2 @@
+<?php
+ declare(strict_types=1); namespace League\CommonMark\Extension\Attributes\Node; use League\CommonMark\Inline\Element\AbstractInline; final class AttributesInline extends AbstractInline { public $attributes; public $block; public function __construct(array $attributes, bool $block) { $this->attributes = $attributes; $this->block = $block; $this->data = ['delim' => true]; } public function getAttributes(): array { return $this->attributes; } public function isBlock(): bool { return $this->block; } } 

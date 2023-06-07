@@ -1,0 +1,2 @@
+<?php
+ namespace League\CommonMark\Util; final class PrioritizedList implements \IteratorAggregate { private $list = []; private $optimized; public function add($item, int $priority): void { $this->list[$priority][] = $item; $this->optimized = null; } #[\ReturnTypeWillChange] public function getIterator(): iterable { if ($this->optimized === null) { \krsort($this->list); $sorted = []; foreach ($this->list as $group) { foreach ($group as $item) { $sorted[] = $item; } } $this->optimized = new \ArrayIterator($sorted); } return $this->optimized; } } 

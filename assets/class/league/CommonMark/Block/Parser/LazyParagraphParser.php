@@ -1,0 +1,2 @@
+<?php
+ namespace League\CommonMark\Block\Parser; use League\CommonMark\ContextInterface; use League\CommonMark\Cursor; final class LazyParagraphParser implements BlockParserInterface { public function parse(ContextInterface $context, Cursor $cursor): bool { if (!$cursor->isIndented()) { return false; } $context->setBlocksParsed(true); return true; } } 

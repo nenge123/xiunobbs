@@ -1,0 +1,17 @@
+<!--{if empty($_GET['inajax'])}--><!--{template admin:common/header}--><!--{/if}-->
+<div class="content">
+    <form class="form-setiitings" method="post" action="{url admin-settings}" ajax="basePost">
+        <!--{loop $settings_list $name $data}-->
+        <h3>
+            <a id="{$name}" class="anchor" aria-hidden="true" href="#{$name}"><span aria-hidden="true"></span></a>
+            <span><!--{$language['title_'.$name]}--></span>
+        </h3>
+        <!--{loop $data $k $v}-->
+            <!--{subtemplate admin:common/settings_input}-->
+        <!--{/loop}-->
+        <p class="start"><button>{lang submit}</button></p>
+        <!--{/loop}-->
+    </form>
+</div>
+<!--{template admin:common/status}-->
+<!--{if empty($_GET['inajax'])}--><!--{template admin:common/footer}--><!--{/if}-->

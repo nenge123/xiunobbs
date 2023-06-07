@@ -1,0 +1,11 @@
+            <!--{if !empty($postlist)}-->
+                <!--{subtemplate list/post_pagination}-->
+                <!--{loop $postlist $k $post}-->
+                <div class="box-reply">
+                    <div class="box-body">
+                        <!--{subtemplate list/postleft}-->
+                    </div>
+                </div>
+                <!--{/loop}-->
+                <!--{subtemplate list/post_pagination}-->
+            <!--{/if}-->

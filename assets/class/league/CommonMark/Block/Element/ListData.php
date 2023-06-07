@@ -1,0 +1,2 @@
+<?php
+ namespace League\CommonMark\Block\Element; class ListData { public $start; public $padding = 0; public $type; public $delimiter; public $bulletChar; public $markerOffset; public function equals(ListData $data) { return $this->type === $data->type && $this->delimiter === $data->delimiter && $this->bulletChar === $data->bulletChar; } } 

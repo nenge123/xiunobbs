@@ -1,0 +1,28 @@
+	<div class="debug">
+		<div class="container"><!--{echo APP::output_debug()}--></div>
+	</div>
+	<footer class="xn-footer">
+		<div class="container">
+			<p>
+				<span>Nenge&nbsp;©2022&nbsp;Nenge.&nbsp;All&nbsp;Rights&nbsp;Reserved.</span>
+				<b>
+					<span>迷你修罗</span>
+					<span><!--{$myapp['settings']['version']}--></span>
+				</b>
+			</p>
+			<p>
+				<span><!--{$language["sql_query"]}-->:&nbsp;</span>
+				<!--{if $sqldata = DB::getSql()}-->
+				<b><!--{echo count($sqldata)}-->|<!--{echo array_sum(array_column($sqldata,'time'))}-->ms</b>
+				<!--{/if}-->
+				<span>,&nbsp;<!--{$language["processed_run"]}-->:&nbsp;</span>
+				<b><!--{echo round((microtime(1) - $_SERVER['REQUEST_TIME'])*1000,2)}-->ms</b>
+				<span>,&nbsp;<!--{$language["server_time"]}-->:&nbsp;<!--{echo date('Y/m/d H:i:s')}--></span>
+			</p>
+		</div>
+	</footer>
+	<script src="<!--{$sitelink['js']}-->common.js?<!--{$myapp['ver']}-->"></script>
+	<script src="<!--{$sitelink['js']}-->common_append.js?<!--{$myapp['ver']}-->"></script>
+	<script src="<!--{$sitelink['data']}-->plugin.js?<!--{$myapp['ver']}-->"></script>
+</body>
+</html>

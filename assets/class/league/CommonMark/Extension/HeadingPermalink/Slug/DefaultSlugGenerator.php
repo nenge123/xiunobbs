@@ -1,0 +1,2 @@
+<?php
+ namespace League\CommonMark\Extension\HeadingPermalink\Slug; use League\CommonMark\Normalizer\SlugNormalizer; @trigger_error(sprintf('%s is deprecated; use %s instead', DefaultSlugGenerator::class, SlugNormalizer::class), E_USER_DEPRECATED); final class DefaultSlugGenerator implements SlugGeneratorInterface { public function createSlug(string $input): string { $slug = \trim($input); $slug = \mb_strtolower($slug); $slug = \preg_replace('/\s+/u', '-', $slug) ?? $slug; $slug = \preg_replace('/[^\p{L}\p{Nd}\p{Nl}\p{M}-]+/u', '', $slug) ?? $slug; return $slug; } } 

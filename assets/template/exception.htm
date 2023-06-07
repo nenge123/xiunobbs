@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHP ERROR</title>
+</head>
+
+<body style="background-color: #c5d6e5;padding: 1em;">
+    <div class="alert alert-danger">
+        <div class="alert-title">
+            <b>
+                <!--{echo $language[get_class($exception)]}-->:
+                <!--{echovar $exception->getCode()}--></b>
+        </div>
+        <div class="alert-body" style="background-color: #aed9ff;color: red;padding: .5rem;">
+            <p>
+                <!--{echo strtr($exception->getMessage(),array('Call to undefined method'=>$language['call_undefined_method'],'Call to undefined function'=>$language['call_undefined_function'],'You have an error in your SQL syntax;'=>$language['sql_syntax'],'check the manual that corresponds to your MySQL server version for the right syntax to use near'=>$language['check_manual_near'],'Unsupported operand types'=>$language['unsupported_type'],'parse error'=>$language['parse_error'],'failed at'=>$language['failed_at']))}-->
+            </p>
+            <!--{if $exception instanceof mysqli_sql_exception}-->
+            <p>Sql state:
+                <!--{echo $exception->getSqlState()}--> | Sql code:
+                <!--{echovar $exception->getCode()}-->
+            </p>
+            <!--{/if}-->
+            <!--{if $array_trace = $exception->getTrace()}-->
+            <ul>
+                <!--{loop $array_trace $v}-->
+                <li><span>
+                    <!--{if !empty($v['class'])}--><!--{$v['class']}--><!--{echo htmlentities(!empty($v['type'])?$v['type']:'::')}-->
+                    <!--{if !empty($v['function'])}--><!--{$v['function']}-->(<!--{if !empty($v['args'])}--><!--{echo implode(',',array_map(fn($f)=>str_replace($myapp->data['path']['root'],'',$f),$v['args']))}--><!--{/if}-->)<!--{/if}-->
+                    <!--{elseif !empty($v['function'])}--><!--{$v['function']}-->(<!--{if !empty($v['args'])}--><!--{echo implode(',',array_map(fn($f)=>str_replace($myapp->data['path']['root'],'',$f),$v['args']))}--><!--{/if}-->)<!--{/if}-->
+                    </span><!--{if !empty($v['file'])}--><b style="font-size: 12px;color: #1385e9;"><!--{echo !empty($myapp->data['path']['root'])?str_replace($myapp->data['path']['root'],'',$v['file']):$v['file'];}-->(<!--{echovar $v['line']}-->)</b><!--{/if}-->
+                </li>
+                <!--{/loop}-->
+            </ul>
+            <!--{else}-->
+            <p><b style="font-size: 12px;color: #1385e9;">
+                    <!--{echo !empty($myapp->data['path']['root'])?str_replace($myapp->data['path']['root'],'',$exception->getFile()):$exception->getFile ();}-->(
+                    <!--{echo $exception->getLine()}-->)</b></p>
+            <!--{/if}-->
+        </div>
+        <div class="alert-foot">
+            <ul>
+                <!--{loop get_included_files() $v}-->
+                <li><!--{echo !empty($myapp->data['path']['root'])?str_replace($myapp->data['path']['root'],'',$v):$v;}--></li>
+                <!--{/loop}-->
+            </ul>
+        </div>
+    </div>
+</body>
+
+</html>

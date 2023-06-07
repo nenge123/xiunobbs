@@ -1,0 +1,2 @@
+<?php
+ namespace League\CommonMark\Extension\TableOfContents; use League\CommonMark\Block\Element\Document; use League\CommonMark\Extension\TableOfContents\Node\TableOfContents; interface TableOfContentsGeneratorInterface { public function generate(Document $document): ?TableOfContents; } \class_exists(TableOfContents::class); 

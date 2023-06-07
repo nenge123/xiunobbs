@@ -1,0 +1,74 @@
+	<header class="xn-header">
+		<div class="container">
+			<div class="menu-btn" xn-action="togglePrevActive"><span></span></div>
+			<h1>
+				<img alt="{$myapp['settings']['site_name']}" src="{$sitelink['images']}logo.png"/>
+				<a href="{$sitelink['root']}">{$myapp['settings']['site_name']}</a>
+			</h1>
+			<div class="right-menu">
+				<!--{if empty($myapp['user']['uid'])}-->
+				<div><a class="btn i-login" href="{url sign-in}">{lang login}</a></div>
+				<div><a class="btn i-register" href="{url sign-up}">{lang register}</a></div>
+				<!--{else}-->
+				<div class="user-avatar">
+					<a href="{url my}">
+						<img alt="{$myapp['user'][username]}" src="<!--{echo $myapp->avatar($myapp['user'])}-->">
+						<span><!--{$myapp['user'][username]}--></span>
+					</a>
+				</div>
+				<div><a class="btn i-settings" href="{url user}">{lang setting}</a></div>
+				<!--{if $myapp['user']['gid'] == 1}-->
+				<div><a class="btn i-admin" href="{url admin}">{lang admin_page}</a></div>
+				<!--{/if}-->
+				<div><a class="btn i-loginout" href="{url sign-out}">{lang logout}</a></div>
+				<!--{/if}-->
+			</div>
+		</div>
+		<div class="container">
+			<nav>
+				<div class="item"><a class="i-home<!--{if $myapp['router'][0]=='index'}--> active<!--{/if}-->" href="{$sitelink['root']}"><!--{lang index_page}--></a></div>
+				<!--{if !empty($myapp['navlist'])}-->
+				<!--{loop $myapp['navlist'] $k $v}-->
+				<div class="item">
+					<a class="i-nav-{$k}<!--{if $k==$myapp['router'][1]}--> active<!--{/if}-->" href="{$v['url']}">{$v['name']}</a>
+					<!--{if !empty($v['submenu'])}-->
+					<ul>
+						<!--{loop $v['submenu'] $s $m}-->
+						<li><a href="{$m['url']}" class="class="i-nav-{$k}-{$s}">{$m['name']}</a></li>
+						<!--{/loop}-->
+					</ul>
+					<!--{/if}-->
+				</div>
+				<!--{/loop}-->
+				<!--{else}-->
+				<!--{loop $myapp->allowforum() $k $fid}-->
+				<!--{eval $v = $myapp->data['forumlist'][$fid]}-->
+				<!--{if empty($v['fup'])}-->
+				<div class="item<!--{if !empty($v['subforum'])}--> submenu<!--{/if}-->">
+					<a class="i-forumid-{$k}<!--{if $v['fid']==$forum_id}--> active<!--{/if}-->" href="<!--{echo $myapp->url('forum-'.$v['fid'])}-->"><!--{$v['name']}--></a>
+					<!--{if !empty($v['subforum'])}-->
+					<ul>
+						<!--{loop $v['subforum'] $s $m}-->
+						<!--{if $sforum = $myapp['forumlist'][$m]}-->
+						<li>
+							<a href="{url "forum-".$m}" class="class="i-forumid-<!--{$m}--><!--{if $m == $forum_id}--> active<!--{/if}-->">{$sforum['name']}</a>
+						</li>
+						<!--{/if}-->
+						<!--{/loop}-->
+					</ul>
+					<!--{/if}-->
+				</div>
+				<!--{/if}-->
+				<!--{/loop}-->
+				<div class="item"><a class="i-doc<!--{if $myapp['router'][0]=='document'}--> active<!--{/if}-->" href="{url document}">document</a></div>
+				<!--{/if}-->
+			</nav>
+			<div class="right-menu">
+				<form class="search" action="{url search}" method="post">
+					<input type="text">
+					<button type="submit">&#61442;</button>
+				</form>
+				<a class="post-btn" href="{url post-$forum_id a=k}">{lang create_thread}</a>
+			</div>
+		</div>
+	</header>

@@ -1,0 +1,36 @@
+<!--{template header.htm}-->
+<main class="xn-main">
+	<div class="container">
+		<div class="xn-breadcrumb">
+			<ol>
+				<li><a href="{$sitelink['root']}" aria-label="<!--{$language['index_page']}-->" class="home">&#61461;</a></li>
+				<li><a href="<!--{url forum-$forum_id}-->"><!--{$forum['name']}--></a></li>
+				<li class="active"><a href="<!--{echo $myapp->url($scriptThread)}-->" title="<!--{$language['index_page']}-->返回主题第一页"><!--{$thread['subject']}--></a></li>
+			</ol>
+		</div>
+		<div class="xn-content">
+			<!--{if !empty(list($postlist,$postFirst,$postAttach)=$myapp->F('get_postlist',$thread,$page,$myapp['settings']['thread_size'],$threadQuery))}-->
+			<!--{if !empty($post = $postFirst)}-->
+			<div class="box-post">
+				<div class="box-header">
+					<h1 class="box-title">{$thread['subject']}</h1>
+					<p>
+						<span class="username">{$postFirst['username']}</span>
+						<span>{lang post_by}</span>
+						<time><!--{echo $myapp->F('date_format_local',$thread['create_date'])}--></time>
+					</p>
+				</div>
+				<div class="box-body">
+<!--{subtemplate list/postleft}-->
+				</div>
+			</div>
+			<!--{/if}-->
+            <div class="reply-list">
+			<!--{subtemplate list/postreply}-->
+			</div>
+			<!--{/if}-->
+		</div>
+	</div>
+</main>
+<!--{template footer.htm}-->
+<!--{hook thread_js.htm}-->

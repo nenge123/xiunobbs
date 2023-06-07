@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="<!--{$myapp['langName']}-->">
+<head>
+	<meta charset="utf-8">
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" >
+	<!--{if $myapp['mobile']}-->
+	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no,width=device-width">
+	<!--{/if}-->
+	<title><!--{$myapp['title']}--> {lang admin_index_page}  - {$myapp['settings']['site_name']}</title>
+	<link rel="stylesheet" href="admin:style.scss">
+</head>
+<body class="module-{echo $myapp['router'][0]}{if !empty($myapp['mobile'])} mobile{/if}">
+<header>
+	<div class="container">
+		<div class="site">
+			<a href="{url admin}">
+				<img src="{$sitelink['images']}logo.png">
+				<span>{lang XBBS}</span>
+			</a>
+		</div>
+		<div class="menu">
+			<a href="{url user-$myapp['user']['uid']}">{$myapp['user']['username']}</a>
+			<a href="{url index}">{lang front_index_page}</a>
+			<a href="{url sign-out}">{lang logout}</a>
+		</div>
+	</div>
+</header>
+<main class="xn-main">
+	<div class="container-left">
+		<button type="button" class="menu-open"></button>
+		<ul>
+			<li>
+				<h3 class="i-settings"><a href="{url admin-settings}" ajax="getPage">{lang admin_setting_base}</a></h3>
+				<ul>
+					<li><a href="#site">{lang title_site}</a></li>
+					<li><a href="#privacy">{lang title_privacy}</a></li>
+					<li><a href="#time">{lang title_time}</a></li>
+					<li><a href="#language">{lang title_language}</a></li>
+					<li><a href="#forum">{lang title_forum}</a></li>
+					<li><a href="#thread">{lang title_thread}</a></li>
+					<li><a href="#post">{lang title_post}</a></li>
+					<li><a href="#attach">{lang title_attach}</a></li>
+					<li><a href="#update">{lang title_update}</a></li>
+					<li><a href="#verify">{lang title_verify}</a></li>
+				</ul>
+			</li>
+			<li>
+				<h3 class="i-smtp"><a href="{url admin-smtp}" ajax="getPage">{lang admin_smtp}</a></h3>
+			</li>
+			<li>
+				<h3 class="i-forum"><a href="{url admin-forum}" ajax="getPage">{lang admin-forum}</a></h3>
+			</li>
+		</ul>
+	</div>
+	<div class="container-right">

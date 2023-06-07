@@ -1,0 +1,63 @@
+<!--{if !empty($threadlist['top'])}-->
+<ul>
+    <!--{loop $threadlist['top'] $k $thread}-->
+    <li>{$thread['subject']}</li>
+    <!--{/loop}-->
+</ul>
+<!--{/if}-->
+<ul class="thread-list-base">
+<!--{loop $threadlist['list'] $tid $thread}-->
+    <li class="media" tid="{$thread['tid']}">
+    <!--{if !empty($allowEditThread)&&$thread['fid'] == $forum_id}-->
+        <label>
+            <input tabindex="11" type="checkbox" name="tid" value="<!--{$thread['tid']}-->" placeholder="{lang edit}"/>
+            <p>{lang edit}</p>
+        </label>
+    <!--{/if}-->
+        <a href="<!--{echo $myapp->url('user-'.$thread['uid'])}-->" class="avatar">
+            <img alt="{$thread['uid']}" src="<!--{echo $myapp->avatar($thread['uid'])}-->">
+        </a>
+        <div class="media-body">
+            <div class="subject">
+            <!--{if !empty($thread['closed'])}-->
+                <i class="i-closed">&#61475;</i>
+            <!--{/if}-->
+            <!--{if !empty($thread['top'])}--><!--{if $thread['top']>0}-->
+                <i class="i-top-<!--{$thread['top']}-->">&#61581;</i>
+            <!--{else}-->
+                <i class="i-bottom-<!--{echo abs($thread['top'])}-->">&#61581;</i>
+            <!--{/if}-->
+            <!--{/if}-->
+                <a class="title" href="<!--{echo $myapp->url('thread-'.$thread['tid'])}-->"><!--{$thread['subject']}--></a>
+            <!--{if !empty($thread['images'])}-->
+                <i class="i-img">&#61502;</i>
+            <!--{elseif !empty($thread['files'])}-->
+                <i class="i-attach">&#61788;</i>
+            <!--{/if}-->
+            <!--{if !empty($thread['tagid'])&&empty($myapp['tagslist'])}-->
+                <i class="i-tags-{$thread['tagid']}">{$myapp['tagslist'][$thread['tagid']]}</i>
+            <!--{/if}-->
+            </div>
+            <div class="info">
+                <span class="username"><!--{$thread['username']}--></span>
+            <!--{if in_array($thread['gid'],array(1,2,3))}-->
+                <span class="badge gid-{$thread['gid']}">{$myapp['grouplist'][$thread['gid']]['name']}</span>
+            <!--{/if}-->
+                <span class="nsbp">&#62098;</span>
+                <span class="date"><!--{timehuman $thread['create_date']}--></span>
+            <!--{if $thread['posts']>0&&!empty($thread['lastuser'])}-->
+                <span class="lastby">{lang last_reply_by}</span>
+                <span class="username"><!--{$thread['lastuser']}--></span>
+                <span class="date"><!--{timehuman $thread['last_date']}--></span>
+            <!--{/if}-->
+            </div>
+        </div>
+        <div class="reply-num"><!--{$thread['posts']}--></div>
+    </li>
+<!--{/loop}-->
+<!--{if empty($threadlist)}-->
+    <li>
+        <div><!--{$language['none']}--></div>
+    </li>
+<!--{/if}-->
+</ul>

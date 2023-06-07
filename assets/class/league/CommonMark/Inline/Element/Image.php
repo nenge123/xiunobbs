@@ -1,0 +1,2 @@
+<?php
+ namespace League\CommonMark\Inline\Element; class Image extends AbstractWebResource { public function __construct(string $url, ?string $label = null, ?string $title = null) { parent::__construct($url); if (!empty($label)) { $this->appendChild(new Text($label)); } if (!empty($title)) { $this->data['title'] = $title; } } } 

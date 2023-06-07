@@ -1,0 +1,35 @@
+        <div class="group {$v['type']}">
+            <!--{if $v['type']=='radio'}-->
+            <div class="left">
+                <span><!--{$language[$k.'_txt']}-->:</span>
+                <!--{loop $v['option'] $xk $xo}-->
+                <label>
+                    <input type="radio" name="{$k}" value="{$xk}" {if isset($settings[$k])&&$settings[$k]==$xk || empty($settings[$k])&&isset($v['defalut'])&&$v['defalut']==$xk}checked{/if}>
+                    <span>{$xo}</span>
+                </label>
+                <!--{/loop}-->
+            </div>
+            <!--{else}-->
+            <label>
+                <span><!--{$language[$k.'_txt']}-->:</span>
+                <!--{if $v['type']=='text'}-->
+                <input type="text" name="{$k}" value="<!--{if isset($settings[$k])}--><!--{$settings[$k]}--><!--{else}--><!--{$v['value']}-->{/if}">
+                <!--{elseif $v['type']=='textarea'}-->
+                <textarea name="{$k}" rows="4">{if isset($settings[$k])}{$settings[$k]}{/if}</textarea>
+                <!--{elseif $v['type']=='select'}-->
+                <select name="{$k}">
+                    <!--{loop $v['option'] $xk $xo}-->
+                    <!--{if isset($v['key'])}-->
+                    <option value="{$xo}" {if empty($settings[$k])&&$xo==$v['defalut']||isset($settings[$k])&&$xo===$settings[$k]}selected{/if}>{echo $myapp->language->offsetExists($xo)?$language[$xo]:$xo}</option>
+                    <!--{elseif is_int($xk)}-->
+                    <option value="{$xk}" {if empty($settings[$k])&&$xk==$v['defalut']||isset($settings[$k])&&$xk===$settings[$k]}selected{/if}>{echo $myapp->language->offsetExists($xo)?$language[$xo]:$xo}</option>
+                    <!--{else}-->
+                    <option value="{$xk}" {if empty($settings[$k])&&$xk==$v['defalut']||isset($settings[$k])&&$xk===$settings[$k]}selected{/if}>{$xo}</option>
+                    <!--{/if}-->
+                    <!--{/loop}-->
+                </select>
+                <!--{/if}-->
+            </label>
+            <!--{/if}-->
+            <div class="info"><!--{$language[$k.'_info']}--></div>
+        </div>

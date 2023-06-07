@@ -1,0 +1,20 @@
+<!--{template "header"}-->
+<style>
+@font-face {
+    font-family: "bootstrap-v4";
+    src: url(/xiunobbs4/assets/fonts/static/bootstrap-icons-v4.woff2) format("woff2"), url(/xiunobbs4/assets/fonts/static/bootstrap-icons-v4.woff) format("woff")
+}
+.allicon{
+    font-family:'bootstrap-v4';
+    font-size: 26px;
+    font-style: normal;
+    display: block;
+}
+</style>
+<div style="display:flex;flex-wrap: wrap;align-items: center;justify-content: center;">
+
+<!--{for($i=61697;$i<63380;$i++)}-->
+    <p style="display:inline-block ;padding: 1rem;text-align: center;"><i class="allicon">&#{$i};</i><span style="display:block">\{echo dechex($i)}</span>&amp;#{echo $i};</p>
+<!--{/for}-->
+</div>
+<!--{template "footer"}-->

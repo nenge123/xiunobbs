@@ -1,0 +1,2 @@
+<?php
+ namespace League\CommonMark\Block\Parser; use League\CommonMark\ContextInterface; use League\CommonMark\Cursor; interface BlockParserInterface { public function parse(ContextInterface $context, Cursor $cursor): bool; } 

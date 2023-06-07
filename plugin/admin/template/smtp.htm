@@ -1,0 +1,52 @@
+<!--{if empty($_GET['inajax'])}--><!--{template admin:common/header.htm}--><!--{/if}-->
+<div class="content">
+    <form method="post" action="{url admin-smtp}" ajax="basePost">
+        <div class="box-smtp">
+            <div class="box-header">
+                <h3 class="box-title"></h3>
+            </div>
+            <div class="box-body">
+                <p>
+                    <button type="submit">{lang submit}</button>
+                </p>
+                <table>
+                    <tr>
+                        <th>{lang smtp_mail_txt}</th>
+                        <th>{lang smtp_host_txt}</th>
+                        <th>{lang smtp_port_txt}</th>
+                        <th>{lang smtp_user_txt}</th>
+                        <th>{lang smtp_password_txt}</th>
+                        <th>{lang smtp_action_txt}</th>
+                    </tr>
+                    <!--{if !empty($smtplist)}-->
+                    <!--{loop $smtplist $k $v}-->
+                    <tr>
+                        <td><input type="text" name="email[]" value="{$v['email']}"></td>
+                        <td><input type="text" name="host[]" value="{$v['host']}"></td>
+                        <td><input type="text" name="port[]" value="{$v['port']}"></td>
+                        <td><input type="text" name="user[]" value="{$v['user']}"></td>
+                        <td><input type="text" name="pass[]" value="{$v['pass']}"></td>
+                        <td><button type="button" xn-action="smtpDelete">{lang delete}</button></td>
+                    </tr>
+                    <!--{/loop}-->
+                    <!--{/if}-->
+                    <!--{for($i=0;$i<5;$i++)}-->
+                    <tr>
+                        <td><input type="text" name="email[]" value=""></td>
+                        <td><input type="text" name="host[]" value=""></td>
+                        <td><input type="text" name="port[]" value=""></td>
+                        <td><input type="text" name="user[]" value=""></td>
+                        <td><input type="text" name="pass[]" value=""></td>
+                        <td>{lang smtp_new_txt}</td>
+                    </tr>
+                    <!--{/for}-->
+                </table>
+                <p>
+                    <button type="submit">{lang submit}</button>
+                </p>
+            </div>
+        </div>
+    </form>
+</div>
+<!--{template admin:common/status.htm}-->
+<!--{if empty($_GET['inajax'])}--><!--{template admin:common/footer.htm}--><!--{/if}-->

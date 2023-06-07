@@ -1,0 +1,2 @@
+<?php
+ namespace League\CommonMark\Block\Renderer; use League\CommonMark\Block\Element\AbstractBlock; use League\CommonMark\ElementRendererInterface; use League\CommonMark\HtmlElement; interface BlockRendererInterface { public function render(AbstractBlock $block, ElementRendererInterface $htmlRenderer, bool $inTightList = false); } 

@@ -1,0 +1,43 @@
+<!--{template "header"}-->
+<main id="index-body">
+	<div class="index-box">
+		<div class="box-header">
+			<div class="box-title">小伙伴</div>
+			<button class="box-title-right icon-sign">签到</button>
+		</div>
+		<div class="box-body"></div>
+	</div>
+
+</main>
+<main class="xn-main">
+	<div class="container">
+		<div class="xn-content">
+			<!--{if !empty($threadlist = DB::t('thread')->indexlist($page))}-->
+			<div class="box-card">
+				<div class="box-header">
+					<a class="box-title <!--{if $myapp['router'][0]=='index'}--> active<!--{/if}-->" href="{url index}"><!--{$language['new_thread']}--></a>
+					<div class="menu">
+
+					</div>
+				</div>
+				<div class="box-body">
+					<!--{template list/index}-->
+				</div>
+			</div>		
+			<!--{else}-->
+			<div class="box-card">
+				<div class="box-body">{$language['none']}</div>
+			</div>
+			<!--{/if}-->
+		</div>	
+		<aside>
+			<div class="box-card">
+				<div class="box-header"><h3 class="box-title">{lang site_about}</h3></div>
+				<div class="box-body min-font">
+					{lang site_about_txt}
+				</div>
+			</div>
+		</aside>
+	</div>
+</main>
+<!--{template footer}-->

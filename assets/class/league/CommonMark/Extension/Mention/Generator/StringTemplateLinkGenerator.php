@@ -1,0 +1,2 @@
+<?php
+ namespace League\CommonMark\Extension\Mention\Generator; use League\CommonMark\Extension\Mention\Mention; use League\CommonMark\Inline\Element\AbstractInline; final class StringTemplateLinkGenerator implements MentionGeneratorInterface { private $urlTemplate; public function __construct(string $urlTemplate) { $this->urlTemplate = $urlTemplate; } public function generateMention(Mention $mention): ?AbstractInline { return $mention->setUrl(\sprintf($this->urlTemplate, $mention->getIdentifier())); } } 

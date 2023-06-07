@@ -1,0 +1,143 @@
+<!--{if empty($_GET['inajax'])}--><!--{template admin:common/header.htm}--><!--{/if}-->
+<div class="content">
+    <h1>{lang index_welcome} - {lang version}{$myapp['settings']['version']}</h1>
+    <p>{lang index_tips}</p>
+    <div>
+        <!--{eval $status = $myapp->DB('FetchTableRows','online,user,post,thread,attach')}-->
+        <!--{if !empty($status)}-->
+        <div class="box-info">
+            <div class="box-header">
+                <h3 class="box-title"><!--{lang site_stat_info}--></h3>
+            </div>
+            <div class="box-body">
+                <ul class="status">
+                    <li>
+                        <b><!--{lang threads}-->：</b>
+                        <span><!--{$status['thread']}--></span>
+                    </li>
+                    <li>
+                        <b><!--{lang posts}-->：</b>
+                        <span><!--{$status['post']}--></span>
+                    </li>
+                    <li>
+                        <b><!--{lang users}-->：</b>
+                        <span><!--{$status['user']}--></span>
+                    </li>
+                    <li>
+                        <b><!--{lang attachs}-->：</b>
+                        <span><!--{$status['attach']}--></span>
+                    </li>
+                    <li>
+                        <b><!--{lang disk_free_space}-->：</b>
+                        <span><!--{echo $myapp->F('humansize',disk_free_space($myapp->path->root))}--></span>
+                    </li>
+                    <li>
+                        <b><!--{lang onlines}-->：</b>
+                        <span><!--{$status['online']}--></span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <!--{/if}-->
+        <div class="box-info">
+            <div class="box-header">
+                <h3 class="box-title"><!--{lang server_info}--></h3>
+            </div>
+            <div class="box-body">
+                <ul>
+                    <li>
+                        <b><!--{lang os}-->：</b>
+                        <span><!--{echo PHP_OS}--></span>
+                    </li>
+                    <li>
+                        <b>Web Server：</b>
+                        <span><!--{$_SERVER['SERVER_SOFTWARE']}--></span>
+                    </li>
+                    <li>
+                        <b>PHP：</b><!--{echo PHP_VERSION}-->
+                    </li>
+                    <!--{if !empty($dbinfo = $myapp->DB('support'))}-->
+                    <li>
+                        <b><!--{lang database}-->：</b>
+                        <span><!--{$dbinfo['type']}--><small> (<!--{$dbinfo['version']}-->)</small></span>
+                    </li>
+                    <!--{/if}-->
+                    <li>
+                        <b><!--{lang post_max_size}-->：</b>
+                        <span><!--{echo ini_get('post_max_size')}--></span>
+                    </li>
+                    <li>
+                        <b><!--{lang upload_max_filesize}-->：</b>
+                        <span><!--{echo ini_get('upload_max_filesize')}--></span>
+                    </li>
+                    
+                    <li>
+                        <b><!--{lang allow_url_fopen}-->：</b>
+                        <span><!--{echo $language[ini_get('allow_url_fopen') ? 'yes':'no']}--></span>
+                    </li>
+                    <li>
+                        <b><!--{lang safe_mode}-->：</b>
+                        <span><!--{echo $language[ini_get('safe_mode') ? 'yes':'no']}--></span>
+                    </li>
+                    <li>
+                        <b><!--{lang max_execution_time}-->：</b>
+                        <span><!--{echo ini_get('max_execution_time')}-->s</span>
+                    </li>
+                    
+                    <li>
+                        <b><!--{lang memory_limit}-->：</b>
+                        <span><!--{echo ini_get('memory_limit')}--></span>
+                    </li>
+                    <li>
+                        <b><!--{lang client_ip}-->：</b>
+                        <span><!--{echo $myapp->ip()}--></span>
+                    </li>
+                    <li>
+                        <b><!--{lang server_ip}-->：</b>
+                        <span><!--{echo empty($_SERVER['REMOTE_ADDR'])?$_SERVER['REMOTE_ADDR']:$_SERVER['REMOTE_ADDR']}--></span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="box-info">
+            <div class="box-header">
+                <h3 class="box-title"><!--{lang dev_team_info}--></h3>
+            </div>
+            <div class="box-body">
+                <ul class="link">
+                    <li>
+                        <h6>{lang main_program}</h6>
+                        <ul>
+                            <li>
+                                <span>Nenge</span>
+                                <a href="#">{lang a_link}</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <h6>{lang test_for}</h6>
+                        <ul>
+                            <li>none</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <h6>{lang thanks_for}</h6>
+                        <ul>
+                            <li>none</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <h6>{lang edit_for}</h6>
+                        <ul>
+                            <li>none</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="box-footer">
+                <p class="end">{lang keep_text_on_edit}</p></div>
+        </div>
+    </div>
+</div>
+<!--{template admin:common/status.htm}-->
+<!--{if empty($_GET['inajax'])}--><!--{template admin:common/footer.htm}--><!--{/if}-->

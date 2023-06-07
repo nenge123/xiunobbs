@@ -1,0 +1,21 @@
+<div class="debug">
+    <div class="container"><!--{echo $myapp->DeBug()}--></div>
+</div>
+<footer class="xn-footer">
+    <div class="container">
+        <p>
+            <span>©2022-2023&nbsp;Nenge.&nbsp;All&nbsp;Rights&nbsp;Reserved.</span>
+            <b>
+                <span>{lang XBBS}</span>
+                <span><!--{$myapp['settings']['version']}--></span>
+            </b>
+        </p>
+        <p>
+            <span><!--{$language["sql_query"]}-->:&nbsp;</span>
+            <b><!--{echo $myapp->sqlnum()}--></b>
+            <span>,&nbsp;<!--{$language["processed"]}-->:&nbsp;</span>
+            <b><!--{echo $myapp->cost()}-->s</b>
+            <span>,&nbsp;<!--{$language["server_time"]}-->:&nbsp;<!--{echo date('Y/m/d H:i:s')}--></span>
+        </p>
+    </div>
+</footer>

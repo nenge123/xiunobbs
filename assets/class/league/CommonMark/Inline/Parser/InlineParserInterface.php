@@ -1,0 +1,2 @@
+<?php
+ namespace League\CommonMark\Inline\Parser; use League\CommonMark\InlineParserContext; interface InlineParserInterface { public function getCharacters(): array; public function parse(InlineParserContext $inlineContext): bool; } 

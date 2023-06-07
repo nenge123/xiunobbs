@@ -1,0 +1,2 @@
+<?php
+ namespace League\CommonMark\Event; abstract class AbstractEvent { private $propagationStopped = false; final public function isPropagationStopped(): bool { return $this->propagationStopped; } final public function stopPropagation(): void { $this->propagationStopped = true; } } 

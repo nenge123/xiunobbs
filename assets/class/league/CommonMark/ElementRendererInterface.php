@@ -1,0 +1,2 @@
+<?php
+ namespace League\CommonMark; use League\CommonMark\Block\Element\AbstractBlock; use League\CommonMark\Inline\Element\AbstractInline; interface ElementRendererInterface { public function getOption(string $option, $default = null); public function renderInline(AbstractInline $inline): string; public function renderInlines(iterable $inlines): string; public function renderBlock(AbstractBlock $block, bool $inTightList = false): string; public function renderBlocks(iterable $blocks, bool $inTightList = false): string; } 

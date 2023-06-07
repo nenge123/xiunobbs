@@ -1,0 +1,2 @@
+<?php
+ namespace League\CommonMark\Extension; use League\CommonMark\ConfigurableEnvironmentInterface; interface ExtensionInterface { public function register(ConfigurableEnvironmentInterface $environment); } 

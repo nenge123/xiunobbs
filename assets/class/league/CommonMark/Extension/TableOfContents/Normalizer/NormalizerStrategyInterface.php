@@ -1,0 +1,2 @@
+<?php
+ namespace League\CommonMark\Extension\TableOfContents\Normalizer; use League\CommonMark\Block\Element\ListItem; interface NormalizerStrategyInterface { public function addItem(int $level, ListItem $listItemToAdd): void; } 

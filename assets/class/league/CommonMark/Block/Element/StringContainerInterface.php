@@ -1,0 +1,2 @@
+<?php
+ namespace League\CommonMark\Block\Element; use League\CommonMark\ContextInterface; use League\CommonMark\Cursor; interface StringContainerInterface { public function addLine(string $line); public function getStringContent(): string; public function handleRemainingContents(ContextInterface $context, Cursor $cursor); } 

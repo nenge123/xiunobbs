@@ -1,0 +1,2 @@
+<?php
+ namespace League\CommonMark\Extension\TableOfContents\Node; use League\CommonMark\Block\Element\ListBlock; use League\CommonMark\Extension\TableOfContents\TableOfContents as DeprecatedTableOfContents; final class TableOfContents extends ListBlock { } \class_exists(DeprecatedTableOfContents::class); 
