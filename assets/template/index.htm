@@ -1,43 +1,26 @@
 <!--{template "header"}-->
 <main id="index-body">
+	<!--{subtemplate index/online}-->
 	<div class="index-box">
-		<div class="box-header">
-			<div class="box-title">小伙伴</div>
-			<button class="box-title-right icon-sign">签到</button>
-		</div>
-		<div class="box-body"></div>
-	</div>
-
-</main>
-<main class="xn-main">
-	<div class="container">
-		<div class="xn-content">
-			<!--{if !empty($threadlist = DB::t('thread')->indexlist($page))}-->
-			<div class="box-card">
-				<div class="box-header">
-					<a class="box-title <!--{if $myapp['router'][0]=='index'}--> active<!--{/if}-->" href="{url index}"><!--{$language['new_thread']}--></a>
-					<div class="menu">
-
-					</div>
-				</div>
-				<div class="box-body">
-					<!--{template list/index}-->
-				</div>
-			</div>		
-			<!--{else}-->
-			<div class="box-card">
-				<div class="box-body">{$language['none']}</div>
-			</div>
-			<!--{/if}-->
-		</div>	
-		<aside>
-			<div class="box-card">
-				<div class="box-header"><h3 class="box-title">{lang site_about}</h3></div>
-				<div class="box-body min-font">
-					{lang site_about_txt}
-				</div>
-			</div>
-		</aside>
-	</div>
+    <div class="box-header np">
+        <ul class="box-title forum-title">
+			<li{if empty($_GET['type'])} class="active"{/if}><a class="icon-forum" href="{url index}">最新</a></li>
+			<li{if $myapp->GET('type') == '1'} class="active"{/if}><a class="icon-forum" href="{url index type=1}">精华</a></li>
+			<li{if $myapp->GET('type') == '2'} class="active"{/if}><a class="icon-forum" href="{url index type=2}">新帖</a></li>
+			<li{if $myapp->GET('type') == '3'} class="active"{/if}><a class="icon-forum" href="{url index type=3}">板块</a></li>
+		</ul>
+    </div>
+    <div class="box-body">
+		<!--{if $myapp->GET('type') == '1'}-->
+			<!--{template index/jinghua}-->
+		<!--{elseif $myapp->GET('type') == '2'}-->
+			<!--{template index/newthread}-->
+		<!--{elseif $myapp->GET('type') == '3'}-->
+			<!--{template index/forumlist}-->
+		<!--{else}-->
+			<!--{template index/lastthread}-->
+		<!--{/if}-->
+    </div>
+</div>
 </main>
 <!--{template footer}-->

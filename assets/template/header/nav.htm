@@ -2,8 +2,8 @@
 		<div class="container">
 			<div class="menu-btn" xn-action="togglePrevActive"><span></span></div>
 			<h1>
-				<img alt="{$myapp['settings']['site_name']}" src="{$sitelink['images']}logo.png"/>
-				<a href="{$sitelink['root']}">{$myapp['settings']['site_name']}</a>
+				<img alt="{$myapp['settings']['site_name']}" src="{$myapp['site']['images']}logo.png"/>
+				<a href="{$myapp['site']['root']}">{$myapp['settings']['site_name']}</a>
 			</h1>
 			<div class="right-menu">
 				<!--{if empty($myapp['user']['uid'])}-->
@@ -26,7 +26,7 @@
 		</div>
 		<div class="container">
 			<nav>
-				<div class="item"><a class="i-home<!--{if $myapp['router'][0]=='index'}--> active<!--{/if}-->" href="{$sitelink['root']}"><!--{lang index_page}--></a></div>
+				<div class="item"><a class="i-home<!--{if $myapp['router'][0]=='index'}--> active<!--{/if}-->" href="{$myapp['site']['root']}"><!--{lang index_page}--></a></div>
 				<!--{if !empty($myapp['navlist'])}-->
 				<!--{loop $myapp['navlist'] $k $v}-->
 				<div class="item">

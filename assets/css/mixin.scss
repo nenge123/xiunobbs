@@ -1,0 +1,60 @@
+@mixin  flex-nowarp {
+    display: flex;
+    flex-wrap: nowrap;
+}@mixin  flex-warp {
+    display: flex;
+    flex-wrap: wrap;
+}
+@mixin  flex-center {
+    @include flex-nowarp();
+    align-items: center;
+}
+@mixin  flex-lr-center {
+    @include flex-center();
+    justify-content: space-between;
+}
+@mixin  flex-l-center {
+    @include flex-center();
+    justify-content:flex-start;
+}
+@mixin  flex-r-center {
+    @include flex-center();
+    justify-content:flex-end;
+}
+@mixin flex-column {
+    @include flex-nowarp();
+    flex-direction:column;
+}
+@mixin flex-column-lr {
+    @include flex-nowarp();
+    flex-direction:column;
+    align-items: stretch;
+    justify-content: flex-start;
+}
+
+@mixin font-text($font: '') {
+    @if not $font or $font== '' {
+        $font: 'bootstrap';
+    }
+    font-family: $font;
+}
+@mixin font-before($font: '') {
+    @include flex-l-center;
+    &::before {
+        display: inline-block;
+        margin-right: 2px;
+        @include font-text($font);
+        @content;
+    }
+}
+@mixin font-after($font: '',$flex:'') {
+    @if not $flex or $flex== '' {
+        @include flex-l-center;
+    }
+    &::before {
+        display: inline-block;
+        margin-left: 2px;
+        @include font-text($font);
+        @content;
+    }
+}

@@ -454,7 +454,7 @@ class DB
 				$sql .= $quote_name. ($param_cdt == '=' ? 'IS' : 'IS NOT') . ' NULL ' . $cstr;
 				continue;
 			}
-			if (is_array($value)) {
+			if (is_array($value)&&array_is_list($value)) {
 				if (empty($value)) continue;
 				$len = count($value);
 				if ($len == 1) {
@@ -485,12 +485,15 @@ class DB
 					}
 					$sql .= '( ' . rtrim($sqlx, ' AND ') . ' ) ' . $cstr;
 				}
-			} else {
+			} else if(is_string($value)){
 				$sql .= $quote_name . $param_cdt . ' ? ' . $cstr;
 				$query['param'][] = $value;
 			}
 		}
-		if(!empty($sql))$query['sql'] .= 'WHERE ' . rtrim($sql, $cstr);
+		if(!empty($sql)){
+			$query['sql'] .= 'WHERE ' . rtrim($sql, $cstr);
+			#print_r($sql);exit;
+		}
 		return $query;
 	}
 	private function prepare_filter_order($query)

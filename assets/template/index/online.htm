@@ -1,0 +1,19 @@
+<div class="index-box">
+    <div class="box-header">
+        <div class="box-title icon-online">小伙伴</div>
+        <button class="box-title-right icon-sign">签到</button>
+    </div>
+    <!--{if $onlinelist = DB::t('user')->online($myapp['time'] - $myapp['settings']['update_online'])}-->
+    <div class="box-body">
+        <ul class="index-online-list">
+        <!--{loop $onlinelist $id $u}-->
+            <li>
+                <img src="{$myapp->avatar($u['uid'])}" height="48">
+                <!--{ifvar $u['login_date']}--><p>{timehuman $u['login_date']}</p><!--{/if}-->
+                <p>{$u['username']}</p>
+            </li>	
+        <!--{/loop}-->	
+        </ul>
+    </div>
+    <!--{/if}-->
+</div>

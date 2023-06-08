@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="<!--{$myapp->conf['lang'] ?? $sitelink['images']}-->">
+<html lang="<!--{$myapp->conf['lang'] ?? {$myapp['site']['images']}-->">
 <head>
 	<meta charset="utf-8">
 	<meta name="keywords" content="<!--{$myapp['keywords']}-->" />
@@ -9,35 +9,51 @@
 	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no,width=device-width">
 	<title><!--{$myapp['title']}--> - {$myapp['settings']['site_name']}</title>
 	<meta name="hash" content="{$myapp['hash']}">
-	<link rel="shortcut icon" href="<!--{$sitelink['images']}-->favicon.ico" />
-	<link rel="icon" sizes="32x32" href="<!--{$sitelink['images']}-->favicon.ico">
-	<link rel="Bookmark" href="<!--{$sitelink['images']}-->favicon.ico" />
-	<link rel="stylesheet" href="common.scss">
+	<link rel="shortcut icon" href="<!--{$myapp['site']['images']}-->favicon.ico" />
+	<link rel="icon" sizes="32x32" href="<!--{$myapp['site']['images']}-->favicon.ico">
+	<link rel="Bookmark" href="<!--{$myapp['site']['images']}-->favicon.ico" />
+	<link rel="stylesheet" href="{$myapp['site']['css']}static/font-HarmonySanc.css">
 	<link rel="stylesheet" href="origin.scss">
 </head>
 <body class="module-{echo $myapp['router'][0]}{if !empty($myapp['mobile'])} mobile{/if}">
-<header id="header">
+<header id="header" class="active">
 	<div class="top-navbar">
-		<a href="{$myapp['site']['root']}" class="logo"><img src="{$myapp['site']['images']}logo.png" alt="{lang index_page}"></a>
-		<ul class="nav-center">
+		<button type="button" class="nav-menu"></button>
+		<span class="nav-site">{$myapp['settings']['site_name']}</span>
+		<a href="{$myapp['site']['root']}" class="nav-logo"><img src="{$myapp['site']['images']}logo.png" height="30" alt="{lang index_page}"></a>
+		<div class="nav-center">
+			<ul class="nav-list">
 				<li class="nav-item"><a href="{$myapp['site']['root']}" class="icon-home">{lang index_page}</a></li>
 				<li class="nav-item">
 					<span class="icon-bbs">{lang bbs}</span>
 					<!--{if $allowforum = $myapp->allowforum()}-->
-					<nav>
+					<nav class="nav-subitem">
 						<!--{loop $allowforum $fid}-->
-						<a href="{url 'forum-'.$fid}"><img src="{echo $myapp->forumimg($fid)}" alt="{$myapp['forumlist'][$fid]['name']}">{$myapp['forumlist'][$fid]['name']}</a>
+						<a href="{url 'forum-'.$fid}"><img src="{echo $myapp->forumimg($fid)}" height="21" alt="{$myapp['forumlist'][$fid]['name']}">{$myapp['forumlist'][$fid]['name']}</a>
 						<!--{/loop}-->
 					</nav>
 					<!--{/if}-->
 				</li>
-				<li>
+				<li class="nav-item-search">
 					<form action="{url search}" method="post">
-						<input type="text">
-						<button type="submit">{lang search}</button>
+						<label>
+						<input type="text" name="word" class="nav-search" placeholder="关键字">
+						<button type="submit" class="nav-search-btn">{lang search}</button>
+						</label>
 					</form>
 				</li>
 			</ul>
-		<div class="nav-right"></div>
+			<div class="nav-right">
+				<!--{ifvar $myapp['uid']}-->
+				<button class="nav-notice"></button>
+				<button class="nav-write"></button>
+				<a href="{url my}" class="nav-my"><img src="{$myapp->avatar($myapp['uid'])}"></a>
+				<a href="{url sign-out}" class="nav-signup">退出</a>
+				<!--{else}-->
+				<a href="{url sign-in}" class="nav-signin">登录</a>
+				<a href="{url sign-up}" class="nav-signup">注册</a>
+				<!--{/if}-->
+			</div>
+		</div>
 	</div>
 </header>

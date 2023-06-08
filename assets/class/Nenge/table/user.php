@@ -1,7 +1,7 @@
 <?php
 namespace Nenge\table;
 class table_user extends base{
-    public $list = [];
+    public array $list = array();
     function __construct()
     {
         $this->table = 'user';
@@ -33,5 +33,13 @@ class table_user extends base{
         if(isset($this->list[$uid])) return $this->list[$uid];
         $this->list[$uid] = $this->fetch(array('uid'=>$uid));
         return $this->list[$uid];
+    }
+    public function online($time,$limit=15)
+    {
+        $result = $this->all(array('>:login_date'=>$time),array('order'=>array('login_date'=>'DESC'),'limit'=>$limit));
+        if(!empty($result)){
+            $this->list += $result;
+        }
+        return $result;
     }
 }

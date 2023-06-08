@@ -406,7 +406,7 @@ class APP implements \ArrayAccess
         ini_set('session.cookie_path', $this->conf['cookie_path']);
         ini_set('session.cookie_httponly', 'On');
         set_error_handler(array($this, 'error_handler'));
-        set_exception_handler(array($this, 'exception_handler'));
+        set_exception_handler(array($this, 'error_exception_handler'));
         $get = array();
         $router = array();
         $get_first = array_key_first($_GET);
@@ -528,13 +528,11 @@ class APP implements \ArrayAccess
     }
     public static function GET($name)
     {
-        $GET = self::app()->data['GET'];
-        return empty($GET[$name]) ? '' : $GET[$name];
+        return empty($_GET[$name]) ? '' : $_GET[$name];
     }
     public static function POST($name)
     {
-        $POST = self::app()->data['POST'];
-        return empty($POST[$name]) ? '' : trim($POST[$name]);
+        return empty($_POST[$name]) ? '' : trim($_POST[$name]);
     }
     public static function url($router, $param = '', $clear = true)
     {
@@ -556,7 +554,8 @@ class APP implements \ArrayAccess
             return dirname($_SERVER['URL']) . '/' . $router . $query;
         } else {
             if (!empty($query)) $query = '&' . $query;
-            return str_replace('index.php', '', $_SERVER['URL']) . '?' . $router . '.html' . $query;
+            $result = $_SERVER['URL']. '?' . $router . '.html' . $query;
+            return strtr($result,array('/index.php'=>'/','?index.html&'=>'?'));
         }
     }
     public static function avatar($user)
@@ -621,15 +620,12 @@ class APP implements \ArrayAccess
     {
         return '<span style="display:inline-block;background:#f95543;color:#000;border:1px solid #313131;font-size:12px;border-radius:.25rem;padding:1px;"><b>' . $level . ':</b>' . $errfile . '(' . $errline . ')<b style="color:#fff;">' . $errstr . '</b></span>';
     }
-    public function exception_handler($exception)
+    public function error_exception_handler($exception)
     {
         #print_r($exception);
+        ob_end_clean();
         include $this->template('exception');
         $this->exit();
-    }
-    public function error_notice($errno, $errstr, $errfile, $errline)
-    {
-        return $errstr;
     }
     public $session_fields = array('uid', 'gid', 'username', 'realname', 'login_date', 'logins');
     public function session_tokens($user)
