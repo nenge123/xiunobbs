@@ -381,9 +381,9 @@ class APP implements \ArrayAccess
             $router_arr = explode('-', $router_key);
             foreach ($router_arr as $k => $v) {
                 $router[] = $v;
-                if($k==1&&!is_numeric($router[0])){
-                    $router[$router[0]] = $v;
-                }
+            }
+            if(!empty($router[0])&&!is_numeric($router[0])){
+                $router[$router[0]] = isset($router[1])?$router[1]:'';
             }
         }
         return $router;
@@ -538,6 +538,7 @@ class APP implements \ArrayAccess
     {
         $data = self::app()->data;
         $query = $clear ? array() : $data['get'];
+        $URL = str_replace('/index.php','/',$_SERVER['URL']);
         if (!empty($param)) {
             if (is_string($param)) parse_str($param, $param);
             $query = array_merge($query, $param);
@@ -551,11 +552,11 @@ class APP implements \ArrayAccess
             if ($data['settings']['site_rewrite'] == 1) $router .= '.html';
             else if ($data['settings']['site_rewrite'] == 2) $router = str_replace('-', '/', $router) . '/';
             if (!empty($query)) $query = '?' . $query;
-            return dirname($_SERVER['URL']) . '/' . $router . $query;
+            return $URL. $router . $query;
         } else {
             if (!empty($query)) $query = '&' . $query;
-            $result = $_SERVER['URL']. '?' . $router . '.html' . $query;
-            return strtr($result,array('/index.php'=>'/','?index.html&'=>'?'));
+            $result = $URL. '?' . $router . '.html' . $query;
+            return strtr($result,array('/?index.html&'=>'/?','/?index.html'=>'/'));
         }
     }
     public static function avatar($user)
