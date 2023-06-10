@@ -1,2 +1,0 @@
-<?php
- namespace League\CommonMark\Inline\Element; use League\CommonMark\Node\Node; abstract class AbstractInline extends Node { public $data = []; public function isContainer(): bool { return false; } public function getData(string $key, $default = null) { return isset($this->data[$key]) ? $this->data[$key] : $default; } } 

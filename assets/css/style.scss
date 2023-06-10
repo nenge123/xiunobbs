@@ -1,0 +1,20 @@
+@import 'functions.scss';
+@import 'mixin.scss';
+$max-width: 1140px;
+$full-width: 992px;
+$bg-color: #eff2f6;
+$c-white: #fff;
+body {
+    background-color: $bg-color;
+    margin: 0;
+    padding: 0;
+    font-size: 1rem;
+}
+@font-face {
+    font-family: 'bootstrap';
+    src: url(fontPath('static/bootstrap-icons-v4.woff2')) format('woff2'),
+        url(fontPath('static/bootstrap-icons-v4.woff')) format('woff');
+}
+@import 'origin/header.scss';
+@import 'origin/body.scss';
+@import 'origin/footer.scss';

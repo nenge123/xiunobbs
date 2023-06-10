@@ -1,2 +1,0 @@
-<?php
- namespace League\CommonMark\Inline\Element; class AbstractStringContainer extends AbstractInline { protected $content = ''; public function __construct(string $contents = '', array $data = []) { $this->content = $contents; $this->data = $data; } public function getContent(): string { return $this->content; } public function setContent(string $contents) { $this->content = $contents; return $this; } } 

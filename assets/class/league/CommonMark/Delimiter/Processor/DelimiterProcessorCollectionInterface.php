@@ -1,2 +1,0 @@
-<?php
- namespace League\CommonMark\Delimiter\Processor; interface DelimiterProcessorCollectionInterface { public function add(DelimiterProcessorInterface $processor); public function getDelimiterProcessor(string $char): ?DelimiterProcessorInterface; public function getDelimiterCharacters(): array; } 

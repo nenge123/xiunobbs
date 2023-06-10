@@ -1,5 +1,46 @@
 <?php
 defined('XIUNO')||die('return to <a href="">Home</a>');
+$myapp->data['title'] = $language['thread_not_exists'];
+if(!empty($router_value)&&is_numeric($router_value)){
+    $thread = Nenge\DB::t('thread')->fetch(array('tid'=>$router_value));
+    if(!empty($thread)){
+            if(in_array($thread['fid'],$myapp->allowforum())){
+                #无权访问  板块
+                #$myapp->exit($language['insufficient_visit_forum_privilege']);
+            $myapp->data['title'] = $thread['subject'];
+            $only = !1;
+            $order = 'ASC';
+            $limit = 40;
+            $page = 1;
+            if(empty($_GET['page'])){
+                $page = !empty($myapp->data['router'][2])&&is_numeric($myapp->data['router'][2])?intval($myapp->data['router'][2]):1;
+                $order = !empty($myapp->data['router'][3])&&$myapp->data['router'][2]=='DESC'?'DESC':'ASC';
+
+            }else{
+                $page = intval($_GET['page']);
+                $page = $page?:1;
+                if(!empty($_GET['order'])){
+                    $order = $_GET['order']=='DESC'?'DESC':'ASC';
+                }
+            }
+            if(!empty($_GET['only'])){
+                $only = $thread['uid'];
+            }
+            $url_order = '-'.$order;
+            $order = strtoupper($order);
+            $postlist = Nenge\DB::t('post')->page_by_tid($thread['tid'],$page,$order,$only,$limit);
+            if($order == 'ASC'){
+                $floor = ($page-1)*40+1;
+            }else{
+                $floor = $thread['posts']+2;
+            }
+        }else{
+            $thread = null;
+        }
+    }
+}
+include $myapp->template('thread');
+/*
 $thread_id = intval($myapp->router->act);
 if(!$thread_id){
     $myapp->exit($language['thread_not_exists']);
@@ -205,6 +246,7 @@ if($myapp->data['method']=='POST'){
     }
     $myapp->json($_POST);
     */
+    /*
     $myapp->json($errorPost);
 }
 #$attach_pids = [];
@@ -221,3 +263,5 @@ if(!empty($myapp->DB('Update','thread',array('+:views'=>1),array('tid'=>$thread_
     $thread['views'] += 1;
 }
 include $myapp->getTemplate($myapp->data['settings']['thread_template']);
+*/
+?>

@@ -1,0 +1,245 @@
+
+
+#header {
+    padding: 0px max(#{space_width_half($max-width)}, 5px);
+}
+#header{
+    background-color: #ffffffdb;
+    backdrop-filter: blur(10.5px);
+    border: 0 solid #ffffff12;
+    box-shadow: #8e8e8e12 0 6px 15px 0;
+    border-radius: 0;
+    button,input{
+        border: none;
+        outline: none;
+        background: transparent;
+    }
+    a {
+        text-decoration: none;
+    }
+    .nav-subitem{
+        @include flex-column-lr;
+        img {
+            margin-right: 0.25rem;
+            border-radius: 0.25rem;
+        }
+    }
+    .nav-right{
+        
+        color: #00000080;
+        @include flex-r-center;
+        font-size: 0.875rem;
+    }
+    form label {
+        @include flex-l-center;
+        &:hover {
+            .nav-search {
+                border-bottom: 1px solid #1970c7;
+            }
+            .nav-search-btn {
+                color: #1970c7;
+            }
+            .nav-search-btn::before {
+                content: '\f133';
+            }
+        }
+    }
+    .nav-search {
+        border-bottom: 1px solid #dee2e6;
+        height: 30px;
+        font-size: 0.875rem;
+        text-align: center;
+    }
+    .nav-search-btn {
+        @include bootstrap-before() {
+            content: '\f786';
+        }
+        font-size: 1rem;
+        color: #00000080;
+    }
+
+}
+.top-navbar {
+    @include flex-lr-center;
+}
+@media screen and (min-width: $full-width) {
+    #header {
+        position: sticky;
+        top: 0px;
+        z-index: 100;
+        .nav-menu,.nav-site{
+            display: none;
+        }
+        .nav-logo {
+            display: inline-block;
+            padding-top: 0.3125rem;
+            padding-bottom: 0.3125rem;
+            margin-right: 1rem;
+            img {
+                height: 1.8rem;
+            }
+        }
+        .nav-center {
+            @include flex-lr-center;
+            flex-grow: 1;
+            a {
+                color: #00000080;
+            }
+        }
+        .nav-list{
+            flex-grow: 1;
+            @include flex-l-center;
+            list-style: none;
+            padding: 0px;
+            margin: 0px;
+            font-size: 14px;
+            color: #00000080;
+        }
+        .nav-item {
+            position: relative;
+            font-size: 14px;
+            nav {
+                display: none;
+                position: absolute;
+                z-index: 1;
+                background: #fff;
+                padding: 0.5rem 0px;
+
+                a {
+                    @include flex-center;
+                    padding: 0.25rem;
+                    min-width: 120px;
+                    font-weight: 300;
+                    color: #212529;
+                    font-size: 0.875rem;
+                    transition: background-color 250ms cubic-bezier(0.27, 0.01, 0.38, 1.06),
+                        color 250ms cubic-bezier(0.27, 0.01, 0.38, 1.06);
+
+                    &:hover {
+                        color: #16181b;
+                        background-color: #eceeef;
+                    }
+                }
+            }
+            &:hover {
+                color: #1970c7;
+                nav {
+                    @include flex-column-lr;
+                }
+                > a {
+                    color: #1970c7;
+                }
+            }
+        }
+        .icon-home {
+            padding: 1rem;
+            @include bootstrap-before() {
+                content: '\f424';
+            }
+        }
+        .icon-bbs {
+            padding: 1rem;
+            @include bootstrap-before() {
+                content: '\f5b1';
+            }
+        }
+        .nav-right {
+            > * {
+                color: #00000080;
+                padding: 1rem;
+            }
+            a {
+                img {
+                    border-radius: 0.25rem;
+                    height: 2.4rem;
+                }
+            }
+        }
+        .nav-notice {
+            @include bootstrap-before() {
+                content: '\f18a';
+            }
+        }
+        .nav-write {
+            @include bootstrap-before() {
+                content: '\f266';
+            }
+        }
+    }
+}
+@media screen and (max-width: #{$full-width  - 1} ) {
+    #header{
+        .nav-menu{
+            padding: 1rem;
+            font-size: 1rem;
+            @include bootstrap-before(){
+                content: '\f585';
+            }
+        }
+        .nav-logo{
+            display: none;
+        }
+    }
+    #header:not([class~='active']){
+        .nav-menu,.nav-center{
+            width: 50px;
+            text-align: center;
+        }
+        .nav-site{
+            text-align: center;
+            display: inline-block;
+            width: calc(100% - 100px);
+        }
+        .nav-signup,.nav-my,.nav-write{
+            display: none
+        }
+        .nav-list{
+            display: none;
+        }
+    }
+    #header.active{
+        .nav-site{
+            display: none;
+        }
+        .nav-right{
+            order: -1;
+            text-align: right;
+        }
+        .nav-list{
+            list-style: none;
+            padding-left: 10px;
+        }
+        .nav-item{
+            margin-bottom: .8rem;
+        }
+        .nav-item>*:first-child{
+            display: block;
+            border-left: 3px solid #007bff;
+            padding-left: 2px;
+            margin-bottom: .5rem;
+        }
+        .nav-center{
+            @include flex-column-lr;
+            position: fixed;
+            left:0px;
+            right: 0px;
+            bottom: 0px;
+            top: 50px;
+            padding-right: unquote("max(20vw,calc(100vw - 300px))");
+            height:calc(100vh - 50px);
+            background-color:#16181b59;
+            z-index: 999;
+            &::after{
+                position: absolute;
+                width: unquote("min(80vw,300px)");
+                height:calc(100vh - 50px);
+                left:0px;
+                top: 0px;
+                bottom: 0px;
+                background-color:#eff2f6e3;
+                z-index: -1;
+                content: '';
+            }
+        }
+    }
+}

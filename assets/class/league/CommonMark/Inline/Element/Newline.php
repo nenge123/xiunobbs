@@ -1,2 +1,0 @@
-<?php
- namespace League\CommonMark\Inline\Element; class Newline extends AbstractInline { const HARDBREAK = 0; const SOFTBREAK = 1; protected $type; public function __construct(int $breakType = self::HARDBREAK) { $this->type = $breakType; } public function getType(): int { return $this->type; } } 

@@ -1,18 +1,55 @@
-
-			<!--{if !empty($threadlist = DB::t('thread')->indexlist($page))}-->
-			<div class="box-card">
-				<div class="box-header">
-					<a class="box-title <!--{if $myapp['router'][0]=='index'}--> active<!--{/if}-->" href="{url index}"><!--{$language['new_thread']}--></a>
-					<div class="menu">
-
-					</div>
-				</div>
-				<div class="box-body">
-					<!--{template list/index}-->
-				</div>
-			</div>		
-			<!--{else}-->
-			<div class="box-card">
-				<div class="box-body">{$language['none']}</div>
-			</div>
-			<!--{/if}-->
+<!--{eval if(empty($thread_field))$thread_field='last_date';}-->
+<!--{eval if(empty($thread_order))$thread_order='DESC';}-->
+<!--{eval if(empty($digest))$digest=false;}-->
+<!--{eval if(empty($fids))$fids=array();}-->
+<!--{eval if(empty($thread_time))$thread_time=0;}-->
+<!--{if !empty($threadlist = DB::t('thread')->page_by_time($thread_time,$thread_field,$thread_order,$fids,40,$digest))}-->
+<!--{ifvar $threadlist['top']}-->
+<ul class="thread-list">
+    <!--{loop $threadlist['top'] $tid $thread}-->
+    <li class="thread-item">
+        <a class="thread-top" href="{url 'thread-'.$tid}"></a>
+        <div class="thread-info">
+            <div class="thread-subject">
+                <a href="{url 'thread-'.$thread['tid']}">{$thread['subject']}</a>
+            </div>
+            <div class="thread-meta">
+                <a href="{url 'forum-'.$thread['fid']}"><!--{$myapp['forumlist'][$thread['fid']]['name']}--></a>
+                <a href="{url 'space-'.$thread['uid']}"><!--{$thread['username']}--></a>
+                <span><!--{time $thread['create_date']}--></span>
+                <a href="{url 'space-'.$thread['lastuid']}"><!--{$thread['lastuser']}--></a>
+                <span>发表于<!--{timehuman $thread['last_date']}--></span>
+            </div>
+        </div>
+    </li>
+    <!--{/loop}-->
+</ul>
+<!--{/if}-->
+<!--{ifvar $threadlist['list']}-->
+<ul class="thread-list">
+    <!--{loop $threadlist['list'] $tid $thread}-->
+    <li class="thread-item">
+        <a class="thread-left" href="{url 'space-'.$thread['uid']}">
+            <img src="{echo $myapp->avatar($thread['uid'])}" height="30">
+        </a>
+        <div class="thread-info">
+            <div class="thread-subject">
+                <a href="{url 'thread-'.$thread['tid']}">{$thread['subject']}</a>
+            </div>
+            <div class="thread-meta">
+                <a href="{url 'forum-'.$thread['fid']}"><!--{$myapp['forumlist'][$thread['fid']]['name']}--></a>
+                <a href="{url 'space-'.$thread['uid']}"><!--{$thread['username']}--></a>
+                <span><!--{time $thread['create_date']}--></span>
+                <a href="{url 'space-'.$thread['lastuid']}"><!--{$thread['lastuser']}--></a>
+                <span>发表于<!--{timehuman $thread['last_date']}--></span>
+            </div>
+        </div>
+    </li>
+    <!--{/loop}-->
+</ul>
+<!--{/if}-->
+<!--{else}-->
+<div class="box-card">
+    <div class="box-body">{lang none}</div>
+</div>
+<!--{/if}-->

@@ -1,2 +1,0 @@
-<?php
- namespace League\CommonMark\Util; interface ConfigurationInterface { public const MISSING = '833f2700-af8d-49d4-9171-4b5f12d3bfbc'; public function merge(array $config = []); public function replace(array $config = []); public function get(?string $key = null, $default = null); public function set(string $key, $value = null); } 

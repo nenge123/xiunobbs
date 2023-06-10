@@ -32,29 +32,78 @@
     justify-content: flex-start;
 }
 
-@mixin font-text($font: '') {
+@mixin  flex-full {
+    display: flex;
+    align-items: stretch;;
+}
+@mixin font-text($flex:'',$font:'') {
     @if not $font or $font== '' {
         $font: 'bootstrap';
     }
     font-family: $font;
 }
-@mixin font-before($font: '') {
-    @include flex-l-center;
+@mixin bootstrap-v4 {
+    display: inline-block;
+    line-height: 1;
+    vertical-align: -.125em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+@mixin bootstrap-before($flex:'') {
+    @if $flex == 'true' {
+        @include flex-l-center;
+    }@else{
+        &::before{
+            @include bootstrap-v4;
+        }
+    }
     &::before {
         display: inline-block;
         margin-right: 2px;
-        @include font-text($font);
+        @include font-text('bootstrap');
         @content;
     }
 }
-@mixin font-after($font: '',$flex:'') {
-    @if not $flex or $flex== '' {
+@mixin bootstrap-after($flex:'') {
+    @if $flex == 'true' {
         @include flex-l-center;
+    }@else{
+        &::after{
+            @include bootstrap-v4;
+        }
     }
     &::before {
         display: inline-block;
         margin-left: 2px;
-        @include font-text($font);
+        @include font-text('bootstrap');
         @content;
+    }
+}
+@mixin basebox {
+    @include flex-column-lr;
+    margin-bottom: 1rem;
+    border: none;
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.08) !important;
+    min-width: 0;
+    word-wrap: break-word;
+    .box-header {
+        @include flex-lr-center;
+        margin-bottom: 0;
+        border: 1px solid #dee2e6;
+        border-radius: 0.25rem 0.25rem 0 0;
+        background-image: linear-gradient(0deg, #e9ecef, #f8f9fa);
+        &:not([class~='np']){
+            padding: 0.75rem 1.25rem;
+        }
+        & ~ .box-body {
+            border-top: none;
+        }
+    }
+
+    .box-body {
+        border: 1px solid #dee2e6;
+        background-color:#fff;
+        flex: 1 1 auto;
+        min-height: 1px;
     }
 }

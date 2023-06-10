@@ -1,2 +1,0 @@
-<?php
- declare(strict_types=1); namespace League\CommonMark\Normalizer; final class SlugNormalizer implements TextNormalizerInterface { public function normalize(string $text, $context = null): string { $slug = \trim($text); $slug = \mb_strtolower($slug); $slug = \preg_replace('/\s+/u', '-', $slug) ?? $slug; $slug = \preg_replace('/[^\p{L}\p{Nd}\p{Nl}\p{M}-]+/u', '', $slug) ?? $slug; return $slug; } } 

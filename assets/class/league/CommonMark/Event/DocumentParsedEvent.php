@@ -1,2 +1,0 @@
-<?php
- namespace League\CommonMark\Event; use League\CommonMark\Block\Element\Document; final class DocumentParsedEvent extends AbstractEvent { private $document; public function __construct(Document $document) { $this->document = $document; } public function getDocument(): Document { return $this->document; } } 

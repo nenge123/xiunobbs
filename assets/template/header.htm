@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="<!--{$myapp->conf['lang'] ?? {$myapp['site']['images']}-->">
+<html lang="<!--{$myapp->conf['lang'] ?? 'zh-cn'}-->">
 <head>
 	<meta charset="utf-8">
 	<meta name="keywords" content="<!--{$myapp['keywords']}-->" />
@@ -13,7 +13,7 @@
 	<link rel="icon" sizes="32x32" href="<!--{$myapp['site']['images']}-->favicon.ico">
 	<link rel="Bookmark" href="<!--{$myapp['site']['images']}-->favicon.ico" />
 	<link rel="stylesheet" href="{$myapp['site']['css']}static/font-HarmonySanc.css">
-	<link rel="stylesheet" href="origin.scss">
+	<link rel="stylesheet" href="style.scss">
 </head>
 <body class="module-{echo $myapp['router'][0]}{if !empty($myapp['mobile'])} mobile{/if}">
 <header id="header" class="active">

@@ -1,5 +1,10 @@
 <?php
 defined('XIUNO')||die('return to <a href="">Home</a>');
+if(!empty( $myapp->data['forumlist'][$router_value]['name'])){ 
+    $myapp->data['title'] = $myapp->data['forumlist'][$router_value]['name'];
+}
+include $myapp->template('forum');
+/*
 $forum_id = intval($myapp->router->act);
 $forum_id = $forum_id ?:1;
 if(empty($myapp->data['forumlist'][$forum_id])||!empty($myapp['forumlist'][$forum_id]['display'])){
@@ -125,6 +130,7 @@ if(!empty($myapp['settings']['forum_info'])){
     $forum['todayposts'] = $nowforum['todayposts'];
     $forum['todaythreads'] = $nowforum['todaythreads'];
     */
+    /*
     $forum = array_merge($forum,$nowforum);
 }
 #设置默认 查询排序
@@ -139,3 +145,5 @@ $myapp->data['title']= $forum['name'];
 
 $myapp->getCache('threadtop');
 include $myapp->getTemplate($myapp->data['settings']['forum_template']);
+*/
+?>

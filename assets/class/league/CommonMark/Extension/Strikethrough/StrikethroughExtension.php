@@ -1,2 +1,0 @@
-<?php
- namespace League\CommonMark\Extension\Strikethrough; use League\CommonMark\ConfigurableEnvironmentInterface; use League\CommonMark\Extension\ExtensionInterface; final class StrikethroughExtension implements ExtensionInterface { public function register(ConfigurableEnvironmentInterface $environment) { $environment->addDelimiterProcessor(new StrikethroughDelimiterProcessor()); $environment->addInlineRenderer(Strikethrough::class, new StrikethroughRenderer()); } } 

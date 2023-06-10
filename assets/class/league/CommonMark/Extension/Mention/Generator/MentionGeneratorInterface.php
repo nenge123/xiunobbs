@@ -1,2 +1,0 @@
-<?php
- namespace League\CommonMark\Extension\Mention\Generator; use League\CommonMark\Extension\Mention\Mention; use League\CommonMark\Inline\Element\AbstractInline; interface MentionGeneratorInterface { public function generateMention(Mention $mention): ?AbstractInline; } 

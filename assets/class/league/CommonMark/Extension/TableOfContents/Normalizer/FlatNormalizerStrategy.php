@@ -1,2 +1,0 @@
-<?php
- namespace League\CommonMark\Extension\TableOfContents\Normalizer; use League\CommonMark\Block\Element\ListItem; use League\CommonMark\Extension\TableOfContents\Node\TableOfContents; final class FlatNormalizerStrategy implements NormalizerStrategyInterface { private $toc; public function __construct(TableOfContents $toc) { $this->toc = $toc; } public function addItem(int $level, ListItem $listItemToAdd): void { $this->toc->appendChild($listItemToAdd); } } \class_exists(TableOfContents::class); 

@@ -1,2 +1,0 @@
-<?php
- namespace League\CommonMark\Inline\Renderer; use League\CommonMark\ElementRendererInterface; use League\CommonMark\HtmlElement; use League\CommonMark\Inline\Element\AbstractInline; interface InlineRendererInterface { public function render(AbstractInline $inline, ElementRendererInterface $htmlRenderer); } 

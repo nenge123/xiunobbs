@@ -1,140 +1,36 @@
 <!--{template header}-->
-	<main class="xn-main">
-		<div class="container">
-			<div class="xn-breadcrumb">
-				<ol>
-					<li><a href="{$myapp['site']['root']}" aria-label="<!--{$language['index_page']}-->" class="home">&#61461;</a></li>
-					<li><a href="<!--{url forum-$forum_id}-->"><!--{$forum['name']}--></a></li>
-				</ol>
-			</div>
-			<div class="xn-content">
-				<!--{if !empty($myapp['forumlist'][$forum_id]['subforum'])}-->
-				<div class="box-card">
-					<div class="box-header" xn-action="hideBox">
-						<h3 class="box-title">{lang subforum}</h3>
-					</div>
-					<div class="box-body" hidden>
-						<ul class="subforum">
-						<!--{loop $myapp['forumlist'][$forum_id]['subforum'] $k $v}-->
-							<li><a href="{url forum-$k}">{$v}</a></li>
-						<!--{/loop}-->
-						</ul>
-					</div>
-				</div>
-				<!--{/if}-->
-				<!--{if !empty($threadlist = $myapp->F('get_forumthread',$forum_id,$page,$myapp['settings']['forum_size'],$myapp['settings']['forum_order']))}-->
-				<div class="box-card">
-					<div class="box-header">
-						<a class="box-title<!--{if empty($myapp->router->do)}--> active<!--{/if}-->" href="{url forum-$forum_id}"><!--{$language['new_thread']}--></a>
-						<div class="menu">
-							<!--{if !empty($allowEditThread)}-->
-							<button type="button" xn-action="openForumTheadsEdit">&#61459;&nbsp;{lang plcz}</button>
-							<!--{/if}-->
-						</div>
-					</div>
-					<div class="box-body">
-						<!--{if !empty($myapp['settings']['template_list_forum'])}-->
-						<!--{template($myapp['settings']['template_list_forum'])}-->
-						<!--{else}-->
-						<!--{template list/thread_base}-->
-						<!--{/if}-->
-						<!--{if !empty($allowEditThread)}-->
-						<form class="edit-thread" ajax="editThread" method="post" action="{url forum-$forum_id}">
-							<h3 class="title"><span>&#61459;&nbsp;{lang plcz}</span><span class="close">&#61453;</span></h3>
-							<div class="ebody">
-								<input type="hidden" value="" name="tids">
-								<ul class="list"></ul>
-								<p class="act">
-									<select name="action" title="{lang operation}">
-										<option value="2">{lang top_1}</option>
-										<option value="1">{lang top_3}</option>
-										<option value="8">{lang top_2}</option>
-										<option value="3">{lang top_0}</option>
-										<option value="7">{lang top_end}</option>
-										<option value="4">{lang close_thread}</option>
-										<option value="5">{lang open_thread}</option>
-										<option value="6">{lang move_forum}</option>
-										<option value="9">{lang delete}</option>
-									</select>
-									<select name="forumid" title="{lang forum_list}">
-										<!--{loop $myapp['forumsname'] $k $v}-->
-										<option value="{$k}">{$v}</option>
-										<!--{/loop}-->
-									</select>
-								</p>
-								<p class="end"><button type="submit">{lang submit}</button></p>
-							</div>
-						</form>
-						<!--{/if}-->
-					</div>
-				</div>
-				<!--{else}-->
-				<div class="box-card">
-					<div class="box-body">{$language['none']}</div>
-				</div>
-				<!--{/if}-->
-				<!--{if !empty($pagination = $myapp->F('pagination',$page,$forum['threads'],$myapp['settings']['thread_size']))}-->
-				<ul class="pagination">
-					<!--{loop $pagination $k $v}-->
-					<li><a href="<!--{url forum-$forum_id-$v[page]}-->" <!--{if $v['page'] == $page||$page==0&&$v['page']==1}-->class="active"<!--{/if}-->>{$v['name']}</a></li>
-					<!--{/loop}-->
-				</ul>
-				<!--{/if}-->
-			</div>
-			<aside>
-				<div class="box-card">
-					<div class="box-body">
-						<p class="center"><img src="{$forum['img_url']}"></p>
-						<p>{$forum['brief']}</p>
-					</div>
-					<!--{if !empty($myapp['settings']['forum_info'])}-->
-					<div class="box-footer lightblue">
-						<ul class="forum-status">
-							<li>
-								<p class="i-text i-thread">&#62098;</p>
-								<p><span>{lang threads}</span><strong>{$forum['threads']}</strong></p>
-							</li>
-							<li>
-								<p class="i-text i-todaypost">&#61446;</p>
-								<p><span>{lang forum_todaypost}</span><strong>{$forum['todayposts']}</strong></p>
-							</li>
-							<li>
-								<p class="i-text i-todaythread">&#61829;</p>
-								<p><span>{lang forum_todaythread}</span><strong>{$forum['todaythreads']}</strong></p>
-							</li>
-						</ul>
-					</div>
-					<!--{/if}-->
-				</div>
-				<!--{if !empty($forum['modlist'])}-->
-				<div class="box-card">
-					<div class="box-header">
-						<h3 class="box-title">{lang forum_modlist}</h3>
-					</div>
-					<div class="box-body">
-						<ul class="forum-modlist">
-							<!--{loop $forum['modlist'] $k $v}-->
-							<li><a href="{url user-$k}"><img src="<!--{echo $myapp->avatar(array('uid'=>$k))}-->"><span>{$v}</span></a></li>
-							<!--{/loop}-->
-						</ul>
-					</div>
-				</div>
-				<!--{/if}-->
-				<!--{if !empty($myapp['userlist'])}-->
-				<div class="box-card">
-					<div class="box-header">
-						<span class="box-title">{lang site_talk}</span>
-					</div>
-					<div class="box-body">
-						<ul class="site-talk">
-							<!--{loop $myapp['userlist'] $k $v}-->
-							<li><img src="<!--{echo $myapp->avatar($v)}-->"><p><a href="{url user-$v['uid']}">{$v['username']}</a></p></li>
-							<!--{/loop}-->
-						</ul>
-					</div>
-				</div>
-				<!--{/if}-->
-			</aside>
+<main id="forum-body">
+<!--{eval $fids = intval($router_value);}-->
+<!--{if !empty($myapp['forumlist'][$router_value])&&in_array($router_value,$myapp->allowforum())}-->
+<div class="index-box">
+    <div class="box-header np">
+        <ul class="box-title forum-title">
+			<li{if empty($_GET['type'])} class="active"{/if}><a class="icon-forum" href="{url 'forum-'.$fids}">最新</a></li>
+			<li{if $myapp->GET('type') == '1'} class="active"{/if}><a class="icon-forum" href="{url 'forum-'.$fids type=1}">精华</a></li>
+			<li{if $myapp->GET('type') == '2'} class="active"{/if}><a class="icon-forum" href="{url 'forum-'.$fids type=2}">新帖</a></li>
+		</ul>
+    </div>
+    <div class="box-body">
+		<!--{if $myapp->GET('type') == '1'}-->
+			<!--{template index/digest}-->
+		<!--{elseif $myapp->GET('type') == '2'}-->
+			<!--{template index/newthread}-->
+		<!--{else}-->
+			<!--{template index/lastthread}-->
+		<!--{/if}-->
+    </div>
+</div>
+<!--{else}-->
+<div class="index-box">
+    <div class="box-header np">
+        <div class="box-title forum-title">
+			提示
 		</div>
-	</main>
+    </div>
+    <div class="box-body">
+		板块不存在,或者你所在用户组无权访问
+	</div>
+</div>
+<!--{/if}-->
+</main>
 <!--{template footer}-->

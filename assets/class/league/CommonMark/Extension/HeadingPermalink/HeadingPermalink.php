@@ -1,2 +1,0 @@
-<?php
- namespace League\CommonMark\Extension\HeadingPermalink; use League\CommonMark\Inline\Element\AbstractInline; final class HeadingPermalink extends AbstractInline { private $slug; public function __construct(string $slug) { $this->slug = $slug; } public function getSlug(): string { return $this->slug; } } 

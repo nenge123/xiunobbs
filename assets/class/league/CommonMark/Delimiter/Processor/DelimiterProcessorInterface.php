@@ -1,2 +1,0 @@
-<?php
- namespace League\CommonMark\Delimiter\Processor; use League\CommonMark\Delimiter\DelimiterInterface; use League\CommonMark\Inline\Element\AbstractStringContainer; interface DelimiterProcessorInterface { public function getOpeningCharacter(): string; public function getClosingCharacter(): string; public function getMinLength(): int; public function getDelimiterUse(DelimiterInterface $opener, DelimiterInterface $closer): int; public function process(AbstractStringContainer $opener, AbstractStringContainer $closer, int $delimiterUse); } 

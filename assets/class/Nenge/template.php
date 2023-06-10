@@ -32,6 +32,8 @@ class template
 	public function parse($template, $cachefile = '')
 	{
 		$myapp = APP::app();
+		#语句
+		$template = preg_replace_callback('/\<\?php\s(.+?)\s\?\>/is', fn ($m) => $this->fn_php($m[1]), $template);
 		#引用子模版
 		$template = preg_replace_callback($this->regexp['subtemplate'], fn ($m) => $this->fn_contents($m[2]), $template);
 
@@ -53,7 +55,7 @@ class template
 		$template = preg_replace_callback("/[\n\r\t\s]*\{url\s(.+?)\}[\n\r\t\s]*/is", fn ($m) => $this->fn_url($m[1]), $template);
 
 		#头像
-		$template = preg_replace_callback("/[\n\r\t]*\{avatar\((.+?)\)\}[\n\r\t]*/i", fn ($m) => $this->fn_avatartags($m[1]), $template);
+		$template = preg_replace_callback("/[\n\r\t]*\{avatar\s(.+?)\}[\n\r\t]*/i", fn ($m) => $this->fn_avatartags($m[1]), $template);
 		#插入执行代码
 		$template = preg_replace_callback("/[\n\r\t]*\{eval\}[\n\r\t]*(\<\!\-\-)*(.+?)(\-\-\>)*[\n\r\t]*\{\/eval\}[\n\r\t]*/is", fn ($m) => $this->fn_evaltags($m[2]), $template);
 
@@ -70,8 +72,8 @@ class template
 		#$template = preg_replace("/\{(\\\$[a-zA-Z0-9_\-\>\[\]\'\"\$\.\x7f-\xff]+)\s(or|\?\?)\s([a-zA-Z0-9\']+)\}/s", "{echo \\1 ?? \\3}", $template);
 
 		#变量
-		$template = preg_replace("/\{(\\\$[^\}\s]+|[A-Z]+[^\}\s]+)\s\?\?\s(\\\$[^\}\s]+|[A-Z]+[^\}\s]+)\}/s",'<?=\\1?:\\2?>', $template);
-		$template = preg_replace("/\{(\\\$[^\}\s]+|[A-Z]+[^\}\s]+)\}/s",'<?=\\1?>', $template);
+		$template = preg_replace("/\{(\\\$[\w\_]+?[^\}\s;]+)\s\?\?\s(\\\$[^\}+]|['\"].+['\"])\}/is",'<?=\\1?:\\2?>', $template);
+		$template = preg_replace("/\{(\\\$[\w\_]+[^\}\s;]+)\}/is",'<?=\\1?>', $template);
 
 		#hook
 		if (!empty($myapp->data['settings']['include_hook'])) {
@@ -94,34 +96,34 @@ class template
 		$template = preg_replace_callback("/\{echovar\s([^\s]+?)((?:\s)[^\}]*)?\}/is", fn ($m) => '<?php echo empty(' . $m[1] . ')?"'.trim(isset($m[2])?$m[2]:'').'":' . $m[1] . ';?>', $template);
 
 		#if
-		$template = preg_replace_callback("/[\n\r\t\s]*{if\s(.+?)\}[\n\r\t]*/is", fn ($m) => $this->fn_stags("<? if(" . $m[1] . ") { ?>"), $template);
+		$template = preg_replace_callback("/[\n\r\t\s]*{if\s(.+?)\}[\n\r\t]*/is", fn ($m) => $this->fn_stags("<?php if(" . $m[1] . ") { ?>"), $template);
 
-		$template = preg_replace_callback("/[\n\r\t\s]*{ifvar\s(.+?)\}[\n\r\t]*/is", fn ($m) => $this->fn_stags("<? if(!empty(" . $m[1] . ")) { ?>"), $template);
+		$template = preg_replace_callback("/[\n\r\t\s]*{ifvar\s(.+?)\}[\n\r\t]*/is", fn ($m) => $this->fn_stags("<?php if(!empty(" . $m[1] . ")) { ?>"), $template);
 
 		#elseif
-		$template = preg_replace_callback("/[\n\r\t]*\{elseif\s(.+?)\}[\n\r\t]*/is", fn ($m) => $this->fn_stags("<? } elseif(" . $m[1] . ") { ?>"), $template);
+		$template = preg_replace_callback("/[\n\r\t]*\{elseif\s(.+?)\}[\n\r\t]*/is", fn ($m) => $this->fn_stags("<?php } elseif(" . $m[1] . ") { ?>"), $template);
 		#elseif
-		$template = preg_replace_callback("/[\n\r\t]*\{elseifvar\s(.+?)\}[\n\r\t]*/is", fn ($m) => $this->fn_stags("<? } elseif(!empty(" . $m[1] . ")) { ?>"), $template);
+		$template = preg_replace_callback("/[\n\r\t]*\{elseifvar\s(.+?)\}[\n\r\t]*/is", fn ($m) => $this->fn_stags("<?php } elseif(!empty(" . $m[1] . ")) { ?>"), $template);
 
 		#else
-		$template = preg_replace("/[\n\r\t]*\{else\}[\n\r\t]*/is", "<? } else { ?>", $template);
+		$template = preg_replace("/[\n\r\t]*\{else\}[\n\r\t]*/is", "<?php } else { ?>", $template);
 
 		#endif
-		$template = preg_replace("/[\n\r\t]*\{\/if\}[\n\r\t\s]*/is", "<? } ?>", $template);
+		$template = preg_replace("/[\n\r\t]*\{\/if\}[\n\r\t\s]*/is", "<?php } ?>", $template);
 		#for
-		$template = preg_replace("/[\n\r\t]*\{for\((.+?)\)\}[\n\r\t]*/is", "<? for(\\1){ ?>", $template);
+		$template = preg_replace("/[\n\r\t]*\{for\((.+?)\)\}[\n\r\t]*/is", "<?php for(\\1){ ?>", $template);
 		#endfor
-		$template = preg_replace("/[\n\r\t]*\{\/for\}[\n\r\t\s]*/is", "<? } ?>", $template);
+		$template = preg_replace("/[\n\r\t]*\{\/for\}[\n\r\t\s]*/is", "<?php } ?>", $template);
 
 		#for
-		$template = preg_replace_callback("/[\n\r\t]*\{for\s(.+?)\}[\n\r\t]*/is", fn ($m) => '<? for(' . $m[1] . '){ ?>', $template);
+		$template = preg_replace_callback("/[\n\r\t]*\{for\s(.+?)\}[\n\r\t]*/is", fn ($m) => '<?php for(' . $m[1] . '){ ?>', $template);
 
 		#loop
 		$template = preg_replace_callback("/[\n\r\t\s]*\{loop\s(\S+)\s+(\S+)\}[\n\r\t]*/is", fn ($m) => $this->fn_looptags($m[1], $m[2]), $template);
 
 		#loop
 		$template = preg_replace_callback("/[\n\r\t\s]*\{loop\s(\S+)\s+(\S+)\s+(\S+)\}[\n\r\t]*/is", fn ($m) => $this->fn_looptags($m[1], $m[2], $m[3]), $template);
-		$template = preg_replace("/[\n\r\t]*\{\/loop\}[\n\r\t\s]*/is", "<? } ?>", $template);
+		$template = preg_replace("/[\n\r\t]*\{\/loop\}[\n\r\t\s]*/is", "<?php } ?>", $template);
 
 		#常量
 		$template = preg_replace_callback("/\{" . $this->regexp['const'] . "\}/s", fn ($m) => '<?=' . $this->fn_stags($m[1]) . '?>', $template);
@@ -133,7 +135,7 @@ class template
 
 		$template = preg_replace_callback("/\<script[^\>]*?src=\"(.+?)\"(.*?)\>\s*\<\/script\>/is", fn ($m) => $this->fn_stripscriptamp($m[1], $m[2]), $template);
 
-		$template = preg_replace("/\<\?\s+/is", "<?php ", $template);
+		#$template = preg_replace("/\<\?\s+/is", "<?php ", $template);
 		$template = preg_replace("/\<\?\=(.+?)\?\>/s", "<?php echo \\1;?>", $template);
 		if (!empty($myapp->plugin['method']['template'])) {
 			foreach ($myapp->plugin['method']['template'] as $k => $v) {
@@ -186,12 +188,20 @@ class template
 		$this->replacecode['replace'][$i] = "<?php echo \$myapp->avatar($parameter);?>";
 		return $search;
 	}
+	public function fn_php($php)
+	{
+		$myapp = APP::app();
+		$i = count($this->replacecode['search']);
+		$this->replacecode['search'][$i] = $search = "<!--PHP_TAG_$i-->";
+		$this->replacecode['replace'][$i] = '<?php '.PHP_EOL.$php.PHP_EOL.'?>';
+		return $search;
+	}
 	public function fn_evaltags($php)
 	{
 		$myapp = APP::app();
 		$i = count($this->replacecode['search']);
 		$this->replacecode['search'][$i] = $search = "<!--EVAL_TAG_$i-->";
-		$this->replacecode['replace'][$i] = !empty($myapp->conf['debug']) ? '<? ' . preg_replace(array('/^L\d+[\w\.\/]*\-\-\>/', '/\<\!\-\-L\d+[\w\.\/]*\-\-\>/', '/\<\!\-\-L\d+[\w\.\/]*$/', '/^\s*\<\!\-\-/', '/\-\-\>\s*$/'), '', $php) . ';?>' : "<? {$php};?>";
+		$this->replacecode['replace'][$i] = !empty($myapp->conf['debug']) ? '<?php ' . preg_replace(array('/^L\d+[\w\.\/]*\-\-\>/', '/\<\!\-\-L\d+[\w\.\/]*\-\-\>/', '/\<\!\-\-L\d+[\w\.\/]*$/', '/^\s*\<\!\-\-/', '/\-\-\>\s*$/'), '', $php) . ';?>' : "<?php {$php};?>";
 		return $search;
 	}
 	public function fn_hooktags($hook)
@@ -243,8 +253,8 @@ class template
 		if (preg_match("/^\<\?\=(\\\$.+?)\?\>$/s", $param1, $matches)) {
 			$param1 = $matches[1];
 		}
-		if (preg_match('/\(.*\)$/', $param1) == 1) $return = '<? ';
-		else $return = '<? if(isset(' . $param1 . ') && is_array(' . $param1 . ')) ';
+		if (preg_match('/\(.*\)$/', $param1) == 1) $return = '<?php ';
+		else $return = '<?php if(!empty(' . $param1 . ') && is_array(' . $param1 . ')) ';
 		if ($param3) {
 			$return .= 'foreach(' . $param1 . ' as ' . $param2 . ' => ' . $param3 . ') { ?>';
 		} else {

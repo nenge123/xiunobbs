@@ -1,2 +1,0 @@
-<?php
- declare(strict_types=1); namespace League\CommonMark\Extension\Footnote\Node; use League\CommonMark\Inline\Element\AbstractInline; use League\CommonMark\Reference\ReferenceInterface; final class FootnoteBackref extends AbstractInline { private $reference; public function __construct(ReferenceInterface $reference) { $this->reference = $reference; } public function getReference(): ReferenceInterface { return $this->reference; } } 

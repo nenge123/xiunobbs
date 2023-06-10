@@ -1,0 +1,45 @@
+<!--{ifvar $forumlist=DB::t('forum')->all('',array('order'=>array('rank'=>'DESC')))}-->
+<ul class="forum-list">
+    <!--{loop $forumlist $fid $forum}-->
+    <!--{if in_array($fid,$myapp->allowforum())&&empty($forum['fup'])}-->
+    <li class="forum-item">
+        <div class="forum-div">
+            <div class="forum-info">
+                <img src="{$myapp->forumimg($fid)}" height="63">
+                <div class="forum-meta">
+                    <h3 class="forum-header">
+                        <a href="{url 'forum-'.$fid}"><!--{$forum['name']}--></a>
+                    </h3>
+                    <div class="forum-brief">
+                        <p>
+                            <span>主题:{$forum['threads']}</span>
+                            <span>今日主题:{$forum['todaythreads']}</span>
+                        </p>
+                        <p><!--{$forum['brief']}-->DFGDFDSSFGVFVCVgf反对发射点反对v持续出现啊飒飒,烦烦烦啊啊的在同样突然变得我</p>
+                        <!--{ifvar $myapp['forumlist'][$fid]['subforum']}-->
+                        <p>
+                            下级板块:<!--{loop $myapp['forumlist'][$fid]['subforum'] $sfid}-->
+                                <a href="{url 'forum-'.$sfid}"><!--{$forumlist[$sfid]['name']}--></a>
+
+                            <!--{/loop}-->
+                        </p>
+                        <!--{/if}-->
+                    </div>
+                </div>
+            </div>
+            <div class="forum-mod">
+                <div>
+                    <!--{ifvar $myapp['forumlist'][$fid]['moderators']}-->
+                    论坛版主:<!--{loop $myapp['forumlist'][$fid]['moderators'] $mid $mname}-->
+                    <a href="{url 'user-'.$mid}"><!--{$mname}--></a>
+                    <!--{/loop}-->
+                    <!--{/if}-->
+                </div>
+                <a href="{url 'forum-'.$fid}">进入</a>
+            </div>
+        </div>
+    </li>
+    <!--{/if}-->
+    <!--{/loop}-->
+</ul>
+<!--{/if}-->

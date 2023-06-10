@@ -169,13 +169,14 @@ class APP implements \ArrayAccess
     public function setCookies($name, $data = "", $time = -1)
     {
         $this->data['cookies'][$name] = $data;
+        if(!empty($data)&&$time==-1)$time = $this->data['time']+2592000;
         setcookie(
             $this->conf['cookie_prefix'] . $name,
             $data,
             ($time > $this->data['time'] || $time <= 0) ? $time : $time + $this->data['time'],
             $this->conf['cookie_path'],
             $this->conf['cookie_domain'],
-            $this->data['https'],
+            $_SERVER['HTTPS']!='off',
             true
         );
     }
@@ -378,14 +379,10 @@ class APP implements \ArrayAccess
                 $router_key = strtr($router_key, array_flip($this->data['settings']['router_replace']));
             }
             $router_arr = explode('-', $router_key);
-            $router_data = [];
             foreach ($router_arr as $k => $v) {
-                $router_data[$k % 2][] = $v;
                 $router[] = $v;
-            }
-            if (!empty($router_data)) {
-                foreach ($router_data[0] as $k => $v) {
-                    $router[$v] = isset($router_data[1][$k]) ? $router_data[1][$k] : null;
+                if($k==1&&!is_numeric($router[0])){
+                    $router[$router[0]] = $v;
                 }
             }
         }
@@ -456,7 +453,7 @@ class APP implements \ArrayAccess
                     if (!empty($this->conf['debug']) || !is_file($this->data['path']['data'] . 'plugin_lang.php')) {
                         $this->write_plugin_lang($langdirs, $this->conf['lang']);
                     } else {
-                        $this->language += (array)include($this->data['path']['data'] . 'plugin_lang.php');
+                        $this->language += (array)include($this->data['path']['data'] . 'plugin_lang_'.str_replace('-','_',$this->conf['lang']).'.php');
                     }
                 }
             }
@@ -476,7 +473,10 @@ class APP implements \ArrayAccess
             }
             if (!empty($this->data['cookies']['tokens'])) {
                 parse_str($this->str_decrypt($this->data['cookies']['tokens']), $tokens);
+                #print_r($tokens);
                 if (!empty($tokens) && count($this->session_fields) == count($tokens)) {
+                    #print_r($tokens);
+
                     $this->data['tokens'] = array_combine($this->session_fields, $tokens);
                     $this->data['user'] = $this->data['tokens'];
                 } else if (!empty($this->data['cookies']['sid'])) {
@@ -627,14 +627,33 @@ class APP implements \ArrayAccess
         include $this->template('exception');
         $this->exit();
     }
-    public $session_fields = array('uid', 'gid', 'username', 'realname', 'login_date', 'logins');
+    public $session_fields = array('uid', 'gid', 'username', 'login_date', 'logins');
     public function session_tokens($user)
     {
-        $newuser = array();
+        $tokens = array();
         foreach ($this->session_fields as $v) {
-            if (!isset($user[$v])) $newuser[] = $user[$v];
+            $tokens[] = empty($user[$v])?'':$user[$v];
         }
-        $this->setCookies('token', http_build_query(array_values($newuser)));
+        #echo $this->str_encrypt(http_build_query(array_values($tokens)));
+        $this->setCookies('tokens',$this->str_encrypt(http_build_query(array_values($tokens))));
+    }
+    public function session_login($uid)
+    {
+        $user = DB::t('user')->uids($uid);
+        #print_r($user);
+        if(!empty($user['uid'])){
+            $this->data['user'] = $user;
+            $this->data['uid'] = $user['uid'];
+            $this->data['gid'] = $user['gid'];
+            $this->data['access'] = $this->data['grouplist'][0];
+            $this->session_tokens($user);
+        }
+    }
+    public function session_verify()
+    {
+        if(!empty($this->data['user'])&&empty($this->data['user']['password'])){
+            $this->data['user'] = DB::t('user')->uids($this->data['user']['uid']);
+        }
     }
     public static function template($router)
     {
@@ -834,7 +853,7 @@ class APP implements \ArrayAccess
         #$result = DB::mquery_table(array('settings', 'forum', 'forum_access', 'group'));
         $result = array(
             'settings' => DB::t('settings')->all(),
-            'forum' => DB::t('forum')->all(),
+            'forum' => DB::t('forum')->all('',array('order'=>array('rank'=>'DESC'))),
             'forum_access' => DB::t('forum_access')->all(),
             'group' => DB::t('group')->all(),
         );
@@ -998,33 +1017,30 @@ class APP implements \ArrayAccess
                             continue;
                         }
                     }
-                    if (!empty($v['template'])) {
-                        if (is_string($v['template'])) $v['template'] = explode(',', $v['template']);
-                        foreach ($v['template'] as $tempname) {
-                            $result['template'][$tempname] = $file;
-                        }
-                    }
-                    if (!empty($v['router'])) {
-                        if (is_string($v['router'])) $v['router'] = explode(',', $v['router']);
-                        foreach ($v['router'] as $r) {
-                            $result['router'][$r] = $file;
-                        }
-                    }
-                    if (!empty($v['class'])) {
-                        if (is_string($v['class'])) $v['class'] = explode(',', $v['class']);
-                        foreach ($v['class'] as $r) {
-                            include_once($path . $file . '\\' . $r . '.class.php');
-                            if (class_exists('Nenge\plugin\plugin_' . $r, !1)) {
-                                $methods = get_class_methods('Nenge\plugin\plugin_' . $r);
-                                foreach ($methods as $method) {
-                                    $result['method'][$method][] = array($file, $r);
+                    foreach(array('template','router','css','class','js') as $dir){
+                        if (!empty($v[$dir])) {
+                            if (is_string($v[$dir])) $v[$dir] = array_unique(explode(',', $v[$dir]));
+                            foreach ($v[$dir] as $tempname) {
+                                $tempname = basename($tempname);
+                                if($dir=='class'){
+                                    $class_file = $path . $file . '\\' . $tempname . '.class.php';
+                                    if(is_file($class_file)){
+                                        include_once($class_file);
+                                        if (class_exists('Nenge\plugin\plugin_' . $tempname, !1)) {
+                                            $methods = get_class_methods('Nenge\plugin\plugin_' . $tempname);
+                                            foreach ($methods as $method) {
+                                                $result['method'][$method][] = array($file, $tempname);
+                                            }
+                                        }
+                                    }
+                                }elseif($dir=='js'){
+                                    if (is_file($path . $plugin . '\js\\' . $tempname.'.js')) {
+                                        $pluginjs .= file_get_contents($path . $plugin . '\js\\' . $tempname.'.js') . ';' . PHP_EOL;
+                                    }
+                                }else{
+                                    $result['template'][$tempname] = $file;
                                 }
                             }
-                        }
-                    }
-                    if (!empty($v['js'])) {
-                        if (is_file($path . $plugin . '\js\\' . $v['js'])) {
-                            $pluginjs .= file_get_contents($path . $plugin . '\js\\' . $v['js']) . ';' . PHP_EOL;
                         }
                     }
                 }
@@ -1075,7 +1091,7 @@ class APP implements \ArrayAccess
                 $langdata += (array) include($file);
             }
         }
-        $this->write_data($this->data['path']['data'] . 'plugin_lang.php', $langdata);
+        $this->write_data($this->data['path']['data'] . 'plugin_lang_'.str_replace('-','_',$name).'.php', $langdata);
         $this->language += $langdata;
     }
     public function plugin_read_require($name, $plugin_names, &$require)
@@ -1187,7 +1203,66 @@ class sitelink implements \ArrayAccess
         return $this->offsetExists($offset) ? APP::app()->data['site'][$offset] : APP::app()->data['site']['root'];
     }
 }
-
+class message{
+    public static function post_html($post)
+    {
+        $doc = new \DOMDocument('1.0','UTF-8');
+        @$doc->loadHTML('<html><head><meta charset="utf-8"></head><body>'.$post['message'].'</body></html>');
+        $srcipt = $doc->getElementsByTagName('script');
+        $body = $doc->getElementsByTagName('body')[0];
+        if(!empty($srcipt)&&$srcipt->length){
+            $i=0;
+            while ($node = $srcipt->item($i++)) {
+                $body->removeChild($node);
+            }
+        }
+        $post['message'] = preg_replace('/^<body>(.+?)<\/body>$/s',"\\1",html_entity_decode($doc->saveHTML($body)));
+        $myapp = APP::app();
+		if (!empty($myapp->plugin['method']['message_html_format'])) {
+            #插件中处理格式化后的HTML
+			foreach ($myapp->plugin['method']['message_html_format'] as $k => $v) {
+				$plugin_class = array($myapp->plugin_read_class($v), 'message_html_format');
+				if (is_callable($plugin_class)) {
+					$post = call_user_func($plugin_class, $post);
+				}
+			}
+		}
+        return $post;
+    }
+    public static function post_text($post)
+    {
+        $myapp = APP::app();
+		if (!empty($myapp->plugin['method']['message_html_format'])) {
+            #插件中处理格式化后的HTML
+			foreach ($myapp->plugin['method']['message_html_format'] as $k => $v) {
+				$plugin_class = array($myapp->plugin_read_class($v), 'message_html_format');
+				if (is_callable($plugin_class)) {
+					$post = call_user_func($plugin_class, $post);
+				}
+			}
+		}
+        return $post;
+    }
+    public static function post($post)
+    {
+        $myapp = APP::app();
+		if (!empty($myapp->plugin['method']['message'])) {
+			foreach ($myapp->plugin['method']['message'] as $k => $v) {
+				$plugin_class = array($myapp->plugin_read_class($v), 'message');
+				if (is_callable($plugin_class)) {
+					$post = call_user_func($plugin_class, $post);
+				}
+			}
+		}
+        if($post['doctype'] == 0){
+            $post = self::post_html($post);
+        }elseif($post['doctype'] == 1){
+            $post['message'] = nl2br(htmlentities(trim($post['message'])));
+            $post = self::post_text($post);
+        }
+        return $post;
+    }
+}
 namespace Nenge\plugin;
 
 class base

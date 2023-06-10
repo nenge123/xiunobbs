@@ -2,44 +2,37 @@
 namespace Nenge\table;
 use Nenge\DB;
 class table_forum extends base{
-    public $list = array();
+    public array $list = array();
+    public int $length;
     function __construct()
     {
         $this->table = 'forum';
         $this->indexkey = 'fid';
     }
-    /*
-    public function get_count_posts($fids=array())
+    public function get_threads_count($fids=array())
     {
-        if(empty($list))$this->list = $this->all();
-        if(empty($fids)){
-            return array_sum(array_column($this->list,'post'));
-        }else{
-            $num = 0;
-            foreach($fids as $fid){
-                $num += (int) (isset($this->list[$fid]['posts'])?$this->list[$fid]['posts']:0);
-            }
-            return $num;
+        if(is_numeric($fids)&&isset($this->list[$fids]['threads'])){
+            return $this->list[$fids]['threads']?:0;
         }
-    }
-    */
-    public function get_count_threads($fids=array())
-    {
-        if(empty($list))$this->list = $this->all();
-        if(empty($fids)){
-            return array_sum(array_column($this->list,'threads'));
-        }else{
+        if(empty($this->list) || $this->length!=count($this->list)){
+                $this->list = $this->all();
+                $this->length = count($this->list);
+        }
+        if(is_array($fids)){
             $num = 0;
             foreach($fids as $fid){
                 $num += (int) (isset($this->list[$fid]['threads'])?$this->list[$fid]['threads']:0);
             }
             return $num;
+        }elseif(is_numeric($fids)&&isset($this->list[$fids]['threads'])){
+            return $this->list[$fids]['threads']?:0;
         }
+        return array_column($this->list,'threads','fid');
     }
-    public function reset_count_threads()
+    public function reset_threads_count()
     {
         //SELECT COUNT(tid) as `num`,`fid` FROM `bbs_thread` GROUP BY `fid`;
-        $result = DB::t('thread')->get_count_fid();
+        $result = DB::t('thread')->get_fids_count();
         if(!empty($result)){
             $data = [];
             foreach($result as $k=>$v){

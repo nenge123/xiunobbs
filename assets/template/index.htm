@@ -1,4 +1,11 @@
-<!--{template "header"}-->
+<!--{if isset($_GET['in_ajax'])}-->
+<!--{if $myapp->GET('type') == '1'}--><!--{template index/digest}-->
+<!--{elseif $myapp->GET('type') == '2'}--><!--{template index/newthread}-->
+<!--{elseif $myapp->GET('type') == '3'}--><!--{template index/forumlist}-->
+<!--{else}--><!--{template index/lastthread}--><!--{/if}-->
+<!--{eval $mypp->exit();}-->
+<!--{/if}-->
+<!--{template header}-->
 <main id="index-body">
 	<!--{subtemplate index/online}-->
 	<div class="index-box">
@@ -11,8 +18,9 @@
 		</ul>
     </div>
     <div class="box-body">
+		<!--{eval $thread_time = $router_value;}-->
 		<!--{if $myapp->GET('type') == '1'}-->
-			<!--{template index/jinghua}-->
+			<!--{template index/digest}-->
 		<!--{elseif $myapp->GET('type') == '2'}-->
 			<!--{template index/newthread}-->
 		<!--{elseif $myapp->GET('type') == '3'}-->

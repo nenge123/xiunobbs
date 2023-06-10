@@ -1,2 +1,0 @@
-<?php
- namespace League\CommonMark\Extension\HeadingPermalink; use League\CommonMark\ConfigurableEnvironmentInterface; use League\CommonMark\Event\DocumentParsedEvent; use League\CommonMark\Extension\ExtensionInterface; final class HeadingPermalinkExtension implements ExtensionInterface { public function register(ConfigurableEnvironmentInterface $environment) { $environment->addEventListener(DocumentParsedEvent::class, new HeadingPermalinkProcessor(), -100); $environment->addInlineRenderer(HeadingPermalink::class, new HeadingPermalinkRenderer()); } } 

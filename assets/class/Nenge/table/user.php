@@ -11,15 +11,26 @@ class table_user extends base{
     {
         if(empty($uids))return array();
         $result = $this->all(array('uid'=>$uids));
+        #print_r($this->connect()->query);
         $this->list+=$result;
         return $result;
     }
     public function uids($uids)
     {
-        if(is_int($uids)) $uids = array($uids);
+        if(is_numeric($uids)){
+            if(isset($this->list[$uids])) return $this->list[$uids];
+            else {
+                $result = $this->fetch_by_uids($uids);
+                if(!empty($result[$uids])) return $result[$uids];
+            }
+            return $result;
+        }
+        elseif(is_string($uids)) return array();
+        $uids = array_unique($uids);
         $newuids = [];
         $result = [];
         foreach($uids as $k=>$v){
+            $v = (int) $v;
             if(empty($this->list[$v])){
                 $newuids[] = $v;
             }else{

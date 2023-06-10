@@ -1,2 +1,0 @@
-<?php
- namespace League\CommonMark\Node; final class NodeWalkerEvent { private $node; private $isEntering; public function __construct(Node $node, $isEntering = true) { $this->node = $node; $this->isEntering = $isEntering; } public function getNode(): Node { return $this->node; } public function isEntering(): bool { return $this->isEntering; } } 

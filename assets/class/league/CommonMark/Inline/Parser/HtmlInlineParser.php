@@ -1,2 +1,0 @@
-<?php
- namespace League\CommonMark\Inline\Parser; use League\CommonMark\Inline\Element\HtmlInline; use League\CommonMark\InlineParserContext; use League\CommonMark\Util\RegexHelper; final class HtmlInlineParser implements InlineParserInterface { public function getCharacters(): array { return ['<']; } public function parse(InlineParserContext $inlineContext): bool { if ($m = $inlineContext->getCursor()->match('/^' . RegexHelper::PARTIAL_HTMLTAG . '/i')) { $inlineContext->getContainer()->appendChild(new HtmlInline($m)); return true; } return false; } } 

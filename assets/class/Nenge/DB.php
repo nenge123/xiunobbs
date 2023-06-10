@@ -426,7 +426,7 @@ class DB
 		} else {
 			$sth = $link->prepare($query['sql'], $query['param']);
 			$result = $link->result($sth, $query['FetchRow'], $query['FetchMode']);
-			if (!empty($query['indexkey'])) {
+			if (!empty($query['indexkey'])&&!empty($result)) {
 				$keys = array_column($result, $query['indexkey']);
 				if (count($keys) == count($result)) $result = array_combine($keys, $result);
 			}
@@ -485,7 +485,7 @@ class DB
 					}
 					$sql .= '( ' . rtrim($sqlx, ' AND ') . ' ) ' . $cstr;
 				}
-			} else if(is_string($value)){
+			} else{
 				$sql .= $quote_name . $param_cdt . ' ? ' . $cstr;
 				$query['param'][] = $value;
 			}
