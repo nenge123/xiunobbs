@@ -8,7 +8,7 @@
     <div class="box-title">
       
       <h1 class="box-title"><!--{$thread['subject']}--></h1>
-      <p><img src="{avatar $first['uid']}" height="30"><!--{$user[$first['uid']]['username']}--></p>
+      <p><img src="{avatar $first['uid']}" height="30"><!--{$first['username']}--></p>
       <p>发布于<!--{timehuman $first['create_date']}--> <i>查看<!--{$thread['views']}--></i> <i>回复<!--{$thread['posts']}--></i></p>
     </div>
   </div>
@@ -23,12 +23,19 @@
   <?php if($order=='ASC'){$floor+=1;}else {$floor -=1;} ?>
   <div class="box-header">
     <div class="box-title">
-      <p><img src="{avatar $first['uid']}" height="30"><!--{$user[$post['uid']]['username']}--></p>
+      <p><img src="{avatar $post['uid']}" height="30"><!--{echovar $post['username']}--></p>
       <p>发布于<!--{timehuman $post['create_date']}--></p>
     </div>
     <p><!--{$floor}-->楼</p>
   </div>
   <div class="box-body">
+    <!--{ifvar $post['blockquote']}-->
+    <blockquote class="blockquote">
+      <a href="{url 'space-'.$post['quoteuid']}">
+        <img src="{avatar $post['quoteuid']}">{echovar $user[$post['quoteuid']]['username']  $language['user_name_delete']}
+      </a>{$post['blockquote']}
+      </blockquote>
+    <!--{/if}-->
     <!--{$post['message']}-->
   </div>
 

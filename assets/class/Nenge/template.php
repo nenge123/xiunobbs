@@ -93,7 +93,7 @@ class template
 		#echo
 		$template = preg_replace_callback("/\{echo\s(.+?)\}/is", fn ($m) => '<?php echo '.$m[1].';?>', $template);
 
-		$template = preg_replace_callback("/\{echovar\s([^\s]+?)((?:\s)[^\}]*)?\}/is", fn ($m) => '<?php echo empty(' . $m[1] . ')?"'.trim(isset($m[2])?$m[2]:'').'":' . $m[1] . ';?>', $template);
+		$template = preg_replace_callback("/\{echovar\s([^\s]+?)(\s[^\}]+)?\}/is", fn ($m) => '<?php echo empty(' . $m[1] . ') ?'.trim(isset($m[2])?$m[2]:'').':' . $m[1] . ';?>', $template);
 
 		#if
 		$template = preg_replace_callback("/[\n\r\t\s]*{if\s(.+?)\}[\n\r\t]*/is", fn ($m) => $this->fn_stags("<?php if(" . $m[1] . ") { ?>"), $template);

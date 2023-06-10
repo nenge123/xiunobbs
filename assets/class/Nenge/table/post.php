@@ -2,6 +2,7 @@
 namespace Nenge\table;
 use Nenge\DB;
 class table_post extends base{
+    public array $list = array();
     function __construct()
     {
         $this->table = 'post';
@@ -46,6 +47,7 @@ class table_post extends base{
     public function page_by_tid($tid,$page=1,$order='ASC',$only=false,$limit=40)
     {
         #SELECT *  FROM `bbs_post` WHERE `tid` = 12  ORDER BY `bbs_post`.`isfirst` DESC,`bbs_post`.`create_date` ASC LIMIT 1,3;
+        $language = \Nenge\language::app();
         $where = array('tid'=>$tid);
         if($only){
             $where['uid'] = $only;
@@ -53,17 +55,36 @@ class table_post extends base{
         $list = $this->all($where,array(
             'order'=>array(
                 'isfirst'=>'DESC',
-                'create_date'=>$order=='ASC'?'ASC':'DESC'
+                'create_date'=>$order=='DESC'?'DESC':'ASC'
             ),
             'limit'=>array(($page-1)*$limit,$page*$limit)
         ));
         if(!empty($list)){
+            $this->list += $list;
+            $quotelist = $this->pids(array_column($list,'quotepid'));
             $uids = array_column($list,'uid');
+            if(!empty($quotelist)){
+                $uids = array_column($quotelist,'uid');
+            }
             $userlist = DB::t('user')->uids($uids);
             $postlist = array();
             $posttop = array();
             foreach($list as $pid=>$post){
+                if(!empty($post['uid'])){
+                    if(isset($userlist[$post['uid']])){
+                        $post['username'] = $userlist[$post['uid']]['username'];
+                    }else{
+                        $post['uid'] = -1;
+                        $post['username'] = $language['user_name_delete'];
+                    }
+                }else{
+                    $post['username'] = $language['user_name_unknow'];
+                }
                 $post = \Nenge\message::post($post);
+                if(isset($post['quotepid'])&&isset($quotelist[$post['quotepid']])){
+                    $post['quoteuid'] = $quotelist[$post['quotepid']]['uid'];
+                    $post['blockquote'] = \Nenge\message::post_sub($quotelist[$post['quotepid']],300)['message'];
+                }
                 if($post['isfirst']){
                     $posttop = $post;
                 }else{
@@ -77,5 +98,38 @@ class table_post extends base{
             );
 
         }
+    }
+    public function pids($pids)
+    {
+        if(is_numeric($pids)){
+            if(isset($this->list[$pids])) return $this->list[$pids];
+            else {
+                $result = $this->fetch_by_pids($pids);
+                if(!empty($result[$pids])) return $result[$pids];
+            }
+            return $result;
+        }
+        elseif(is_string($pids)) return array();
+        $pids = array_unique($pids);
+        $newpids = [];
+        $result = [];
+        foreach($pids as $k=>$v){
+            if(empty($v))continue;
+            $v = (int) $v;
+            if(empty($this->list[$v])){
+                $newpids[] = $v;
+            }else{
+                $result[$v] = $this->list[$v];
+            }
+        }
+        return $result+$this->fetch_by_pids($newpids);
+    }
+    public function fetch_by_pids($pids)
+    {
+        if(empty($uids))return array();
+        $result = $this->all(array('uid'=>$uids));
+        if(!empty($result))$this->list+=$result;
+        else $result = array();
+        return $result;
     }
 }

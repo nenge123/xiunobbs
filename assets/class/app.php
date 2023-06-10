@@ -1205,10 +1205,22 @@ class sitelink implements \ArrayAccess
     }
 }
 class message{
-    public static function post_html($post)
+    public static function post_sub($post,$length)
+    {
+        if($post['doctype'] == 0){
+            $post['message'] = self::html($post['message'],$length);
+        }else{
+            $post['message'] = nl2br(htmlentities(substr(trim($post['message']),0,$length)));
+        }
+        return $post;
+    }
+    public static function html($message,$length=0)
     {
         $doc = new \DOMDocument('1.0','UTF-8');
-        @$doc->loadHTML('<html><head><meta charset="utf-8"></head><body>'.$post['message'].'</body></html>');
+        if($length!=0){
+            $message = substr($message,0,$length);
+        }
+        @$doc->loadHTML('<html><head><meta charset="utf-8"></head><body>'.$message.'</body></html>');
         $srcipt = $doc->getElementsByTagName('script');
         $body = $doc->getElementsByTagName('body')[0];
         if(!empty($srcipt)&&$srcipt->length){
@@ -1217,7 +1229,11 @@ class message{
                 $body->removeChild($node);
             }
         }
-        $post['message'] = preg_replace('/^<body>(.+?)<\/body>$/s',"\\1",html_entity_decode($doc->saveHTML($body)));
+        return preg_replace('/^<body>(.+?)<\/body>$/s',"\\1",html_entity_decode($doc->saveHTML($body)));
+    }
+    public static function post_html($post)
+    {
+        $post['message'] = self::html($post['message']);
         $myapp = APP::app();
 		if (!empty($myapp->plugin['method']['message_html_format'])) {
             #插件中处理格式化后的HTML

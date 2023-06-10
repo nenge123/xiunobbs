@@ -11,8 +11,8 @@ class table_user extends base{
     {
         if(empty($uids))return array();
         $result = $this->all(array('uid'=>$uids));
-        #print_r($this->connect()->query);
-        $this->list+=$result;
+        if(!empty($result))$this->list+=$result;
+        else $result = array();
         return $result;
     }
     public function uids($uids)
@@ -30,6 +30,7 @@ class table_user extends base{
         $newuids = [];
         $result = [];
         foreach($uids as $k=>$v){
+            if(empty($v))continue;
             $v = (int) $v;
             if(empty($this->list[$v])){
                 $newuids[] = $v;

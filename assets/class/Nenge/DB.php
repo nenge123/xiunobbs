@@ -504,11 +504,12 @@ class DB
 				if (is_numeric($k)) {
 					$sql .= self::quote($v, 0) . 'DESC,';
 				} else {
+					$v = strtoupper($v);
 					$quote_key = self::quote($k, 0); 
-					if (!$v || $v == 'desc' || $v == 'DESC') {
+					if (!$v || $v == 'DESC') {
 						$sql .= $quote_key . 'DESC,';
 					} else {
-						$sql .= $quote_key . 'DESC,';
+						$sql .= $quote_key . 'ASC,';
 					}
 				}
 			}
