@@ -9,7 +9,7 @@ if(!empty($router_value)&&is_numeric($router_value)){
         if(!empty($myapp->data['forum_access'][$forum['fid']][$myapp->data['gid']])){
             $access = array_merge($myapp->data['forum_access'][$forum['fid']][$myapp->data['gid']]);
         }
-        if(!empty($access['allowthread'])){
+        if(!empty($access['allowread'])){
             #无权访问帖子
             $myapp->data['title'] = $thread['subject'];
             $only = !1;

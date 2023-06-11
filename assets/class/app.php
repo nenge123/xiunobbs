@@ -1145,9 +1145,6 @@ class APP implements \ArrayAccess
                 }
             }
         }
-        if($fn&&!empty($fn_arr)){
-            #return $fn($fn_arr);
-        }
         return $fn_arr;
     }
 }
