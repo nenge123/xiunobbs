@@ -879,7 +879,7 @@ class APP implements \ArrayAccess
                 }
                 $data['forumlist'][$v['fid']] = $v;
             }
-            $data['forumnames'] = array_column($data['forumlist'], 'name');
+            $data['forumnames'] = array_column($data['forumlist'], 'name','fid');
             $userlist = [];
             if (!empty($moduids)) {
                 $userlist = DB::t('user')->uids(array_unique($moduids));

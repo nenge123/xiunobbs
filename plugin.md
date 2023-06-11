@@ -47,8 +47,7 @@ $myapp->plugin_class_call(
     }
 );
 #or
-$callable = $myapp->plugin_class_call('template');
-foreach($callable as $plugin_method){
+foreach($myapp->plugin_class_call('template') as $plugin_method){
 	$template=call_user_func($plugin_method,$template,$this->path, $this->file);
 }
 
