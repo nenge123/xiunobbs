@@ -137,14 +137,9 @@ class template
 
 		#$template = preg_replace("/\<\?\s+/is", "<?php ", $template);
 		$template = preg_replace("/\<\?\=(.+?)\?\>/s", "<?php echo \\1;?>", $template);
-		if (!empty($myapp->plugin['method']['template'])) {
-			foreach ($myapp->plugin['method']['template'] as $k => $v) {
-				$plugin_class = array($myapp->plugin_read_class($v), 'template');
-				if (is_callable($plugin_class)) {
-					$template = call_user_func($plugin_class, $template, $this->path, $this->file);
-				}
-			}
-		}
+		$myapp->plugin_class_call('template',function($plugin_method) use (&$template){
+				$template=call_user_func($plugin_method,$template,$this->path, $this->file);
+		});
 		if (!empty($cachefile)) {
 			$template = $this->str_head() . $template;
 			$template = preg_replace("/\?><\?php\s/is", PHP_EOL, $template);

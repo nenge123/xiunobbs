@@ -10,6 +10,7 @@ class APP implements \ArrayAccess
     public static object $_app;
     public array $conf;
     public array $plugin = array();
+    public static array $plugin_class = array();
     public array $language = array();
     public array $data = array();
     public array $settings = array();
@@ -1107,13 +1108,47 @@ class APP implements \ArrayAccess
         }
         return !1;
     }
-    public function plugin_read_class($plugin)
+    public function plugin_class_load($plugin)
     {
-        list($plugin_name, $plugin_file) = $plugin;
-        if (!class_exists('Nenge\plugin\plugin_' . $plugin_file, !1)) {
-            include_once($this->data['path']['plugin'] . $plugin_name . '\\' . $plugin_file . '.class.php');
+        list($plugin_name, $class_name) = $plugin;
+        if (!isset(self::$plugin_class[$class_name])) {
+            self::$plugin_class[$class_name] = false;
+            $class_file = $this->data['path']['plugin'] . $plugin_name . '\\' . $class_name . '.class.php';
+            if(is_file($class_file)){
+                include_once($class_file);
+                $class = 'Nenge\plugin\plugin_' . $class_name;
+                if(class_exists($class, !1)){
+                    return self::$plugin_class[$class_name] = new $class;
+                }
+            }
         }
-        return call_user_func('Nenge\plugin\plugin_' . $plugin_file . '::app');
+        return self::$plugin_class[$class_name];
+    }
+    public function plugin_class_method($plugin,$method)
+    {
+        if($plugin_class = $this->plugin_class_load($plugin)){
+            $plugin_method = array($plugin_class,$method);
+            if(is_callable($plugin_method)){
+                return $plugin_method;
+            }
+        }
+    }
+    public function plugin_class_call($method,$fn=null)
+    {
+        $fn_arr = array();
+		if (!empty($this->plugin['method'][$method])) {
+            #插件中处理格式化后的HTML
+			foreach ($this->plugin['method'][$method] as $k => $v) {
+                if($plugin_method = $this->plugin_class_method($v,$method)){
+                    if($fn)$fn($plugin_method);
+                    $fn_arr[] = $plugin_method;
+                }
+            }
+        }
+        if($fn&&!empty($fn_arr)){
+            #return $fn($fn_arr);
+        }
+        return $fn_arr;
     }
 }
 class language implements \ArrayAccess
@@ -1234,68 +1269,48 @@ class message{
     public static function post_html($post)
     {
         $post['message'] = self::html($post['message']);
-        $myapp = APP::app();
-		if (!empty($myapp->plugin['method']['message_html_format'])) {
-            #插件中处理格式化后的HTML
-			foreach ($myapp->plugin['method']['message_html_format'] as $k => $v) {
-				$plugin_class = array($myapp->plugin_read_class($v), 'message_html_format');
-				if (is_callable($plugin_class)) {
-					$post = call_user_func($plugin_class, $post);
-				}
-			}
-		}
+        APP::app()->plugin_class_call('message_format_html',function($plugin_method) use (&$post){
+            $post=call_user_func($plugin_method,$post)?:$post;
+        });
         return $post;
     }
     public static function post_text($post)
     {
-        $myapp = APP::app();
-		if (!empty($myapp->plugin['method']['message_html_format'])) {
-            #插件中处理格式化后的HTML
-			foreach ($myapp->plugin['method']['message_html_format'] as $k => $v) {
-				$plugin_class = array($myapp->plugin_read_class($v), 'message_html_format');
-				if (is_callable($plugin_class)) {
-					$post = call_user_func($plugin_class, $post);
-				}
-			}
-		}
+        APP::app()->plugin_class_call('message_format_text',function($plugin_method) use (&$post){
+            $post=call_user_func($plugin_method,$post)?:$post;
+        });
         return $post;
     }
     public static function post($post)
     {
-        $myapp = APP::app();
-		if (!empty($myapp->plugin['method']['message'])) {
-			foreach ($myapp->plugin['method']['message'] as $k => $v) {
-				$plugin_class = array($myapp->plugin_read_class($v), 'message');
-				if (is_callable($plugin_class)) {
-					$post = call_user_func($plugin_class, $post);
-				}
-			}
-		}
+        APP::app()->plugin_class_call('message_format',function($plugin_method) use (&$post){
+            $post=call_user_func($plugin_method,$post);
+        });
         if($post['doctype'] == 0){
             $post = self::post_html($post);
         }elseif($post['doctype'] == 1){
             $post['message'] = nl2br(htmlentities(trim($post['message'])));
             $post = self::post_text($post);
+        }else{
+            APP::app()->plugin_class_call('message_format_other',function($plugin_method) use (&$post){
+                $post=call_user_func($plugin_method,$post)?:$post;
+            });
         }
         return $post;
     }
 }
 namespace Nenge\plugin;
-
+use Nenge\APP;
 class base
 {
-    public static object $_app;
     public array $settings = array();
-    public function __construct()
-    {
-        self::$_app = $this;
-    }
     public static function app()
     {
-        if (empty(self::$_app)) {
-            $class = get_called_class();
-            new $class();
+        $class = get_called_class();
+        $class_name = basename($class);
+        if (empty(APP::$plugin_class[$class_name])) {
+            APP::$plugin_class[$class_name] = new $class();
         }
-        return self::$_app;
+        return APP::$plugin_class[$class_name];
     }
 }
