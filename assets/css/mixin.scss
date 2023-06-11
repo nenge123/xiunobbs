@@ -107,3 +107,8 @@
         min-height: 1px;
     }
 }
+@mixin  nobgbr {
+    border: none;
+    outline: none;
+    background-color: transparent;
+}

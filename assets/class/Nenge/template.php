@@ -72,8 +72,8 @@ class template
 		#$template = preg_replace("/\{(\\\$[a-zA-Z0-9_\-\>\[\]\'\"\$\.\x7f-\xff]+)\s(or|\?\?)\s([a-zA-Z0-9\']+)\}/s", "{echo \\1 ?? \\3}", $template);
 
 		#变量
-		$template = preg_replace("/\{(\\\$[\w\_]+?[^\}\s;]+)\s\?\?\s(\\\$[^\}+]|['\"].+['\"])\}/is",'<?=\\1?:\\2?>', $template);
-		$template = preg_replace("/\{(\\\$[\w\_]+[^\}\s;]+)\}/is",'<?=\\1?>', $template);
+		$template = preg_replace("/\{(\\\$[\w\_]+?[^\}\s;]+?)\s\?\?\s(\\\$[^\}+]|['\"].+['\"])\}/is",'<?=\\1?:\\2?>', $template);
+		$template = preg_replace("/\{(\\\$[\w\_]+[^\}\s;]*?)\}/is",'<?=\\1?>', $template);
 
 		#hook
 		if (!empty($myapp->data['settings']['include_hook'])) {

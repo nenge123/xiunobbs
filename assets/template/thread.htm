@@ -17,31 +17,7 @@
   </div>
 </div>
 <!--{/if}-->
-<!--{ifvar $list}-->
-<div class="index-box">
-<!--{loop $list $pid $post}-->
-  <?php if($order=='ASC'){$floor+=1;}else {$floor -=1;} ?>
-  <div class="box-header">
-    <div class="box-title">
-      <p><img src="{avatar $post['uid']}" height="30"><!--{echovar $post['username']}--></p>
-      <p>发布于<!--{timehuman $post['create_date']}--></p>
-    </div>
-    <p><!--{$floor}-->楼</p>
-  </div>
-  <div class="box-body">
-    <!--{ifvar $post['blockquote']}-->
-    <blockquote class="blockquote">
-      <a href="{url 'space-'.$post['quoteuid']}">
-        <img src="{avatar $post['quoteuid']}">{echovar $user[$post['quoteuid']]['username']  $language['user_name_delete']}
-      </a>{$post['blockquote']}
-      </blockquote>
-    <!--{/if}-->
-    <!--{$post['message']}-->
-  </div>
-
-<!--{/loop}-->
-</div>
-<!--{/if}-->
+<!--{template thread/replay}-->
 <!--{else}-->
 <div class="index-box">
     <div class="box-header np">

@@ -3,10 +3,14 @@ defined('XIUNO')||die('return to <a href="">Home</a>');
 $myapp->data['title'] = $language['thread_not_exists'];
 if(!empty($router_value)&&is_numeric($router_value)){
     $thread = Nenge\DB::t('thread')->fetch(array('tid'=>$router_value));
-    if(!empty($thread)){
-            if(in_array($thread['fid'],$myapp->allowforum())){
-                #无权访问  板块
-                #$myapp->exit($language['insufficient_visit_forum_privilege']);
+    if(!empty($thread)&&!empty($myapp->data['forumlist'][$thread['fid']])){
+        $forum = $myapp->data['forumlist'][$thread['fid']];
+        $access = $myapp->data['access'];
+        if(!empty($myapp->data['forum_access'][$forum['fid']][$myapp->data['gid']])){
+            $access = array_merge($myapp->data['forum_access'][$forum['fid']][$myapp->data['gid']]);
+        }
+        if(!empty($access['allowthread'])){
+            #无权访问帖子
             $myapp->data['title'] = $thread['subject'];
             $only = !1;
             $order = 'ASC';
@@ -264,4 +268,3 @@ if(!empty($myapp->DB('Update','thread',array('+:views'=>1),array('tid'=>$thread_
 }
 include $myapp->getTemplate($myapp->data['settings']['thread_template']);
 */
-?>

@@ -1,0 +1,49 @@
+<div class="replay-box">
+    <div class="box-header">
+        <div class="box-title">最新回复(
+            <!--{$thread['posts']}-->)
+        </div>
+        <div class="box-right">d</div>
+    </div>
+    <div class="box-body">
+        <!--{ifvar $list}-->
+        <!--{loop $list $pid $post}-->
+        <?php if($order=='ASC'){$floor+=1;}else {$floor -=1;} ?>
+        <div class="replay-info">
+            <a class="replay-avatar" href="{url 'space-'.$post['uid']}"><img src="{avatar $post['uid']}" height="30"></a>
+            <div class="replay-meta">
+                <div class="replay-user">
+                    <p>
+                        <a href="{url 'space-'.$post['uid']}">
+                            <!--{$post['username']}-->
+                        </a>
+                        <time>
+                            <!--{timehuman $post['create_date']}-->
+                        </time>
+                    </p>
+                    <p class="replay-floor"><!--{$floor}-->楼</p>
+                </div>
+                <div class="post-message">
+                    <!--{ifvar $post['blockquote']}-->
+                    <blockquote class="blockquote">
+                        <a href="{url 'space-'.$post['quoteuid']}">
+                            <img src="{avatar $post['quoteuid']}" height="20">{echovar $user[$post['quoteuid']]['username']
+                            $language['user_name_delete']}
+                        </a>{$post['blockquote']}
+                    </blockquote>
+                    <!--{/if}-->
+                    <!--{$post['message']}-->
+
+                </div>
+                <div class="replay-action">
+                    <button class="icon-zan">点赞</button>
+                    <button class="icon-replay">回复</button>
+                    <button class="icon-qoute">关联</button>
+                </div>
+            </div>
+        </div>
+
+        <!--{/loop}-->
+        <!--{/if}-->
+    </div>
+</div>
