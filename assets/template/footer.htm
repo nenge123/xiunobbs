@@ -1,6 +1,4 @@
-	<div class="debug">
-		<div class="container"><!--{echo APP::output_debug()}--></div>
-	</div>
+	<!--{echo APP::output_debug()}-->
 	<footer id="footer">
 		<div class="container">
 			<p>
@@ -21,7 +19,7 @@
 			</p>
 		</div>
 	</footer>
-	<script src="<!--{$myapp['site']['js']}-->common.js?<!--{$myapp['ver']}-->"></script>
-	<script src="<!--{$myapp['site']['data']}-->plugin.js?<!--{$myapp['ver']}-->"></script>
+	<script src="{site js}common.js?<!--{$myapp['ver']}-->"></script>
+	<script src="{site data}plugin.js?<!--{$myapp['ver']}-->"></script>
 </body>
 </html>

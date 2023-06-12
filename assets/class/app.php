@@ -139,7 +139,7 @@ class APP implements \ArrayAccess
     {
         $myapp = self::app();
         if (empty($myapp->conf['debug'])) return '';
-        $str = '<div class="card"><div class="card-body">';
+        $str = '<div class="debug"><div class="container"><div class="card"><div class="card-body">';
         $sqldata = DB::getSql();
         if (!empty($sqldata)) {
             $str .= '<h5>[SQL]</h5><ul>' . PHP_EOL;
@@ -148,11 +148,12 @@ class APP implements \ArrayAccess
             }
             $str .= '</ul>';
         }
-        $str .= '<h5>' . $myapp->language['included_files'] . '</h5><ul>';
-        foreach (get_included_files() as $v) {
+        $include = get_included_files();
+        $str .= '<h5>' . $myapp->language['included_files'] . '('.count($include).')</h5><ul>';
+        foreach ($include as $v) {
             $str .= '<li>' . str_replace(dirname(__DIR__, 2) . '\\', '', $v) . '</li>' . PHP_EOL;
         }
-        $str .= '</ul></div></div>';
+        $str .= '</ul></div></div></div></div>';
         return $str;
     }
     public static function json($json): never
@@ -261,20 +262,33 @@ class APP implements \ArrayAccess
     }
     public function rmdir($src)
     {
-        if (file_exists($src)) {
-            $dir = opendir($src);
-            while (false !== ($file = readdir($dir))) {
-                if (($file != '.') && ($file != '..')) {
-                    $full = $src . '/' . $file;
-                    if (is_dir($full)) {
-                        $this->rmdir($full);
-                    } else {
-                        unlink($full);
-                    }
+        if (is_dir($src)) {
+            $dirs = scandir($src);
+            foreach($dirs as $link){
+                if($link=='.'||$link=='..')continue;
+                $full = $src. $link;
+                if (is_dir($full.'\\')) {
+                    $this->rmdir($full.'\\');
+                } else {
+                    unlink($full);
                 }
+
             }
-            closedir($dir);
             rmdir($src);
+        }
+    }
+    public function rm_cache($path=false)
+    {
+        if(empty($path))$path = $this->data['path']['cache'];
+        $cache_dirs = scandir($path);
+        foreach($cache_dirs as $dir){
+            if($dir=='.'||$dir=='..')continue;
+            $full = $path. $dir;
+            if(is_file($full)){
+                unlink($full);
+            }elseif(is_dir($full)){
+                $this->rm_cache($full.'\\');
+            }
         }
     }
     public function exit_clear()
@@ -336,7 +350,8 @@ class APP implements \ArrayAccess
         if ($type == 'template') {
             $cachename .= '.php';
         } elseif ($type == 'css') {
-            $cachename = str_replace('.scss', '.css', $cachename);
+            $cachename .='.css';
+            $name .= '.scss';
             $path .= $name;
         } elseif ($type == 'router') {
             $cachename .= '.php';
@@ -1063,17 +1078,19 @@ class APP implements \ArrayAccess
                     if ($dh = opendir($path)) {
                         while (($file = readdir($dh)) !== false) {
                             if ($filename = strstr($file, '.', !0) && !empty($filename)) {
-                                if (empty($this->plugin[$dir . '_data'][$filename])) $this->plugin[$dir . '_data'][$filename] = "\n";
+                                $strdata = '';
                                 $filetype = strstr($file, '.');
                                 if ($filetype == '.php') {
                                     if ($dir == 'include') {
-                                        $this->plugin[$dir . '_data'][$filename] .= preg_replace('/^<\?php\s(.+)\?>$/is', '\\1', trim(php_strip_whitespace($path . $file)));
+                                        $strdata = preg_replace('/^<\?php\s(.+)\?>$/is', '\\1', trim(php_strip_whitespace($path . $file)));
                                     } elseif ($dir == 'hook') {
-                                        $this->plugin[$dir . '_data'][$filename] .= (string)include($path . $file);
+                                        $strdata = (string)include($path . $file);
                                     }
                                 } else {
-                                    $this->plugin[$dir . '_data'][$filename] .= file_get_contents($path . $file) . ";\n";
+                                    $strdata = file_get_contents($path . $file) . ";\n";
                                 }
+                                if (!isset($this->plugin[$dir . '_data'][$filename])) $this->plugin[$dir . '_data'][$filename] = "\n";
+                                $this->plugin[$dir . '_data'][$filename] .= $strdata;
                             }
                         }
                     }
@@ -1133,7 +1150,7 @@ class APP implements \ArrayAccess
             }
         }
     }
-    public function plugin_class_call($method,$fn=null)
+    public function plugin_method_call($method,$fn=null)
     {
         $fn_arr = array();
 		if (!empty($this->plugin['method'][$method])) {
@@ -1147,6 +1164,41 @@ class APP implements \ArrayAccess
         }
         return $fn_arr;
     }
+    public function plugin_method_filter($method,$data='')
+    {
+        $fn_arr = array();
+		if (!empty($this->plugin['method'][$method])) {
+			foreach ($this->plugin['method'][$method] as $k => $v) {
+                if($plugin_method = $this->plugin_class_method($v,$method)){
+                    $data = call_user_func($plugin_method,$data);
+                }
+            }
+        }
+        return $data;
+    }
+    public function scss_load($name,$link=false)
+    {
+		list($path, $cachefile, $csslink) = $this->str_path($name, 'css');
+		if(!empty($this->conf['debug']) || !is_file($csslink)){
+			if (!is_file($path)) {
+				$path = $this->data['path']['css'] . basename($path);
+			}
+			if (is_file($path)) $this->scss_write($path, $cachefile, $this->data['site']);
+		}
+		if ($link) return $csslink;
+		return '<link rel="stylesheet" type="text/css" href="' . $csslink . '?' . $this['ver'] . '" />';
+    }
+	public function scss_write($srcFile, $tempFile, $var = array())
+	{
+		$SCSS = new \ScssPhp\ScssPhp\Compiler();
+		$SCSS->setOutputStyle('compressed');
+		$SCSS->setImportPaths(dirname($srcFile) . '\\');
+		if (!empty($var)) {
+			$SCSS->addVariables($var);
+		}
+		$scssStr = file_get_contents($srcFile);
+		file_put_contents($tempFile, $SCSS->compileString($scssStr)->getCss());
+	}
 }
 class language implements \ArrayAccess
 {
@@ -1295,21 +1347,21 @@ class message{
     public static function post_html($post)
     {
         $post['message'] = self::html($post['message']);
-        APP::app()->plugin_class_call('message_format_html',function($plugin_method) use (&$post){
+        APP::app()->plugin_method_call('message_format_html',function($plugin_method) use (&$post){
             $post=call_user_func($plugin_method,$post)?:$post;
         });
         return $post;
     }
     public static function post_text($post)
     {
-        APP::app()->plugin_class_call('message_format_text',function($plugin_method) use (&$post){
+        APP::app()->plugin_method_call('message_format_text',function($plugin_method) use (&$post){
             $post=call_user_func($plugin_method,$post)?:$post;
         });
         return $post;
     }
     public static function post($post)
     {
-        APP::app()->plugin_class_call('message_format',function($plugin_method) use (&$post){
+        APP::app()->plugin_method_call('message_format',function($plugin_method) use (&$post){
             $post=call_user_func($plugin_method,$post);
         });
         if($post['doctype'] == 0){
@@ -1318,7 +1370,7 @@ class message{
             $post['message'] = nl2br(htmlentities(trim($post['message'])));
             $post = self::post_text($post);
         }else{
-            APP::app()->plugin_class_call('message_format_other',function($plugin_method) use (&$post){
+            APP::app()->plugin_method_call('message_format_other',function($plugin_method) use (&$post){
                 $post=call_user_func($plugin_method,$post)?:$post;
             });
         }

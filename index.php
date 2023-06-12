@@ -13,6 +13,7 @@ define('XIUNO',true);
 use Nenge\APP;
 include(__DIR__.'\\assets\\class\\app.php');
 $myapp = APP::app();
+#$myapp->rm_cache();exit;
 #error_reporting(E_ALL);
 #print_r($myapp->data['router']);
 #print_r(Nenge\DB::t('table_count')->add_count(array('post3'=>1)));

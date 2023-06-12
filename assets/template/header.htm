@@ -9,11 +9,12 @@
 	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no,width=device-width">
 	<title><!--{$myapp['title']}--> - {$myapp['settings']['site_name']}</title>
 	<meta name="hash" content="{$myapp['hash']}">
-	<link rel="shortcut icon" href="<!--{$myapp['site']['images']}-->favicon.ico" />
-	<link rel="icon" sizes="32x32" href="<!--{$myapp['site']['images']}-->favicon.ico">
-	<link rel="Bookmark" href="<!--{$myapp['site']['images']}-->favicon.ico" />
-	<link rel="stylesheet" href="{$myapp['site']['css']}static/font-HarmonySanc.css">
+	<link rel="shortcut icon" href="{site images}favicon.ico" />
+	<link rel="icon" sizes="32x32" href="{site images}favicon.ico">
+	<link rel="Bookmark" href="{site images}favicon.ico" />
+	<link rel="stylesheet" href="{site css}static/font-HarmonySanc.css">
 	<link rel="stylesheet" href="style.scss">
+	<!--{hook header_css}-->
 </head>
 <body class="module-{echo $myapp['router'][0]}{if !empty($myapp['mobile'])} mobile{/if}">
 <header id="header" class="active">

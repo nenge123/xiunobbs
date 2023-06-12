@@ -147,14 +147,14 @@
     .forum-div {
         flex-grow: 1;
         @include flex-column-lr;
-        border-radius: .25rem;
+        border-radius: 0.25rem;
         border: 1px solid #f5f5f5;
         padding: 0.25rem 0.8rem;
     }
     .forum-info {
         @include flex-l-center;
         flex-grow: 1;
-        padding-bottom: .35rem;
+        padding-bottom: 0.35rem;
         border-bottom: 1px solid #0000001a;
     }
     .forum-meta {
@@ -166,22 +166,20 @@
         margin: 0px;
         font-size: 1.25rem;
         height: 30px;
-        a{
-            
-        color: #343a40;
+        a {
+            color: #343a40;
         }
     }
-    .forum-brief{
+    .forum-brief {
         flex-grow: 1;
-        font-size: .6rem;
-        color:#868e96;
-        p{
+        font-size: 0.6rem;
+        color: #868e96;
+        p {
             margin: 0px 1px;
-            &:first-child{
+            &:first-child {
                 color: #6c757d;
             }
         }
-        
     }
     .forum-mod {
         @include flex-lr-center;
@@ -192,95 +190,214 @@
 #forum-body {
     padding: 1rem max(#{space_width_half($max-width)}, 5px);
 }
-.forum-box{
+.forum-box {
     @include basebox;
 }
 
 #thread-body {
     padding: 1rem max(#{space_width_half($max-width)}, 5px);
+
+    .thread-content {
+        @include flex-lr-top;
+        align-items: stretch;
+        margin-bottom: 1rem;
+        > .author-box {
+            flex-grow: 1;
+        }
+    }
+    .thread-aside {
+        margin-left: 10px;
+        position: sticky;
+        top: 55px;
+    }
+
+    .icon-guanzhu {
+        @include nobgbr;
+        @include bootstrap-before {
+            content: '\f4fe';
+        }
+        &.active::before {
+            content: '\f26e';
+        }
+    }
+    .icon-pm {
+        @include nobgbr;
+        @include bootstrap-before {
+            content: '\f694';
+        }
+    }
+    .aside-author-info {
+        width: 270px;
+        border-radius: .25rem;
+        background-size: contain;
+        background-repeat: no-repeat;    
+        @include flex-column-lr;
+        align-items: center;
+        justify-content: flex-end;
+        padding-top: 45px;
+    }
+    .aside-author-avatar{
+        border: 2px solid #fff;
+        width: 4.5rem;
+        height: 4.5rem;
+        border-radius: 4.5rem;
+        z-index: 1;
+    }
+    .aside-author-body{
+        margin-top: -2.25rem;
+        padding-top:2.25rem;
+        z-index: 0;
+        background-color: #fff;
+        width: 100%;
+        text-align: center;
+    }
+    .aside-author-meta{
+        @include flex-lr-center;
+        background-color: #fff;
+        justify-content: center;
+        width: 100%;
+        padding:1rem 0px;
+        border-top: 1px solid #e9ecef;
+        border-radius:0 0 .25rem .25rem;
+        div{
+            text-align: center;
+            padding: 0px .5rem;
+        }
+        p{
+            margin: 0px;
+        }
+    }
+    .aside-author-group{
+        border-radius: .25rem;
+        padding: .25rem;
+        display: inline-block;
+        color:#2997f7;
+        background-color: #2997f71a;
+    }
 }
 
-.replay-box{
+.replay-box {
     @include basebox;
-    font-size: .875rem;
+    font-size: 0.875rem;
     color: #212529;
-    a{
+    a {
         color: #212529;
-        text-decoration: none
+        text-decoration: none;
     }
-    .box-body{
-        padding:.25rem 1.25rem;
+    .box-body {
+        padding: 0.25rem 1.25rem;
     }
-    .replay-info{
+    .replay-info {
         @include flex-lr-center;
         align-items: flex-start;
-        padding: .7rem 0;
+        padding: 0.7rem 0;
         border-bottom: 1px solid #e9ecef;
-        &:last-child{
+        &:last-child {
             border-bottom: none;
         }
     }
-    .replay-avatar{
-        padding: .5rem .8rem 0 0;
-        img{           
+    .replay-avatar {
+        padding: 0.5rem 0.8rem 0 0;
+        img {
             width: 2.4rem;
             height: 2.4rem;
             border-radius: 2.4rem;
         }
     }
-    .replay-meta{
+    .replay-meta {
         flex-grow: 1;
         @include flex-column-lr;
     }
-    .replay-user{
+    .replay-user {
         @include flex-lr-center;
-        p{
+        p {
             margin: 1px 0px;
         }
     }
-    .replay-floor{
+    .replay-floor {
         display: inline-block;
         color: #888;
         background: #8888881a;
-        padding: .25em .4em;
+        padding: 0.25em 0.4em;
         font-size: 75%;
         font-weight: 700;
         line-height: 1;
         text-align: center;
         white-space: nowrap;
-        border-radius: .25rem;
+        border-radius: 0.25rem;
     }
-    .icon-zan{
+    .icon-zan {
         @include nobgbr;
-        @include bootstrap-before{
+        @include bootstrap-before {
             content: '\f407';
         }
-        &.active{
-            &::before{
+        &.active {
+            &::before {
                 content: '\f406';
             }
         }
     }
-    .icon-replay{
+    .icon-replay {
         @include nobgbr;
-        @include bootstrap-before{
+        @include bootstrap-before {
             content: '\f255';
         }
-
     }
-    .icon-qoute{
+    .icon-qoute {
         @include nobgbr;
-        @include bootstrap-before{
+        @include bootstrap-before {
             content: '\f25f';
         }
     }
 }
-.post-message{
-    margin: .25rem 0px;
-    p{
-        margin: .25rem 0px;
+.author-box {
+    @include basebox;
+    margin-bottom: 0px;
+    .box-header {
+        align-items: flex-end;
+        background: #fff;
+        h1 {
+            font-size: 1.25rem;
+            margin: 0.25rem 0px;
+        }
+        p {
+            margin: 1px;
+            font-size: 0.675rem;
+        }
+        .avatar {
+            vertical-align: bottom;
+        }
+        .icon-view {
+            @include bootstrap-before {
+                content: '\f341';
+            }
+        }
+        .icon-replay {
+            @include bootstrap-before {
+                content: '\f267';
+            }
+        }
     }
-    .blockquote{
-        font-size: .675rem;
+    .box-body {
+        padding: 1rem;
+        text-align: left;
+    }
+}
+.post-message {
+    padding: 0.25rem 0px;
+    p {
+        margin: 0.25rem 0px;
+    }
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        margin-top: 1px;
+        margin-bottom: 0.875rem;
+    }
+    .blockquote {
+        font-size: 0.675rem;
     }
 }

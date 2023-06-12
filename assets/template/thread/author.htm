@@ -1,0 +1,51 @@
+<div class="thread-content">
+    <div class="author-box">
+        <div class="box-header">
+            <div class="box-title">
+                <h1><!--{$thread['subject']}--></h1>
+                <p><img src="{avatar $author['uid']}" class="avatar" height="18"><!--{$author['username']}--></p>
+                <p>发布于<!--{timehuman $author['create_date']}--> <span class="icon-view">查看<!--{$thread['views']}--></span> <span class="icon-replay">回复<!--{$thread['posts']}--></span></p>
+            </div>
+            <div class="box-right">
+                <button class="icon-guanzhu">关注</button>
+                <button class="icon-pm">发消息</button>
+            </div>
+        </div>
+        <div class="box-body post-message">
+            <!--{$author['message']}-->
+        </div>
+    </div>
+    <div class="thread-aside">
+        <div class="box-body">
+            <div class="aside-author-info" style="background-image:url('{site images}thread/bg2.png');">
+                <img src="{avatar $author['uid']}" class="aside-author-avatar" height="63">
+                <div class="aside-author-body">
+                    <p><!--{$author['username']}--></p>
+                    <p>
+                        <span class="aside-author-group"><!--{$myapp['grouplist'][$author['gid']]['name']}--></span>
+                    </p>
+                    <p>
+                        <button class="icon-guanzhu">关注</button>
+                        <button class="icon-pm">发消息</button>
+                    </p>
+                </div>
+                <!--{if $author['uid']}-->
+                <div class="aside-author-meta">
+                    <div>
+                        <p>主题数</p>
+                        <b><!--{$user[$author['uid']]['threads']}--></b>
+                    </div>
+                    <div>
+                        <p>帖子</p>
+                        <b><!--{$user[$author['uid']]['threads']}--></b>
+                    </div>
+                    <!--{ifvar $user[$author['uid']]['fans']}--><div>
+                        <p>粉丝</p>
+                        <b><!--{$user[$author['uid']]['fans']}--></b>
+                    </div><!--{/if}-->
+                </div>
+                <!--{/if}-->
+            </div>
+        </div>
+    </div>
+</div>

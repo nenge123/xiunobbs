@@ -1,23 +1,9 @@
 <!--{template header}-->
 <main id="thread-body">
 <!--{if !empty($postlist)}-->
-<!--{eval list('list'=>$list,'user'=>$user,'first'=>$first) = $postlist;}-->
-<!--{ifvar $first}-->
-<div class="index-box">
-  <div class="box-header">
-    <div class="box-title">
-      
-      <h1 class="box-title"><!--{$thread['subject']}--></h1>
-      <p><img src="{avatar $first['uid']}" height="30"><!--{$first['username']}--></p>
-      <p>发布于<!--{timehuman $first['create_date']}--> <i>查看<!--{$thread['views']}--></i> <i>回复<!--{$thread['posts']}--></i></p>
-    </div>
-  </div>
-  <div class="box-body">
-    <!--{$first['message']}-->
-  </div>
-</div>
-<!--{/if}-->
-<!--{template thread/replay}-->
+<!--{eval list('list'=>$list,'user'=>$user,'first'=>$author) = $postlist;}-->
+<!--{subtemplate thread/author}-->
+<!--{subtemplate thread/replay}-->
 <!--{else}-->
 <div class="index-box">
     <div class="box-header np">

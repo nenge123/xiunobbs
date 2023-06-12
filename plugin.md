@@ -38,18 +38,24 @@ class plugin_test extends base{
 }
 ?>
 ```
+- APP->plugin_method_call
 > 调用方式  
 ```php
-$myapp->plugin_class_call(
+$myapp->plugin_method_call(
     'template', #method
     function($plugin_method) use (&$template){ #$plugin_method callable
 		$template=call_user_func($plugin_method,$template,$this->path, $this->file);
     }
 );
 #or
-foreach($myapp->plugin_class_call('template') as $plugin_method){
+foreach($myapp->plugin_method_call('template') as $plugin_method){
 	$template=call_user_func($plugin_method,$template,$this->path, $this->file);
 }
 
 
+```
+- APP->plugin_method_filter
+> 单纯处理单一变量
+```php
+$postlist = $myapp->plugin_method_filter('postlist',$postlist);
 ```

@@ -4,11 +4,14 @@ $max-width: 1140px;
 $full-width: 992px;
 $bg-color: #eff2f6;
 $c-white: #fff;
+html{
+    
+    font-size: 14px;
+}
 body {
     background-color: $bg-color;
     margin: 0;
     padding: 0;
-    font-size: 1rem;
 }
 @font-face {
     font-family: 'bootstrap';

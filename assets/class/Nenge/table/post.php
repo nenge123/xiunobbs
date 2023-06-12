@@ -73,7 +73,9 @@ class table_post extends base{
                 if(!empty($post['uid'])){
                     if(isset($userlist[$post['uid']])){
                         $post['username'] = $userlist[$post['uid']]['username'];
+                        $post['gid'] = $userlist[$post['uid']]['gid'];
                     }else{
+                        $post['gid'] = 7;
                         $post['uid'] = -1;
                         $post['username'] = $language['user_name_delete'];
                     }
