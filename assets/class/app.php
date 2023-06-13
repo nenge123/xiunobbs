@@ -958,13 +958,19 @@ class APP implements \ArrayAccess
         }
         $rule_str = '(?!(' . implode('|', $rootlist) . '))(.*)';
         if (!empty($_SERVER['IIS_UrlRewriteModule'])) {
-            $doc = new \DOMDocument();
-            if (is_file($data['path']['root'] . 'web.config')) {
-                $doc->load($data['path']['root'] . 'web.config');
-                $rewrite = $doc->getElementsByTagName('rule');
-                if (!empty($rewrite)) {
-                    $i = 0;
-                    while ($rule_elm = $rewrite->item($i++)) {
+            $doc = new \DOMDocument('1.0','UTF-8');
+            $doc->formatOutput = !0;
+            $doc->preserveWhiteSpace = !0;
+            $rewrite_file = $data['path']['root'] . 'web.config';
+            if (is_file($rewrite_file)) {
+                @$doc->load($rewrite_file);
+                $node_rules = null;
+                $node_rewrite = $doc->getElementsByTagName('rewrite')[0];
+                if (!empty($node_rewrite))$node_rules = $node_rewrite->getElementsByTagName('rules')[0];
+                if (!empty($node_rules)) {
+                    $rule_list = $node_rules->getElementsByTagName('rule');
+                    for($i=$rule_list->length;--$i>=0;){
+                        $rule_elm = $rule_list->item($i);
                         if (!empty($rule_elm) && $rule_attr = $rule_elm->attributes->getNamedItem('name')) {
                             $nodeValue = $rule_attr->nodeValue;
                             if ($nodeValue == 'xiuno_rewrite') {
@@ -973,27 +979,39 @@ class APP implements \ArrayAccess
                             }
                         }
                     }
+                }else{
+                    $xdoc = $doc;
+                    foreach(array('configuration','system.webServer','rewrite','rules') as $v){
+                        $elm = $doc->getElementsByTagName($v)[0];
+                        if(empty($elm)){
+                            $elm = $doc->createElement($v);
+                            $xdoc->appendChild($elm);
+                        }
+                        $xdoc = $elm; 
+                    }
+                    $node_rules = $xdoc;
                 }
             } else {
-                $doc->loadXML("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\t<configuration>\n\t\t<system.webServer>\n\t\t\t<rewrite>\n\t\t\t\t<rules>\n\t\t\t\t</rules>\n\t\t\t</rewrite>\n\t\t</system.webServer>\n\t</configuration>");
+                $doc->loadXML("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<configuration>\n\t<system.webServer>\n\t\t<rewrite>\n\t\t\t<rules>\n\t\t\t</rules>\n\t\t</rewrite>\n\t</system.webServer>\n</configuration>");
+                $node_rewrite = $doc->getElementsByTagName('rewrite')[0];
+                $node_rules = $node_rewrite->getElementsByTagName('rules')[0];
             }
             $new_rule = $doc->createElement('rule');
-            $new_rule->nodeValue;
-            $new_rule->setAttribute('name', 'xiuno_rewrite');
-            $new_rule->setAttribute('stopProcessing', 'true');
             $new_match = $doc->createElement('match');
-            $new_match->setAttribute('url', '^' . $rule_str . '$');
-            $new_conditions = $doc->createElement('conditions');
-            $new_conditions->setAttribute('logicalGrouping', 'MatchAll');
-            $new_conditions->setAttribute('trackAllCaptures', 'false');
             $new_action = $doc->createElement('action');
-            $new_action->setAttribute('type', 'Rewrite');
-            $new_action->setAttribute('url', 'index.php?{R:0}');
+            $new_conditions = $doc->createElement('conditions');
+            $node_rules->appendChild($new_rule);
             $new_rule->appendChild($new_match);
             $new_rule->appendChild($new_conditions);
             $new_rule->appendChild($new_action);
-            $doc->getElementsByTagName('rules')->item(0)->appendChild($new_rule);
-            file_put_contents($data['path']['root'] . 'web.config', $doc->saveXML());
+            $new_rule->setAttribute('name', 'xiuno_rewrite');
+            $new_rule->setAttribute('stopProcessing', 'true');
+            $new_match->setAttribute('url', '^' . $rule_str . '$');
+            $new_conditions->setAttribute('logicalGrouping', 'MatchAll');
+            $new_conditions->setAttribute('trackAllCaptures', 'false');
+            $new_action->setAttribute('type', 'Rewrite');
+            $new_action->setAttribute('url', 'index.php?{R:0}');
+            file_put_contents($rewrite_file, $doc->saveXML());
         } else {
             file_put_contents($data['path']['root'] . '.htaccess', "<ifMudule mod_rewrite.c>\nRewriteEngine on\nRewriteCond %{REQUEST_FILENAME} !-d\nRewriteCond %{REQUEST_FILENAME} !-f\n" . 'RewriteRule ^' . addcslashes($data['site']['root'], '/.-_') . $rule_str . '$ ' . $data['site']['root'] . 'index.php?$1 [L]' . "\n</ifMudule>");
         }

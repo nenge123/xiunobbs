@@ -13,7 +13,7 @@ use \mysqli;
 class db_mysqli
 {
 	public mixed $link;
-	public array $query = array();
+	public array $QueryData = array();
 	/**
 	 * 最后语句
 	 */
@@ -128,7 +128,7 @@ class db_mysqli
 			if ($sth instanceof \mysqli_stmt)$this->prepare_close($sth->get_result());
 		}
 		else $sth = null;
-		return current($this->query);
+		return current($this->QueryData);
 	}
 	public function update($sql, $param)
 	{
@@ -290,7 +290,7 @@ class db_mysqli
 	}
 	private function sql_query_time($param = array())
 	{
-		$this->query[] = array(
+		$this->QueryData[] = array(
 			'time' => round((microtime(1) - $this->time) * 1000, 2),
 			'sql' => $this->sql
 		) + $param;
@@ -742,7 +742,7 @@ class DB
 		if (!empty($db->settings['link'])) {
 			$sql = [];
 			foreach ($db->settings['link'] as $k => $v) {
-				$sql[] = $v->query;
+				$sql[] = $v->QueryData;
 			}
 			return  array_merge(...$sql);
 		}
