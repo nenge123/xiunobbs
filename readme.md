@@ -7,8 +7,8 @@
 
 
 ## 模块手册
-- [插件模块](plugin.md)
-- [数据库类处理](db.md)
-- [模板类模块](template.md)
-- [Nenge\APP变量说明](myapp_var.md)
-- [Nenge\APP类说明](myapp_class.md)
+- [插件模块](md/plugin.md)
+- [数据库类处理](md/db.md)
+- [模板类模块](md/template.md)
+- [Nenge\APP变量说明](md/myapp_var.md)
+- [Nenge\APP类说明](md/myapp_class.md)
