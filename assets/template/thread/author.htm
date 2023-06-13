@@ -16,36 +16,48 @@
         </div>
     </div>
     <div class="thread-aside">
-        <div class="box-body">
-            <div class="aside-author-info" style="background-image:url('{site images}thread/bg2.png');">
-                <img src="{avatar $author['uid']}" class="aside-author-avatar" height="63">
-                <div class="aside-author-body">
-                    <p><!--{$author['username']}--></p>
-                    <p>
-                        <span class="aside-author-group"><!--{$myapp['grouplist'][$author['gid']]['name']}--></span>
-                    </p>
-                    <p>
-                        <button class="icon-guanzhu">关注</button>
-                        <button class="icon-pm">发消息</button>
-                    </p>
+        <div class="aside-author-info" style="background-image:url('{site images}thread/bg2.png');">
+            <img src="{avatar $author['uid']}" class="aside-author-avatar" height="63">
+            <div class="aside-author-body">
+                <p><!--{$author['username']}--></p>
+                <p>
+                    <span class="aside-author-group"><!--{$myapp['grouplist'][$author['gid']]['name']}--></span>
+                </p>
+                <p>
+                    <button class="icon-guanzhu">关注</button>
+                    <button class="icon-pm">发消息</button>
+                </p>
+            </div>
+            <!--{if $author['uid']}-->
+            <div class="aside-author-meta">
+                <div>
+                    <p>主题数</p>
+                    <b><!--{$user[$author['uid']]['threads']}--></b>
                 </div>
-                <!--{if $author['uid']}-->
-                <div class="aside-author-meta">
-                    <div>
-                        <p>主题数</p>
-                        <b><!--{$user[$author['uid']]['threads']}--></b>
-                    </div>
-                    <div>
-                        <p>帖子</p>
-                        <b><!--{$user[$author['uid']]['threads']}--></b>
-                    </div>
-                    <!--{ifvar $user[$author['uid']]['fans']}--><div>
-                        <p>粉丝</p>
-                        <b><!--{$user[$author['uid']]['fans']}--></b>
-                    </div><!--{/if}-->
+                <div>
+                    <p>帖子</p>
+                    <b><!--{$user[$author['uid']]['threads']}--></b>
                 </div>
-                <!--{/if}-->
+                <!--{ifvar $user[$author['uid']]['fans']}--><div>
+                    <p>粉丝</p>
+                    <b><!--{$user[$author['uid']]['fans']}--></b>
+                </div><!--{/if}-->
+            </div>
+            <!--{/if}-->
+        </div>
+        <!--{ifvar $hotlist = DB::t('thread')->list_hot($thread['fid'])}-->
+        <div class="aside-box">
+            <div class="box-header">
+                <div class="box-title">热门帖子</div>
+            </div>
+            <div class="box-body">
+                <ul class="aside-ul-thread">
+                    <!--{loop $hotlist $hid $hotthread}-->
+                    <li><a href="{url 'thread-'.$hid}"><!--{$hotthread['subject']}--></a></li>
+                    <!--{/if}-->
+                </ul>
             </div>
         </div>
+        <!--{/if}-->
     </div>
 </div>

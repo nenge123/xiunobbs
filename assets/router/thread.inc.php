@@ -2,6 +2,7 @@
 defined('XIUNO')||die('return to <a href="">Home</a>');
 $myapp->data['title'] = $language['thread_not_exists'];
 if(!empty($router_value)&&is_numeric($router_value)){
+    $myapp->session_verify();
     $thread = Nenge\DB::t('thread')->fetch(array('tid'=>$router_value));
     if(!empty($thread)&&!empty($myapp->data['forumlist'][$thread['fid']])){
         $forum = $myapp->data['forumlist'][$thread['fid']];

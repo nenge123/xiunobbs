@@ -26,3 +26,5 @@ Nenge\APP类
 - `allowforum()` 返回当前用户有访问权的板块
 
 - `time_human($timesize)` 返回人性化时间
+
+- `session_verify()` 敏感操作 验证登录状态,进行一次用户查询,获取当前用户所有数据

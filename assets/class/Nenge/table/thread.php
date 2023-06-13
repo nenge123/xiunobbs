@@ -13,7 +13,7 @@ class table_thread extends base
         $this->table = 'thread';
         $this->indexkey = 'tid';
     }
-    public function top_list($reload = false)
+    public function list_top($reload = false)
     {
         $myapp = \Nenge\APP::app();
         if (!empty($this->topthread)) return $this->topthread;
@@ -62,7 +62,7 @@ class table_thread extends base
     }
     public function filter_toplist($fids)
     {
-        $topthread = $this->top_list() ?: array();
+        $topthread = $this->list_top() ?: array();
         $toplist = array();
         $top2 = array();
         $top1 = array();
@@ -216,5 +216,17 @@ class table_thread extends base
         }
         $threads['user'] = $userlist;
         return $threads;
+    }
+    public function list_hot($fid,$limit=15)
+    {
+        return $this->all(
+            array('fid'=>$fid)
+            ,array(
+            'order'=>array(
+                'posts'=>'DESC',
+                'last_date'=>'DESC'
+            ),
+            'limit'=>$limit
+        ));
     }
 }

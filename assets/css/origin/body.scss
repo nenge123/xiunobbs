@@ -209,6 +209,7 @@
         margin-left: 10px;
         position: sticky;
         top: 55px;
+        align-self: flex-start;
     }
 
     .icon-guanzhu {
@@ -235,6 +236,9 @@
         align-items: center;
         justify-content: flex-end;
         padding-top: 45px;
+        &~.aside-box{
+            margin-top: 1rem;
+        }
     }
     .aside-author-avatar{
         border: 2px solid #fff;
@@ -352,7 +356,6 @@
 }
 .author-box {
     @include basebox;
-    margin-bottom: 0px;
     .box-header {
         align-items: flex-end;
         background: #fff;
@@ -399,5 +402,69 @@
     }
     .blockquote {
         font-size: 0.675rem;
+    }
+}
+.aside-box{
+    @include basebox;
+    width: 270px;
+    .aside-ul-thread{
+        @include ul-list-one;
+    }
+    & ~ .aside-box{
+        margin-top: 1rem;
+    }
+}
+.fastpost-box{
+    background-color: #fff;
+    @include basebox;
+    border-radius: .25rem;
+    padding: .25rem;
+    border: 1px solid $box-color-border;
+    margin-bottom: 1rem;
+    .box-body{
+        border: none;
+    }
+    .fastpost-form{
+        @include flex-lr-top;
+        padding: 1rem;
+    }
+    .fastpost-title{
+        @include flex-lr-center;
+        padding: 1rem;
+    }
+    .fastpost-user{
+        text-align: center;
+        padding-right: 1rem;
+        p{
+            margin: 1px;
+        }
+    }
+    .fastpost-input{
+        flex-grow: 1;
+        height: 3rem;
+        transition: height .2s;
+        display: block;
+        width: 100%;
+        padding: .375rem .75rem;
+        font-size: 1rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: #495057;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #ced4da;
+        border-radius: .25rem;
+        outline: 1px solid transparent;
+        &:hover{
+            outline: 1px solid #0084ff;
+            height: 8rem;
+        }
+    }
+    .fastpost-pid{
+        @include flex-lr-center;
+        margin: 1rem;
+        background-color: $box-color-border;
+        padding: .5rem;
+        border-radius: .25rem;
     }
 }

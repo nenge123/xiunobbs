@@ -530,7 +530,7 @@ class APP implements \ArrayAccess
     public function allowforum()
     {
         $data = $this->data;
-        if (!isset($this->data['allowforum'])) {
+        if (!isset($this->data['allowforum']) || $this->data['allowforum']==null) {
             $this->data['allowforum'] = array();
             foreach ($data['forumlist'] as $k => $v) {
                 if (isset($data['forum_access'][$v['fid']])&&isset($data['forum_access'][$v['fid']][$data['gid']])) {
@@ -668,8 +668,14 @@ class APP implements \ArrayAccess
     }
     public function session_verify()
     {
-        if(!empty($this->data['user'])&&empty($this->data['user']['password'])){
+        if(!empty($this->data['uid'])&&empty($this->data['user']['password'])){
             $this->data['user'] = DB::t('user')->uids($this->data['user']['uid']);
+            if(!empty($this->data['user']['uid'])){
+                $this->data['uid'] = $this->data['user']['uid'];
+                $this->data['gid'] = $this->data['user']['gid'];
+                $this->data['access'] = $this->data['grouplist'][$this->data['gid']];
+                $this->data['allowforum'] = null;
+            }
         }
     }
     public static function template($router)
