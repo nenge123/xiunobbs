@@ -5,15 +5,15 @@
 <!--{eval if(empty($thread_time))$thread_time=0;}-->
 <!--{if !empty($threadlist = DB::t('thread')->page_by_time($thread_time,$thread_field,$thread_order,$fids,40,$digest))}-->
 <!--{ifvar $threadlist['top']}-->
-<ul class="thread-list">
+<ul class="forum-thread-list">
     <!--{loop $threadlist['top'] $tid $thread}-->
-    <li class="thread-item">
-        <a class="thread-top" href="{url 'thread-'.$tid}"></a>
-        <div class="thread-info">
-            <div class="thread-subject">
+    <li class="forum-thread-item">
+        <a class="forum-thread-top" href="{url 'thread-'.$tid}"></a>
+        <div class="forum-thread-info">
+            <div class="forum-thread-subject">
                 <a href="{url 'thread-'.$thread['tid']}">{$thread['subject']}</a>
             </div>
-            <div class="thread-meta">
+            <div class="forum-thread-meta">
                 <a href="{url 'forum-'.$thread['fid']}"><!--{$myapp['forumlist'][$thread['fid']]['name']}--></a>
                 <a href="{url 'space-'.$thread['uid']}"><!--{$thread['username']}--></a>
                 <span><!--{time $thread['create_date']}--></span>
@@ -26,17 +26,17 @@
 </ul>
 <!--{/if}-->
 <!--{ifvar $threadlist['list']}-->
-<ul class="thread-list">
+<ul class="forum-thread-list">
     <!--{loop $threadlist['list'] $tid $thread}-->
-    <li class="thread-item">
-        <a class="thread-left" href="{url 'space-'.$thread['uid']}">
+    <li class="forum-thread-item">
+        <a class="forum-thread-left" href="{url 'space-'.$thread['uid']}">
             <img src="{echo $myapp->avatar($thread['uid'])}" height="30">
         </a>
-        <div class="thread-info">
-            <div class="thread-subject">
+        <div class="forum-thread-info">
+            <div class="forum-thread-subject">
                 <a href="{url 'thread-'.$thread['tid']}">{$thread['subject']}</a>
             </div>
-            <div class="thread-meta">
+            <div class="forum-thread-meta">
                 <a href="{url 'forum-'.$thread['fid']}"><!--{$myapp['forumlist'][$thread['fid']]['name']}--></a>
                 <a href="{url 'space-'.$thread['uid']}"><!--{$thread['username']}--></a>
                 <span><!--{time $thread['create_date']}--></span>

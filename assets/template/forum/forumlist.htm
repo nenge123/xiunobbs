@@ -1,16 +1,16 @@
 <!--{ifvar $forumlist=DB::t('forum')->all('',array('order'=>array('rank'=>'DESC')))}-->
-<ul class="forum-list">
+<ul class="forum-all-list">
     <!--{loop $forumlist $fid $forum}-->
     <!--{if in_array($fid,$myapp->allowforum())&&empty($forum['fup'])}-->
-    <li class="forum-item">
-        <div class="forum-div">
-            <div class="forum-info">
+    <li class="forum-all-item">
+        <div class="forum-all-content">
+            <div class="forum-all-info">
                 <img src="{$myapp->forumimg($fid)}" height="63">
-                <div class="forum-meta">
-                    <h3 class="forum-header">
+                <div class="forum-all-meta">
+                    <h3 class="forum-all-header">
                         <a href="{url 'forum-'.$fid}"><!--{$forum['name']}--></a>
                     </h3>
-                    <div class="forum-brief">
+                    <div class="forum-all-brief">
                         <p>
                             <span>主题:{$forum['threads']}</span>
                             <span>今日主题:{$forum['todaythreads']}</span>
@@ -27,7 +27,7 @@
                     </div>
                 </div>
             </div>
-            <div class="forum-mod">
+            <div class="forum-all-mod">
                 <div>
                     <!--{ifvar $myapp['forumlist'][$fid]['moderators']}-->
                     论坛版主:<!--{loop $myapp['forumlist'][$fid]['moderators'] $mid $mname}-->

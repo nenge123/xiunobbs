@@ -19,5 +19,8 @@ body {
         url(fontPath('static/bootstrap-icons-v4.woff')) format('woff');
 }
 @import 'origin/header.scss';
-@import 'origin/body.scss';
+@import 'origin/body_index.scss';
+@import 'origin/body_forum.scss';
+@import 'origin/body_thread.scss';
+@import 'origin/body_aside.scss';
 @import 'origin/footer.scss';

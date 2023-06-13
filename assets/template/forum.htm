@@ -4,7 +4,7 @@
 <!--{if !empty($myapp['forumlist'][$router_value])&&in_array($router_value,$myapp->allowforum())}-->
 <div class="index-box">
     <div class="box-header np">
-        <ul class="box-title forum-title">
+        <ul class="box-title forum-list-title">
 			<li{if empty($_GET['type'])} class="active"{/if}><a class="icon-forum" href="{url 'forum-'.$fids}">最新</a></li>
 			<li{if $myapp->GET('type') == '1'} class="active"{/if}><a class="icon-forum" href="{url 'forum-'.$fids type=1}">精华</a></li>
 			<li{if $myapp->GET('type') == '2'} class="active"{/if}><a class="icon-forum" href="{url 'forum-'.$fids type=2}">新帖</a></li>
@@ -12,18 +12,18 @@
     </div>
     <div class="box-body">
 		<!--{if $myapp->GET('type') == '1'}-->
-			<!--{template index/digest}-->
+			<!--{template forum/digest}-->
 		<!--{elseif $myapp->GET('type') == '2'}-->
-			<!--{template index/newthread}-->
+			<!--{template forum/newthread}-->
 		<!--{else}-->
-			<!--{template index/lastthread}-->
+			<!--{template forum/lastthread}-->
 		<!--{/if}-->
     </div>
 </div>
 <!--{else}-->
 <div class="index-box">
     <div class="box-header np">
-        <div class="box-title forum-title">
+        <div class="box-title">
 			提示
 		</div>
     </div>

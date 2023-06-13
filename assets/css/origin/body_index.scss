@@ -1,0 +1,60 @@
+#index-body {
+    padding: 1rem max(#{space_width_half($max-width)}, 5px);
+}
+.index-box {
+    @include basebox;
+    a {
+        text-decoration: none;
+    }
+    .box-title {
+        color: #454d55;
+        font-size: 14px;
+    }
+    .icon-online {
+        @include bootstrap-before() {
+            content: '\f4cf';
+            font-weight: 900;
+        }
+    }
+    .icon-forum {
+        @include bootstrap-before() {
+            content: '\f459';
+            font-weight: 900;
+        }
+    }
+    .icon-sign {
+        background: #0084ff;
+        border: 1px solid #007bff;
+        color: #fff;
+        padding: 2px 5px;
+        display: block;
+        font-size: 12px;
+        border-radius: 0.25rem;
+        @include bootstrap-before() {
+            content: '\f1e2';
+        }
+    }
+    &~.index-box{
+        margin-top: 1rem;
+    }
+}
+
+.index-online-list {
+    @include flex-l-center;
+    align-items: flex-start;
+    list-style: none;
+    padding: 0.5rem;
+    margin: 0px;
+    font-size: 0.675rem;
+    text-align: center;
+    li {
+        width: 120px;
+    }
+    p {
+        margin: 0px;
+        padding: 2px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}

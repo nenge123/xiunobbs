@@ -26,6 +26,7 @@ const Nenge = new class NengeCores {
         I.mobile && (window.onerror = e => alert(e.message || e));
         let src = spath && spath.src.split('?');
         T.JSpath = src && src[0].split('/').slice(0, -1).join('/') + '/';
+        if(T.JSpath)T.JSpath = T.JSpath.replace('static/','');
         T.triger(document, 'NengeStart', {
             detail: T
         });

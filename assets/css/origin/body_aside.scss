@@ -1,0 +1,10 @@
+.aside-box{
+    @include basebox;
+    width: 270px;
+    .aside-ul-thread{
+        @include ul-list-one;
+    }
+    & ~ .aside-box{
+        margin-top: 1rem;
+    }
+}
