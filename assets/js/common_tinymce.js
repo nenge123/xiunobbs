@@ -7,16 +7,15 @@
                 promotion: !1, //隐藏升级按钮
                 branding: !1,//隐藏官网链接
                 plugins: [
-                    "accordion","advlist","anchor","autolink","autoresize","autosave","charmap","code","codesample","directionality","emoticons","fullscreen","image","importcss","insertdatetime","link","lists","media","nonbreaking","pagebreak","preview","quickbars","save","searchreplace","table","template","visualblocks","visualchars","wordcount"
+                    "accordion","advlist","anchor","autolink","autoresize","autosave","charmap","code","directionality","emoticons","fullscreen","image","insertdatetime","link","lists","media","nonbreaking","pagebreak","preview","quickbars","save","searchreplace","table","visualblocks","visualchars","wordcount"
                 ],
                 suffix: '.min',
-                //skin: 'tinymce-5-dark',
                 //icons: 'thin',\
-                //base_url: 'https://cdn.staticfile.org/tinymce/6.5.0/',
-                //skin: 'oxide',
+                base_url: 'https://cdn.staticfile.org/tinymce/6.5.0/',
+                skin: 'oxide',
                 //skin_url:'https://cdn.staticfile.org/tinymce/6.5.0/skins/ui/oxide',
                 language: 'zh-Hans',
-                //language_url:'{site js}tinymce/langs/zh-Hans.js',
+                language_url:T.JSpath+'tinymce/langs/zh-Hans.js',
                 toolbar: !1,
                 toolbar_location: 'bottom',
                 selector: '.fastpost-textarea',
@@ -59,11 +58,13 @@
             }
         }
     );
-    if(T.$('.fastpost-textarea')){
-        T.tinymce_conf.selector = '.fastpost-textarea';
-        T.tinymce_load().then(e=>{
-            tinymce.init(T.tinymce_conf);
-        });
+    T.docload(e=>{
+        if(T.$('.fastpost-textarea')){
+            T.tinymce_conf.selector = '.fastpost-textarea';
+                T.tinymce_load().then(e=>{
+                    tinymce.init(T.tinymce_conf);
+                });
 
-    }
+        }
+    });
 }).call(Nenge);

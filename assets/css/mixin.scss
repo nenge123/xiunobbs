@@ -104,6 +104,9 @@ $link-highlight:#127feb !default;
         color: $box-color-link;
         text-decoration: none
     }
+    img{
+        max-width: 100%;
+    }
     >.box-header {
         @include flex-lr-center;
         margin-bottom: 0;
