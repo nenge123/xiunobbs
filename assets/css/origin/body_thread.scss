@@ -235,7 +235,7 @@
             margin: 1px;
         }
     }
-    .fastpost-input{
+    .fastpost-textarea{
         flex-grow: 1;
         height: 3rem;
         transition: height .2s;
@@ -255,6 +255,9 @@
             outline: 1px solid #0084ff;
             height: 8rem;
         }
+    }
+    .tox-tinymce{
+        flex-grow: 1;
     }
     .fastpost-pid{
         @include flex-lr-center;

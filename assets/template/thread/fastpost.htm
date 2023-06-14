@@ -19,8 +19,9 @@
                 <img src="{avatar $myapp['uid']}" height="48">
                 <p><!--{$myapp['user']['username']}--></p>
             </div>
-            <textarea class="fastpost-input" placeholder="你要回复点什么"></textarea>
+            <textarea class="fastpost-textarea" placeholder="你要回复点什么"></textarea>
         </form>
     </div>
 </div>
+<!--{eval $myapp->data['footerjs'][] = $myapp['site']['js'].'common_tinymce.js';}-->
 <!--{/if}-->

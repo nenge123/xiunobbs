@@ -446,6 +446,7 @@ class APP implements \ArrayAccess
             'title' => '',
             'keywords' => '',
             'description' => '',
+            'footerjs'=>array(),
             'mobile' => empty($_SERVER['HTTP_SEC_CH_UA_MOBILE']) || $_SERVER['HTTP_SEC_CH_UA_MOBILE'] != '?0'
         );
         if (!is_file($this->data['path']['lang'] . $this->conf['lang'] . '.php')) {
