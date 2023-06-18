@@ -12,3 +12,7 @@
 - [模板类模块](md/template.md)
 - [Nenge\APP变量说明](md/myapp_var.md)
 - [Nenge\APP类说明](md/myapp_class.md)
+
+> 前台
+
+- [Javascript模块手册](md/js-hack.md)

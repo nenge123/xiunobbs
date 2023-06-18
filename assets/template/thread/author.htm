@@ -13,6 +13,13 @@
         </div>
         <div class="box-body post-message">
             <!--{$author['message']}-->
+            <!--{ifvar $author['attach']}-->
+            <ul class="thread-attach-list">
+                <!--{loop $author['attach'] $aid $attach}-->
+                    <!--{subtemplate thread/attach}-->
+                <!--{/loop}-->
+            </ul>
+            <!--{/if}-->
         </div>
     </div>
     <div class="thread-aside">

@@ -69,6 +69,20 @@ class table_post extends base{
             $userlist = DB::t('user')->uids($uids);
             $postlist = array();
             $posttop = array();
+            $attachlist = array();
+            foreach($list as $post){
+                if(!empty($post['images']) || !empty($post['files'])){
+                    $aids[] = $post['pid'];
+                }
+            }
+            if(!empty($aids)){
+                $attachlist = DB::t('attach')->fetch_by_pids($aids);
+                if(!empty($attachlist)){
+                    foreach($attachlist as $v){
+                        $list[$v['pid']]['attach'][$v['aid']] = $v;
+                    }
+                }
+            }
             foreach($list as $pid=>$post){
                 if(!empty($post['uid'])){
                     if(isset($userlist[$post['uid']])){

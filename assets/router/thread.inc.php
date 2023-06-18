@@ -11,7 +11,40 @@ if(!empty($router_value)&&is_numeric($router_value)){
             $access = array_merge($myapp->data['forum_access'][$forum['fid']][$myapp->data['gid']]);
         }
         if(!empty($access['allowread'])){
-            #无权访问帖子
+            #有权访问帖子
+            if($myapp->data['method'] == 'POST'){
+                if(!empty($_POST['message'])){
+                    $attachlist  = [];
+                    if(!empty($_POST['attachid'])){
+                        $attachlist = Nenge\DB::t('attach')->aids(array('aid'=>explode(',',$_POST['attachid'])));;
+                    }
+                    $images = 0;
+                    $files = 0;
+                    if(!empty($attachlist)){
+                        foreach($attachlist as $k=>$v){
+                            if(!empty($v['isimage'])){
+                                $images+=1;
+                            }else{
+                                $files+=1;
+                            }
+                        }
+                    }
+                    $postdata = array(
+                        'uid'=>$myapp->data['user']['uid'],
+                        'tid'=>$thread['tid'],
+                        'fid'=>$thread['fid'],
+                        'create_date'=>$myapp->data['time'],
+                        'images'=>$images,
+                        'files'=>$files,
+                        'userip'=>$myapp->data['longip'],
+                        'doctype'=>intval($myapp->POST('doctype'))?:1,
+                        'quotepid'=>intval($myapp->POST('quotepid'))?:1,
+                        'message'=>$_POST['message']
+                    );
+
+                }
+                $myapp->exit();
+            }
             $myapp->data['title'] = $thread['subject'];
             $only = !1;
             $order = 'ASC';

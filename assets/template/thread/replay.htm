@@ -8,7 +8,7 @@
         <!--{ifvar $list}-->
         <!--{loop $list $pid $post}-->
         <?php if($order=='ASC'){$floor+=1;}else {$floor -=1;} ?>
-        <div class="replay-info">
+        <div class="replay-info" id="pid-{$post['pid']}">
             <a class="replay-avatar" href="{url 'space-'.$post['uid']}"><img src="{avatar $post['uid']}" height="30"></a>
             <div class="replay-meta">
                 <div class="replay-user">
@@ -32,7 +32,13 @@
                     </blockquote>
                     <!--{/if}-->
                     <!--{$post['message']}-->
-
+                    <!--{ifvar $post['attach']}-->
+                    <ul class="thread-attach-list">
+                    <!--{loop $post['attach'] $aid $attach}-->
+                        <!--{subtemplate thread/attach}-->
+                    <!--{/loop}-->
+                    </ul>
+                    <!--{/if}-->
                 </div>
                 <div class="replay-action">
                     <button class="icon-zan">点赞</button>

@@ -19,8 +19,8 @@
 			</p>
 		</div>
 	</footer>
-	<script src="{site js}common.js?<!--{$myapp['ver']}-->"></script>
-	<!--{loop $myapp['footerjs'] $v}--><script src="{$v}"></script><!--{/loop}-->
+	<script src="{site js}common.js?<!--{$myapp['time']}-->"></script>
+	<!--{loop $myapp['footerjs'] $v}--><script src="{$v}?{$myapp['time']}"></script><!--{/loop}-->
 	<script src="{site data}plugin.js?<!--{$myapp['ver']}-->"></script>
 </body>
 </html>

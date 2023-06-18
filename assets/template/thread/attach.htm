@@ -1,0 +1,6 @@
+<li>
+    <a href="{url 'download-'.$aid}" class="icon-{$attach['filetype']}"><!--{$attach['orgfilename']}--><!--{ifvar $attach['comment']}-->(<!--{$attach['comment']}-->)<!--{/if}--><!--{ifvar $attach['create_date']}-->&nbsp;<!--{timehuman $attach['create_date']}--><!--{/if}--></a>
+    <!--{ifvar $attach['credits']}--><p class="icon-credits">积分不低于<!--{$attach['credits']}-->才允许下载</p><!--{/if}-->
+    <!--{ifvar $attach['golds']}--><p class="icon-glods">花费:<!--{$attach['golds']}--></p><!--{/if}-->
+    <!--{ifvar $attach['rmbs']}--><p class="icon-rmbs">花费:<!--{$attach['rmbs']}--></p><!--{/if}-->
+</li>

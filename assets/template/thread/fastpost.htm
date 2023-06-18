@@ -1,25 +1,26 @@
 <!--{if $myapp['uid']}-->
-<div class="fastpost-box">
+<div class="fastpost-box" id="fast-post-div">
     <div class="box-body">
         <div class="fastpost-pid">
             <div>
                 <span>正在回复</span>
-                <b>玛丽苏</b>
+                <b id="fastpost-name">玛丽苏</b>
             </div>
-            <button>取消回复</button>
+            <button id="fastpost-back">取消回复</button>
         </div>
         <div class="fastpost-title">
             <b>回复</b>
-            <span><!--{echo $thread['posts']+1}-->楼</span>
+            <span id="fastpost-floor"><!--{echo $thread['posts']+1}-->楼</span>
         </div>
         <form action="{$_SERVER['REQUEST_URI']}" method="post" class="fastpost-form">
             <input type="hidden" name="doctype" value="1">
-            <input type="hidden" name="pid" value="0">
+            <input type="hidden" name="quotepid" value="0">
+            <input type="hidden" name="attachid" value="">
             <div class="fastpost-user">
                 <img src="{avatar $myapp['uid']}" height="48">
                 <p><!--{$myapp['user']['username']}--></p>
             </div>
-            <textarea class="fastpost-textarea" placeholder="你要回复点什么"></textarea>
+            <textarea class="fastpost-textarea" name="message" placeholder="你要回复点什么"></textarea>
         </form>
     </div>
 </div>

@@ -13,6 +13,9 @@ body {
     margin: 0;
     padding: 0;
 }
+img{
+    max-width: 100%;
+}
 @font-face {
     font-family: 'bootstrap';
     src: url(fontPath('static/bootstrap-icons-v4.woff2')) format('woff2'),
@@ -24,3 +27,28 @@ body {
 @import 'origin/body_thread.scss';
 @import 'origin/body_aside.scss';
 @import 'origin/footer.scss';
+
+
+.mask-content{
+    position: fixed; width: 100vw; height: 100vh; margin: 0px; padding: 0px; z-index: 999999; background: rgba(8, 8, 8, 0.75); display: block; inset: 0px; touch-action: none; pointer-events:visiblefill; overflow: hidden;
+    .mask-label{
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        margin: auto;
+        width: 250px;
+        height: 40px;
+        text-align: center;
+        background: #000;
+        color: #fff;
+        font-size: 12px;
+    }
+    p{
+        margin: 1px;
+        font-weight: bold;
+        color: #f3a109e3;
+    }
+    
+}

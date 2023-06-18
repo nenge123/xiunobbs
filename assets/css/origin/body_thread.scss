@@ -226,7 +226,7 @@
     }
     .fastpost-title{
         @include flex-lr-center;
-        padding: 1rem;
+        padding:1rem 1rem 0 1rem;
     }
     .fastpost-user{
         text-align: center;
@@ -254,6 +254,18 @@
         &:hover{
             outline: 1px solid #0084ff;
             height: 8rem;
+        }
+    }
+    .tox{
+        .tox-statusbar{            
+            font-size: .675rem !important;
+            height: auto !important;
+        }
+        .tox-editor-header{
+            padding: 0px !important;
+        }
+        .tox-mbtn{
+            margin: 0px;
         }
     }
     .tox-tinymce{

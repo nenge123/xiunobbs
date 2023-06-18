@@ -447,7 +447,8 @@ class APP implements \ArrayAccess
             'keywords' => '',
             'description' => '',
             'footerjs'=>array(),
-            'mobile' => empty($_SERVER['HTTP_SEC_CH_UA_MOBILE']) || $_SERVER['HTTP_SEC_CH_UA_MOBILE'] != '?0'
+            'mobile' => empty($_SERVER['HTTP_SEC_CH_UA_MOBILE']) || $_SERVER['HTTP_SEC_CH_UA_MOBILE'] != '?0',
+            'method'=>$_SERVER['REQUEST_METHOD']
         );
         if (!is_file($this->data['path']['lang'] . $this->conf['lang'] . '.php')) {
             $this->conf['lang'] = 'zh-cn';
