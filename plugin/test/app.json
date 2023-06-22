@@ -1,3 +1,4 @@
 {
-    "class":"test"
+    "class":"test",
+    "router":"admin2,admin3"
 }

@@ -4,9 +4,11 @@ cache
 web.config
 .htaccess
 p.php
+old.php
 xiunobbs4.zip
 test.gif
 test.zip
 assets/js/zip.js
 assets/js/zip/webp_enc
 assets/js/zip/wasm-im
+assets/js/zip/webp_gif

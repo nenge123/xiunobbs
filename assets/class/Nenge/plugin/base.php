@@ -1,5 +1,5 @@
 <?php
-namespace Nenge\plugin;
+namespace plugin;
 class base
 {
     public static $_app;

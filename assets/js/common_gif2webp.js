@@ -1,5 +1,10 @@
 !(function(){
     var T = this,I=T.I,F=T.F;
+    /**
+     * gif header
+     * width = m[7]+m[6]
+     * height = m[9]+m[8]
+     */
     Object.assign(T,{
         async gif2webp(buf,width,height,quality,inputName,outputName){
             var resize;

@@ -422,7 +422,8 @@ const Nenge = new class NengeCores {
     }
     ajax(ARG) {
         let T = this,
-            I = T.I;
+            I = T.I,
+            F = T.F;
         if (I.str(ARG)) ARG = {
             url: ARG
         };
@@ -472,7 +473,7 @@ const Nenge = new class NengeCores {
                 }
             });
             ARG.progress && T.on(request, evt[0], e => ARG.progress(I.PER(e.loaded, e.total), e.total, e.loaded, 0, request));
-            ARG.postProcess && T.on(request.upload, evt[0], e => ARG.postProcess(I.PER(e.loaded, e.total), e.total, e.loaded, e));
+            ARG.postProgress && T.on(request.upload, evt[0], e => ARG.postProgress(I.PER(e.loaded, e.total), e.total, e.loaded, e));
             I.toArr(evt, v => I.none(ARG[v]) || (T.on(request, val, ARG[v]), I.DP(ARG, v)));
             ARG.upload && I.toArr(evt, v => I.none(ARG.upload[v]) || (T.on(request, val, ARG.upload[v]), I.DP(ARG.upload, v)));
             let formData, type = ARG.type || "",
@@ -485,7 +486,7 @@ const Nenge = new class NengeCores {
                 formData = I.toJson(ARG.json);
                 if (!type) type = 'json';
                 I.assign(headers, {
-                    Accept: 'application/json, text/plain, */*'
+                    Accept:[F.getMime('json'),F.getMime('text'),'*/*'].join()
                 });
             } else if (ARG.post) {
                 formData = I.post(ARG.post);
@@ -706,7 +707,7 @@ const Nenge = new class NengeCores {
         });
     }
     docElm(str, mime) {
-        return new DOMParser().parseFromString(str, mime || 'text/html');
+        return new DOMParser().parseFromString(str, mime || this.F.getMime('html'));
     }
     HTMLToTxt(str, bool) {
         let T = this,
@@ -723,7 +724,7 @@ const Nenge = new class NengeCores {
     Err(msg) {
         return new Error(msg);
     }
-    download(name, buf, type) {
+    async download(name, buf, type) {
         let T = this,
             F = T.F,
             I = F.I,
@@ -731,13 +732,13 @@ const Nenge = new class NengeCores {
         if (I.str(name)) {
             if (/^(http|blob:)/.test(name)) {
                 href = name;
-                name = 'n.js';
+                name = F.getname(name);
             } else if (buf) {
-                href = F.URL(buf, type);
+                href = F.URL(buf, type||'txt');
             }
         } else {
             href = F.URL(name, type);
-            name = name.name || 'n.js';
+            name = name.name || 'download.'+(await F.CheckExt(name)||'txt');
         }
         let a = T.$ce("a");
         a.href = href;
@@ -792,6 +793,120 @@ const Nenge = new class NengeCores {
                 }
             )
         )
+    }
+    async toZip(files,progress){
+        var T = this;
+        if (!window.zip) await T.loadLibjs(T.JSpath + T.F.zipsrc);
+        var {
+            BlobReader,
+            Uint8ArrayReader,
+            BlobWriter,
+            ZipWriter,
+          } = zip;
+        const zipFileWriter = new BlobWriter();
+        const zipWriter = new ZipWriter(zipFileWriter);
+        if(!files) return zipWriter;
+        if(typeof files.length !='undefined'){
+            T.I.toArr(files).map(file=>zipWriter.add(file.name,new BlobReader(file),{onprogress(current, total){progress&&progress(current, total,file.name)}}));
+        }else if(T.I.blob(files)){
+            T.I.toArr(files).map(file=>zipWriter.add(file[0],new Uint8ArrayReader(file[1]),{onprogress(current, total,b){console.log(current, total,b);progress&&progress(current, total,file[0])}}));
+        }else{
+            return zipWriter;
+        }
+        await zipWriter.close({onprogress(current, total){progress&&progress(current, total,'zip'+T.GL('progress'))}});
+        return await zipFileWriter.getData();
+    }
+    async getImageSize(buf){
+        let T=this,I=T.I,F=T.F;
+        let head = buf.slice(0,32);
+        if(I.blob(head))head = new Uint8Array(await head.arrayBuffer());
+        let headStr = I.buf16str(head);
+        let ext = I.toArr(F.extutf16).filter(e=>e[1].test(headStr))[0]||[];
+        var width=0,height=0;
+        if(ext[0]=='gif'){
+            width = (head[7]<<8) + head[6];
+            height =  (head[9]<<8) + head[8];
+        }else if(ext[0]=='webp'){
+            let offset
+            if(head[15]==0x58 || (head[23]==0&&head[22]==0&&head[21]==0)){
+                offset = 24;
+                width =  (head[offset+2]<<16) + (head[offset+1]<<8) + head[offset] + 1;
+                offset+=3;
+                height =  (head[offset+2]<<16) + (head[offset+1]<<8) + head[offset] + 1;
+            }else if(head[15]==0x20){
+                offset = 26;
+                width = (head[offset+1]<<8) + head[offset];
+                offset = 28;
+                height = (head[offset+1]<<8) + head[offset];
+            }else if(head[15] == 0x4c&&head[20]==0x2f){       
+                offset = 21;
+                var bits=[];
+                for(var i=0;i<5;i++){
+                    bits.push(head[offset+i].toString(2).padStart(8,'0'));
+                }
+                width = I.IntVal(bits[1].slice(2,8)+bits[0],2)+1;
+                height = I.IntVal(bits[3].slice(4,8)+bits[2]+bits[1].slice(0,2),2)+1;
+            }else {       
+                offset = 21;
+                head = buf.slice(0,80);
+                if(I.blob(head))head = new Uint8Array(await head.arrayBuffer());
+                //if(head[13] ==0x2f)
+                window.kk= buf;
+                console.log(I.decode(head),I.buf16str(head),head);
+            }
+        }else if(ext[0]=='jpg'){
+            if(I.blob(buf))buf = new Uint8Array(await buf.arrayBuffer());
+            var offset = 0;
+            for(let i= 0; i < buf.length;i++) {
+                if(buf[i] != 0xff) {
+                    continue
+                }
+                if (buf[i+1] == 0xC0 || buf[i+1] == 0xC1 || buf[i+1] == 0xC2) {
+                    offset = i
+                    break
+                }
+            }
+            offset += 5;
+            if (offset < buf.length) {
+                height =  (buf[offset]<<8) + buf[offset+1];
+                width = (buf[offset+2]<<8) + buf[offset+3];
+            }
+        }else if(ext[0]=='png'){
+            let offset = 16;
+            width =  (head[offset]<<32) + (head[offset+1]<<16) + (head[offset+2]<<8) + head[offset+3];
+            offset+=4;
+            height =  (head[offset]<<32) + (head[offset+1]<<16) + (head[offset+2]<<8) + head[offset+3];
+        }else if(ext[0]=='bmp'){
+            let offset = 18;
+            width =  (head[offset+3]<<32) + (head[offset+2]<<16) + (head[offset+1]<<8) + head[offset];
+            offset+=4;
+            height =  (head[offset+3]<<32) + (head[offset+2]<<16) + (head[offset+1]<<8) + head[offset];
+        }else{
+        }
+        if(!height)return I.Async(re=>{
+                let img = new Image();
+                img.onload = ()=>{
+                    re([img.width,img.height,F.getExt(buf.name)]);
+                    URL.revokeObjectURL(img.src);
+                    img.remove();
+                }
+                img.src = F.URL(buf);
+            });
+        return [width,height,ext[0]];
+    }
+    async toWebp(buf){
+        let T=this,I=T.I,F=T.F;
+        if(!I.blob(buf))buf = new Blob([buf]);
+        let img = await createImageBitmap(buf);
+        let canvas = T.$ct('canvas','','',{width:img.width,height:img.height});
+        let ctx = canvas.getContext("2d");
+        ctx.drawImage(img,0,0);
+        return I.Async(re=>{
+            canvas.toBlob(blob=>{
+                if(buf.name) return re(new File([blob],buf.name.replace(/\.\w+$/ig,'.webp'),{type:F.getMime('webp')}));
+                re(blob);
+            },F.getMime('webp'),100);
+        })
     }
     I = new class NengeType {
         constructor(T) {
@@ -940,7 +1055,10 @@ const Nenge = new class NengeCores {
                     value: o => I.u8buf(o) ? o : new I[11](o.buffer || o)
                 },
                 buf16str: {
-                    value: o => I.toArr(o).map(v => v.toString(16).padStart(2, 0).toLocaleUpperCase()).join("")
+                    value: o => I.toArr(o).map(v =>I.to16(v)).join("")
+                },
+                to16:{
+                    value: o => o.toString(16).padStart(2, 0).toLocaleUpperCase()
                 },
                 ArrTest: {
                     value(o, ...a) {
@@ -976,7 +1094,7 @@ const Nenge = new class NengeCores {
                 },
                 PER: {
                     value(o, ...a) {
-                        return I.Int(100 * o / a[0]).toFixed(0) + "%"
+                        return I.Int(100 * o / a[0]).toFixed(0) + (!a[1]?"%":"")
                     }
                 },
                 Async: {
@@ -1080,7 +1198,7 @@ const Nenge = new class NengeCores {
                         if (o.item) return I.ET(o);
                         if (o.byteLength) return I.ArrFrom(new I[11](o.buffer || o));
                         if (o.entries) return I.EQ(o.entries());
-                        if (o.length) return I.ArrFrom(o);
+                        if (typeof o.length !='undefined') return I.ArrFrom(o);
                         if (o.forEach) return I.FE(o);
                         return I.Entries(o);
                     }
@@ -1201,34 +1319,34 @@ const Nenge = new class NengeCores {
         LibKey = 'script-';
         zipsrc = 'zip.min.js';
         extutf16 = {
-            "7z": /^377ABCAF271C/,
+            '7z': /^377ABCAF271C/,
             rar: /^52617221/,
             zip: /^504B0304/,
             png: /^89504E470D0A1A0A/,
-            gif: /^47494638/,
+            gif: /^47494638(3761|3961)/,
             jpg: /^FFD8FF/,
-            webp: /^52494646/,
+            webp: /^52494646\w{8}57454250/,
             pdf: /^255044462D312E/,
+            bmp: /^424D\w{4}0{8}/,
         };
         exttype = {
-            'application/octet-stream': ['*'],
-            'application/javascript': ['js'],
-            'text/css': ['css', 'style'],
-            'text/scss': ['scss'],
-            'text/sass': ['sass'],
-            'text/html': ['html', 'htm', 'php'],
+            'text': ['css', 'scss','sass','html','htm','xml'],
+            'text/javascript': ['js'],
+            'text/css': ['style'],
+            'text/html': ['htm', 'php'],
             'text/plain': ['txt'],
-            'text/xml': ['xml', 'vml'],
+            'text/xml': ['vml'],
             'image': ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif', 'apng'],
             'font': ['woff', 'woff2', 'ttf', 'otf'],
             'image/svg+xml': ['svg'],
+            'application/octet-stream': ['*'],
             'application': ['pdf', 'json'],
             'application/x-zip-compressed': ['zip'],
             'application/x-rar-compressed': ['rar'],
             'application/x-7z-compressed': ['7z'],
         };
         action = {
-            textext(s) {
+            mimeHead(s) {
                 let F = this,
                     I = F.I,
                     text = I.buf16str(s),
@@ -1392,7 +1510,7 @@ const Nenge = new class NengeCores {
             I.toArr(['headers', 'context', 'referrer', 'referrerPolicy', 'mode', 'credentials', 'redirect', 'integrity', 'cache'], v => I.none(ARG[v]) || (data[v] = ARG[v], I.DP(ARG, v)));
             if (ARG.json) {
                 post = I.toJson(ARG.json);
-                data.headers['Accept'] = 'application/json';
+                data.headers['Accept'] = F.getMime('json');
             } else if (ARG.post) {
                 post = I.post(ARG.post);
             }
@@ -1407,12 +1525,12 @@ const Nenge = new class NengeCores {
             let F = this,
                 I = F.I,
                 buf = u8.slice(0, 16),
-                textext = F.BF('textext');
+                mimeHead = F.BF('mimeHead');
             let text = I.blob(buf) ? buf.arrayBuffer() : I.str(buf) ? I.encode(buf) : buf;
             return I.await(text) ? I.Async(async e => {
                 console.log(text);
-                e(textext(await text))
-            }) : textext(text);
+                e(mimeHead(await text))
+            }) : mimeHead(text);
         }
         async unFile(u8,ARG) {
                 ARG = ARG||{};
@@ -1507,8 +1625,8 @@ const Nenge = new class NengeCores {
                             if (!/\//.test(key)) {
                                 delete F.exttype[key];
                                 key += '/' + v;
-                            } else if (/text\/xml/.test(key) && v != 'xml') key += '+' + v;
-                            if (key != entry[0]) F.exttype[key] = [v];
+                                F.exttype[key] = !0;
+                            }
                             return [v, key]
                         }))));
                 }

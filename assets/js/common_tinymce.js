@@ -7,7 +7,13 @@
             'edit_loading':'编辑器加载中',
             'progress':'进度',
             'Submint':'发布',
-            'Replay':'回帖'
+            'Replay':'回帖',
+            'attach':'附件',
+            'attachfile':'上传附件',
+            'attachimg':'上传图片',
+            'attachunuser':'未使用附件',
+            'uploading...':'上传中...',
+            'request...':'等待服务器响应...'
         },
         'zh-TW':{
             'fonttext':'文本',
@@ -42,7 +48,7 @@
                 toolbar: !1,
                 toolbar_location: 'toolbar_sticky',
                 selector: '.fastpost-textarea',
-                menubar: 'file insert edit format table tools view fonttext',
+                menubar: 'file attachmenu insert edit format table tools view fonttext',
                 min_height:400,
                 mobile: {},
                 menu: {
@@ -50,13 +56,32 @@
                         title:T.GL('Replay'),
                         items:'submintbtn | preview | export print'
                     },
-                    'fonttext': { title: T.GL('fonttext'), items: 'bold superscript subscript forecolor backcolor removeformat' }
+                    'fonttext': { title: T.GL('fonttext'), items: 'bold superscript subscript forecolor backcolor removeformat' },
+                    'attachmenu':{
+                        title:T.GL('attach'),
+                        items:'attachfile | attachimg | attachunuser'
+                    }
                 },                
                 setup: (editor) => {
                     editor.ui.registry.addMenuItem('submintbtn', {
                         text: T.GL('Submint'),
                         icon:'browse',
                         onAction: () => T.tinymce_submit(editor)
+                    });
+                    editor.ui.registry.addMenuItem('attachfile', {
+                        text: T.GL('attachfile'),
+                        icon:'browse',
+                        onAction: () => T.tinymce_uploads(editor)
+                    });
+                    editor.ui.registry.addMenuItem('attachimg', {
+                        text: T.GL('attachimg'),
+                        icon:'browse',
+                        onAction: () => T.tinymce_uploadimg(editor)
+                    });
+                    editor.ui.registry.addMenuItem('attachunuser', {
+                        text: T.GL('attachunuser'),
+                        icon:'browse',
+                        onAction: () => T.tinymce_getattach(editor)
                     });
                 }
             },
@@ -121,14 +146,94 @@
             tinymce_obj(){
                 return tinymce.activeEditor;
             },
-            tinymce_win(){
+            tinymce_wm(){
                 return this.tinymce_obj().windowManager;
             },
             tinymce_alert(str){
-                return this.tinymce_win().alert(str)
+                return this.tinymce_wm().alert(str)
             },
             tinymce_confirm(msg,fn){
-                return this.tinymce_win().confirm(msg,fn);
+                return this.tinymce_wm().confirm(msg,fn);
+            },
+            tinymce_upload(fn,Accept,more){
+                let input = T.$ce('input');
+                input.type='file';
+                if(Accept)input.accept = Accept;
+                if(more)input.multiple = !0;
+                input.onchange = e=>{
+                    fn(e.target.files);
+                    input.remove();
+                };
+                input.click();
+                return input;
+            },
+            tinymce_uploads(editor){
+                let input = T.tinymce_upload(async files=>{
+                    if(files.length>0){
+                        let mask = T.CF('mask');
+                        let zipblob = await T.toZip(files,(current, total,filename)=>{
+                            console.log(current, total,filename);
+                            mask[1].value = T.I.PER(current, total,!0);
+                            mask[2].innerHTML = filename;
+                        });
+                        let zipFile = new File([zipblob],files[0].name+'.zip',{type:F.getMime('zip')});
+                        let post = I.post({'attachFile':zipFile});
+                        T.ajax({
+                            url:location.href,
+                            post,
+                            postProgress(current,total){
+                                mask[1].value = T.I.PER(current, total,!0);
+                                mask[2].innerHTML = T.GL('uploading...');
+                            },
+                            progress(current,total){
+                                mask[1].value = T.I.PER(current, total,!0);
+                                mask[2].innerHTML = T.GL('request...');
+                            },
+                            success(text,headers){
+                                mask[0].remove();
+                                console.log(text,headers);
+                            },
+                            error(){
+                                mask[0].remove();
+                            }
+                        });
+                        //   T.download('abc.zip',zipblob);
+                    }
+                },'*',!0);
+            },
+            tinymce_uploadimg(editor){
+                let input = T.tinymce_upload(async files=>{
+                        //let [width,height,mime] = await T.getImageSize(files[0])
+                        let imgfile = await T.toWebp(files[0]);
+                        //else{
+                        //   if(!T.image2webp_load)await T.addJS(T.JSpath+'common_webp.js');
+                        //    imgfile = new File([await T.image2webp(files[0],width,height)],files[0].name,{type:F.getMime('webp')});
+                        //}
+                        var imgs= new Image();imgs.src=F.URL(imgfile);
+                        document.body.appendChild(imgs);
+                        console.log(imgfile);
+                        return ;
+                        let post = I.post({'attachImages':imgfile});
+                        T.ajax({
+                            url:location.href,
+                            post,
+                            postProgress(current,total){
+                                mask[1].value = T.I.PER(current, total,!0);
+                                mask[2].innerHTML = T.GL('uploading...');
+                            },
+                            progress(current,total){
+                                mask[1].value = T.I.PER(current, total,!0);
+                                mask[2].innerHTML = T.GL('request...');
+                            },
+                            success(text,headers){
+                                mask[0].remove();
+                                console.log(text,headers);
+                            },
+                            error(){
+                                mask[0].remove();
+                            }
+                        });
+                },'image/*');
             }
             /*
             tinymce.activeEditor.windowManager.open({

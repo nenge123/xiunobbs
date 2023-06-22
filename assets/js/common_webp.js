@@ -2,7 +2,7 @@
     var T = this,I=T.I,F=T.F;
     Object.assign(T,{
         image2webp_conf:{
-            quality: 100, //转换质量
+            quality: 80,
             target_size: 0,
             target_PSNR: 0,
             method: 4,
@@ -19,8 +19,8 @@
             partition_limit: 0,
             alpha_compression: 1,
             alpha_filtering: 1,
-            alpha_quality: 100,//透明
-            lossless: 1,//无损
+            alpha_quality: 100,
+            lossless: 0,
             exact: 0,
             image_hint: 0,
             emulate_jpeg_size: 0,
@@ -95,5 +95,6 @@
             document.body.appendChild(mask);
             return [mask,T.$('progress',mask),T.$('b',mask)];
         },
-    })
+    });
+    T.image2webp_load();
 }).call(Nenge);

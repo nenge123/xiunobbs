@@ -1,12 +1,14 @@
 说明
 ====
-> 启动插件需要含有app.json
+> 启动插件需要含有app.json 替换参数/加载类/js  不允许有斜杠,多个用逗号隔开
 ```json
 {
-    "router":"admin", #定义自定义路由名,多个之间用逗号隔开
-    "class":"admin" #定义加载类,对应插件目录下admin.class.php
+    "router":"admin", #定义自定义路由名,多个之间用逗号隔开 替换路由
+    "class":"admin" #定义加载类,
     "template":"", #模板替换,优先级高于主题
     "require":"", #插件前置,如果没有指定前置插件,那么这个插件不会启用
+    "css":"",#替换scss
+    "js":"",#默认加载js
 }
 ```
 
@@ -26,17 +28,41 @@
 - `method` 插件类方法汇总,参考插件类
 
 ## 插件类
-> 用于数据过滤等处理,类名以`plugin_xxx`命名,文件名对应`xxx.class.php`
+> 如果`app.json->class`为true则是`plugin\xxx->xxx.class.php`,多个类逗号隔开,`a->plugin\xxx_a->a.class.php` 
 ```php
 <?php
-namespace Nenge\plugin;
-class plugin_test extends base{
+#app.json中class设置为true plugin/xxx/xxx.class.php
+namespace plugin\xxx;
+class xxx{
     public function template($template,$path,$file)
     {
         return '<!-- plugin_test->template('.$file.') -->'.$template;
     }
 }
 ?>
+<?php
+#app.json中class设置为"test,test2" plugin/xxx/test.class.php plugin/xxx/test2.class.php
+namespace plugin\xxx;
+class test{
+    public function template($template,$path,$file)
+    {
+        return '<!-- plugin_test->template('.$file.') -->'.$template;
+    }
+}
+?>
+
+<?php
+#自定义类 使用 <!--{echp plugin\xxx\abc::test()}>
+#xxx为插件目录 abc为xxx目录下的abc.class.php
+namespace plugin\xxx;
+class abc{
+    public static function test($template,$path,$file)
+    {
+        return 'test';
+    }
+}
+?>
+
 ```
 - APP->plugin_method_call
 > 调用方式  

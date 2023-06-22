@@ -29,6 +29,7 @@ class APP implements \ArrayAccess
             $this->init_settings();
             $this->init_variable();
         }
+        $this->plugin_method_call('common',fn($method)=>call_user_func($method));
     }
     public function offsetSet($offset, $value): void
     {
@@ -182,76 +183,17 @@ class APP implements \ArrayAccess
             true
         );
     }
-    public function getRequest($url, $post = false, $cookie = array(), $refer = "", $timeout = 5)
-    {
-        //$url, $post = array(), $timeout = 30, $times = 1$header = []
-        $ssl = stripos($url, 'https://') === 0 ? true : false;
-        $curlObj = curl_init();
-        $header = [];
-        $options = [
-            CURLOPT_URL => $url,
-            CURLOPT_RETURNTRANSFER => 1,
-            CURLOPT_FOLLOWLOCATION => 1,
-            CURLOPT_AUTOREFERER => 1,
-            CURLOPT_USERAGENT => 'Mozilla/5.0 (compatible; MSIE 5.01; Windows NT 5.0)',
-            CURLOPT_TIMEOUT => $timeout,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_0,
-            CURLOPT_HTTPHEADER => ['Expect:'],
-            //'CURLOPT_IPRESOLVE' => CURL_IPRESOLVE_V4,
-            //'CURLOPT_REFERER' => $url, //伪造来路
-        ];
-        if ($refer) {
-            $options[CURLOPT_REFERER] = $refer;
-        }
-        if ($ssl) {
-            //support https
-            $options[CURLOPT_SSL_VERIFYHOST] = false;
-            $options[CURLOPT_SSL_VERIFYPEER] = false;
-        }
-        if (is_array($cookie)) $cookie = http_build_query($cookie);
-        if ($cookie) {
-            $header = array('Content-type: application/x-www-form-urlencoded', 'X-Requested-With: XMLHttpRequest');
-            $header[] = "Cookie: $cookie";
-        }
-        if ($post) {
-            $options[CURLOPT_POST] = 1;
-            if (is_array($post)) {
-                $options[CURLOPT_POSTFIELDS] =  json_encode($post);
-            } else {
-                $header = array(
-                    'accept: application/json',
-                    'Content-Type:application/json;charset=utf-8',
-                    'Content-Length:' . strlen($post), 'accept:application/json'
-                );
-                $options[CURLOPT_POSTFIELDS] =  $post;
-            }
-        }
-        $options[CURLOPT_HTTPHEADER] = $header;
-        curl_setopt_array($curlObj, $options);
-        $returnData = curl_exec($curlObj);
-        if (curl_errno($curlObj)) {
-            //error message
-            $returnData = json_encode(array('error' => curl_error($curlObj)));
-            //echo $returnData;
-            //exit;
-        }
-        curl_close($curlObj);
-        return $returnData;
-    }
     public function register_autoload($class)
     {
-        if (is_file($this->settings['classpath'] . $class . '.php')) {
+        $arr = explode('\\', $class);
+        if(!empty($arr[1])&&$arr[0]==$arr[1]&&is_file($this->settings['classpath'] . $arr[0] . '\\' . $arr[0] . '.php')) {
+            include_once($this->settings['classpath'] . $arr[0] . '\\' . $arr[0] . '.php');
+        }else if($arr[0]=='plugin'&&is_file($this->settings['root'].$class.'.class.php')){
+            include_once($this->settings['root'].$class.'.class.php');
+        }else if (is_file($this->settings['classpath'] . $class . '.php')) {
             include_once($this->settings['classpath'] . $class . '.php');
         } else {
-            $arr = explode('\\', $class);
-            $path = $this->settings['classpath'] . implode('\\', $arr) . '.php';
-            if (is_file($path)) {
-                include_once($path);
-            } else if (is_file($this->settings['classpath'] . $arr[0] . '/' . $arr[0] . '.php')) {
-                include_once($this->settings['classpath'] . $arr[0] . '/' . $arr[0] . '.php');
-            } else {
-                throw $class . ' is lost!';
-            }
+            throw $class . ' is lost!';
         }
     }
     public static function mkdir($dir)
@@ -367,8 +309,8 @@ class APP implements \ArrayAccess
     public function init_settings()
     {
         $path = dirname(__DIR__, 2) . "/cache/data/settings.php";
-        if (!is_file($path)) $this->data = $this->write_settings();
-        else $this->data = (array)include($path);
+        if (is_file($path)) $this->data = (array)include($path);
+        if (empty($this->data)) $this->write_settings();
     }
     public function init_router_var()
     {
@@ -508,10 +450,10 @@ class APP implements \ArrayAccess
                         $uparray = array(
                             'login_ip' => $this->data['longip'],
                             'login_date' => $this->data['time'],
-                            '+:logins' => 1
+                            //'+:logins' => 1
                         );
                         $this->data['user']['login_date'] = $this->data['time'];
-                        $this->data['user']['logins'] += 1;
+                        //$this->data['user']['logins'] += 1;
                         DB::t('user')->update($uparray, array('uid' => $this->data['user']['uid']));
                         if (!empty($this->data['tokens'])) {
                             $this->session_tokens($this->data['user']);
@@ -937,10 +879,10 @@ class APP implements \ArrayAccess
             closedir($dh);
         }
         $data['ver'] = time();
+        $this->data = $data;
         $this->write_data($data['path']['data'] . 'settings.php', $data);
         $this->write_rewrite($data);
         $this->write_plugin($data);
-        return $data;
     }
     public function write_rewrite($data = array())
     {
@@ -1039,7 +981,7 @@ class APP implements \ArrayAccess
                             $result['require'][$file] = $v['require'];
                         }
                     }
-                    foreach (['hook', 'include', 'template', 'css', 'lang'] as $dir) {
+                    foreach (['hook', 'include', 'template', 'css', 'lang','router'] as $dir) {
                         if (is_dir($path . $file . '\\' . $dir)) {
                             $v['dir_' . $dir] = $file;
                         }
@@ -1062,26 +1004,26 @@ class APP implements \ArrayAccess
                     }
                     foreach(array('template','router','css','class','js') as $dir){
                         if (!empty($v[$dir])) {
-                            if (is_string($v[$dir])) $v[$dir] = array_unique(explode(',', $v[$dir]));
+                            if($v[$dir]===!0){
+                                if($dir=='class'){
+                                    $this->plugin_class_getMethod($file.'\\'.$file,function($method,$class_name) use (&$result){
+                                        $result['method'][$method][] = $class_name;
+                                    });
+                                }
+                                continue;
+                            }elseif (is_string($v[$dir])) $v[$dir] = array_unique(explode(',', $v[$dir]));
                             foreach ($v[$dir] as $tempname) {
                                 $tempname = basename($tempname);
                                 if($dir=='class'){
-                                    $class_file = $path . $file . '\\' . $tempname . '.class.php';
-                                    if(is_file($class_file)){
-                                        include_once($class_file);
-                                        if (class_exists('Nenge\plugin\plugin_' . $tempname, !1)) {
-                                            $methods = get_class_methods('Nenge\plugin\plugin_' . $tempname);
-                                            foreach ($methods as $method) {
-                                                $result['method'][$method][] = array($file, $tempname);
-                                            }
-                                        }
-                                    }
+                                    $this->plugin_class_getMethod($file.'\\' . $tempname,function($method,$class_name) use (&$result){
+                                        $result['method'][$method][] = $class_name;
+                                    });
                                 }elseif($dir=='js'){
-                                    if (is_file($path . $plugin . '\js\\' . $tempname.'.js')) {
-                                        $pluginjs .= file_get_contents($path . $plugin . '\js\\' . $tempname.'.js') . ';' . PHP_EOL;
+                                    if (is_file($path . $file . '\js\\' . $tempname.'.js')) {
+                                        $pluginjs .= file_get_contents($path . $file . '\js\\' . $tempname.'.js') . ';' . PHP_EOL;
                                     }
                                 }else{
-                                    $result['template'][$tempname] = $file;
+                                    $result[$dir][$tempname] = $file;
                                 }
                             }
                         }
@@ -1092,6 +1034,16 @@ class APP implements \ArrayAccess
         file_put_contents($data['path']['data'] . 'plugin.js', $pluginjs);
         $this->write_data($data['path']['data'] . 'plugin.php', $result);
         return $result;
+    }
+    public function plugin_class_getMethod($class_name,$fn)
+    {
+        $class_name = 'plugin\\'.$class_name;
+        if (class_exists($class_name)) {
+            $methods = get_class_methods($class_name);
+            foreach ($methods as $method) {
+                $fn($method,$class_name);
+            }
+        }
     }
     public function write_plugin_data($dir = 'include')
     {
@@ -1153,19 +1105,13 @@ class APP implements \ArrayAccess
     }
     public function plugin_class_load($plugin)
     {
-        list($plugin_name, $class_name) = $plugin;
-        if (!isset(self::$plugin_class[$class_name])) {
-            self::$plugin_class[$class_name] = false;
-            $class_file = $this->data['path']['plugin'] . $plugin_name . '\\' . $class_name . '.class.php';
-            if(is_file($class_file)){
-                include_once($class_file);
-                $class = 'Nenge\plugin\plugin_' . $class_name;
-                if(class_exists($class, !1)){
-                    return self::$plugin_class[$class_name] = new $class;
-                }
+        if (!isset(self::$plugin_class[$plugin])) {
+            self::$plugin_class[$plugin] = !1;
+            if(class_exists($plugin)){
+                return self::$plugin_class[$plugin] = new $plugin;
             }
         }
-        return self::$plugin_class[$class_name];
+        return self::$plugin_class[$plugin];
     }
     public function plugin_class_method($plugin,$method)
     {
@@ -1401,20 +1347,5 @@ class message{
             });
         }
         return $post;
-    }
-}
-namespace Nenge\plugin;
-use Nenge\APP;
-class base
-{
-    public array $settings = array();
-    public static function app()
-    {
-        $class = get_called_class();
-        $class_name = basename($class);
-        if (empty(APP::$plugin_class[$class_name])) {
-            APP::$plugin_class[$class_name] = new $class();
-        }
-        return APP::$plugin_class[$class_name];
     }
 }

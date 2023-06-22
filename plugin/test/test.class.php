@@ -1,6 +1,6 @@
 <?php
-namespace Nenge\plugin;
-class plugin_test extends base{
+namespace plugin\test;
+class test{
     public function template($template,$path,$file)
     {
         return '<!-- plugin_test->template('.$file.') -->'.$template;

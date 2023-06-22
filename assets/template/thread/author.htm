@@ -30,12 +30,14 @@
                 <p>
                     <span class="aside-author-group"><!--{$myapp['grouplist'][$author['gid']]['name']}--></span>
                 </p>
+                <!--{ifvar $user[$author['uid']]}-->
                 <p>
                     <button class="icon-guanzhu">关注</button>
                     <button class="icon-pm">发消息</button>
                 </p>
+                <!--{/if}-->
             </div>
-            <!--{if $author['uid']}-->
+            <!--{ifvar $user[$author['uid']]}-->
             <div class="aside-author-meta">
                 <div>
                     <p>主题数</p>
