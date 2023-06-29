@@ -16,3 +16,23 @@
 > 前台
 
 - [Javascript模块手册](md/js-hack.md)
+
+
+## 使用资源
+- JavaScript
+    - tinymce.zip 编辑器
+    > https://tiny.cloud/
+    - webp_encoder.zip gif to webp  
+    > https://github.com/xiaozhuai/webp_encoder/ 
+    - modernGif.js gif分解出每帧
+    > https://github.com/qq15725/modern-gif 
+    - zip.min.js zip解压压缩
+    > https://github.com/gildas-lormeau/zip.js/
+    - extract7z.zip 7zip解压
+    - libunrar.min.zip rar4解压
+
+- PHP类
+    - PHPMailer 邮件发送
+    > https://github.com/PHPMailer/PHPMailer  
+    - ScssPhp scss转css
+    > https://github.com/scssphp/scssphp 

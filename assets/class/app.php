@@ -390,7 +390,8 @@ class APP implements \ArrayAccess
             'description' => '',
             'footerjs'=>array(),
             'mobile' => empty($_SERVER['HTTP_SEC_CH_UA_MOBILE']) || $_SERVER['HTTP_SEC_CH_UA_MOBILE'] != '?0',
-            'method'=>$_SERVER['REQUEST_METHOD']
+            'method'=>$_SERVER['REQUEST_METHOD'],
+            'charset'=>empty($this->conf['charset'])?'utf-8':$this->conf['charset']
         );
         if (!is_file($this->data['path']['lang'] . $this->conf['lang'] . '.php')) {
             $this->conf['lang'] = 'zh-cn';
@@ -1270,35 +1271,14 @@ class message{
         }
         return $post;
     }
-    public static function html_remove_attr($nodes)
-    {
-        if(!empty($nodes)&&$nodes->length){
-            for($i=$nodes->length;--$i>=0;){
-                $node = $nodes->item($i);
-                if(!empty($node->attributes)&&$node->attributes->length>0){
-                    for($i=$node->attributes->length;--$i>=0;){
-                        $attr = $node->attributes->item($i);
-                        $attrName = $attr->nodeName;
-                        if(preg_match('/^(on|id)/',$attrName)){
-                            $node->removeAttribute($attrName);
-                        }
-                    }
-                }
-                if(!empty($node->childNodes)){
-                    self::html_remove_attr($node->childNodes);
-                }
-
-            }
-        }
-        
-    }
     public static function html($message,$length=0)
     {
         $doc = new \DOMDocument('1.0','UTF-8');
+        $myapp = APP::app();
         if($length!=0){
             $message = substr($message,0,$length);
         }
-        @$doc->loadHTML('<html><head><meta charset="utf-8"></head><body onclick="jj">'.$message.'</body></html>');
+        @$doc->loadHTML('<html><head><meta charset="'.$myapp->data['charset'].'"></head><body><b style="position:1;background-position: bottom;">'.$message.'</body></html>');
         $body = $doc->getElementsByTagName('body')[0];
         foreach(array('script','style','title','meta','link','iframe') as $v){
             $srcipt = $doc->getElementsByTagName($v);
@@ -1314,7 +1294,29 @@ class message{
             }
         }
         self::html_remove_attr($body->childNodes);
-        return trim(preg_replace('/^<body[^\>]*?>(.+?)<\/body>$/s',"\\1",html_entity_decode($doc->saveHTML($body))));
+        $result = trim(preg_replace('/^\<body\>(.+?)\<\/body\>$/s',"\\1",html_entity_decode($doc->saveHTML($body))));
+        return $result;
+    }
+    public static function html_remove_attr($nodes)
+    {
+        if(!empty($nodes->length)){
+            foreach( iterator_to_array( $nodes ) as $node ){
+                if($node->nodeType===1){
+                    if(!empty($node->attributes->length)){
+                        foreach( iterator_to_array( $node->attributes ) as $attribute ){
+                            if($attribute->nodeName=='style'){
+                                $attribute->nodeValue = preg_replace('/(?!-)position\s*?\:/i','',$attribute->nodeValue);
+                            }else if(preg_match('/^(on|id)/i',$attribute->nodeName)){
+                                $node->removeAttribute($attribute->nodeName);
+                            }
+                            if($node->childNodes->length){
+                                self::html_remove_attr($node->childNodes);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
     public static function post_html($post)
     {
@@ -1322,11 +1324,17 @@ class message{
         APP::app()->plugin_method_call('message_format_html',function($plugin_method) use (&$post){
             $post=call_user_func($plugin_method,$post)?:$post;
         });
+        APP::app()->plugin_method_call('message_format_ubb',function($plugin_method) use (&$post){
+            $post=call_user_func($plugin_method,$post)?:$post;
+        });
         return $post;
     }
     public static function post_text($post)
     {
         APP::app()->plugin_method_call('message_format_text',function($plugin_method) use (&$post){
+            $post=call_user_func($plugin_method,$post)?:$post;
+        });
+        APP::app()->plugin_method_call('message_format_ubb',function($plugin_method) use (&$post){
             $post=call_user_func($plugin_method,$post)?:$post;
         });
         return $post;

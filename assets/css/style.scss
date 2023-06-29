@@ -4,23 +4,28 @@ $max-width: 1140px;
 $full-width: 992px;
 $bg-color: #eff2f6;
 $c-white: #fff;
-html{
-    
+
+html {
+
     font-size: 14px;
 }
+
 body {
     background-color: $bg-color;
     margin: 0;
     padding: 0;
 }
-img{
+
+img {
     max-width: 100%;
 }
+
 @font-face {
     font-family: 'bootstrap';
     src: url(fontPath('static/bootstrap-icons-v4.woff2')) format('woff2'),
         url(fontPath('static/bootstrap-icons-v4.woff')) format('woff');
 }
+
 @import 'origin/header.scss';
 @import 'origin/body_index.scss';
 @import 'origin/body_forum.scss';
@@ -29,9 +34,21 @@ img{
 @import 'origin/footer.scss';
 
 
-.mask-content{
-    position: fixed; width: 100vw; height: 100vh; margin: 0px; padding: 0px; z-index: 999999; background: rgba(8, 8, 8, 0.75); display: block; inset: 0px; touch-action: none; pointer-events:visiblefill; overflow: hidden;
-    .mask-label{
+.mask-content {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    margin: 0px;
+    padding: 0px;
+    z-index: 999999;
+    background: rgba(8, 8, 8, 0.75);
+    display: block;
+    inset: 0px;
+    touch-action: none;
+    pointer-events: visiblefill;
+    overflow: hidden;
+
+    .mask-label {
         position: absolute;
         left: 0;
         right: 0;
@@ -45,10 +62,39 @@ img{
         color: #fff;
         font-size: 12px;
     }
-    p{
+
+    p {
         margin: 1px;
         font-weight: bold;
         color: #f3a109e3;
     }
-    
+
+    progress {
+        border: 1px solid #0064B4;
+        background-color: #e6e6e6;
+        color: #0064B4;
+        border-radius:2rem;
+
+        /*IE10下已完成进度的颜色*/
+        &::bar {
+            background: #0064B4;
+        }
+        &::-moz-progress-bar {
+            background: #0064B4;
+        }
+
+        /*表示在Firefox下已完成进度的颜色*/
+        &::-webkit-progress-bar {
+            background: #e6e6e6;
+        }
+
+        /*表示在chrome下全部进度的颜色*/
+        &::-webkit-progress-value {
+            background: #0064B4;
+        }
+
+        /*表示在chrome下已完成进度的颜色*/
+    }
+
+
 }
