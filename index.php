@@ -27,7 +27,7 @@ if(!empty($myapp->data)){
     $router_value = $myapp->data['router'][$router_name];
     #(int) \Nenge\DB::app();
     #Nenge\DB::t('user')->connect()->query('fff');
-    #$myapp->session_login(1);
+    $myapp->session_login(1);
     #print_r($myapp->data['tokens']);
     include $myapp->router($myapp->data['router'][0]);
 }else if(is_file(__DIR__.'\\plugin\install\\index.php')){

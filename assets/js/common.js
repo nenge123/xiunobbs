@@ -23,15 +23,16 @@ const Nenge = new class NengeCores {
         });
         T.language = I.language;
         T.i18nName = I.i18n;
-        //window.onerror = (msg, url, lineNo, columnNo, error) => alert(lineNo);
+        window.onerror = (msg, url, lineNo, columnNo, error) => alert(msg+lineNo+url);
         let src = spath && spath.src.split('?');
         T.JSpath = src && src[0].split('/').slice(0, -1).join('/') + '/';
         if (T.JSpath) T.JSpath = T.JSpath.replace('static/', '');
+        T.ROOT = T.JSpath.replace('assets/js/','');
         T.serviceActive = !1;
         if ('serviceWorker' in navigator) {
+            T.serviceActive = !0;
             navigator.serviceWorker.register('sw.js').then(w => {
                 T.serviceWorker = w.active;
-                if (w.active.state == 'activated') T.serviceActive = !0;
                 T.PostMessage = str => navigator.serviceWorker.controller.postMessage(str);
                 navigator.serviceWorker.onmessage = event => {
                     let data = event.data;
