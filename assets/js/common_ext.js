@@ -13,8 +13,8 @@ var T = Nenge,
     T.docload(async () => {
         //await Nenge.addJS(Nenge.JSpath+'zip/webp_gif/webp_encoder.js');
         //window.encoder = new (await WebpEncoderWasm()).WebpEncoder();
-        window.m = await Nenge.FetchItem({url: 'test.gif?' + T.time,type: 'blob'});
-        window.z = await Nenge.FetchItem({url: 'test.zip?' + T.time,type: 'blob'});
+        //window.m = await Nenge.FetchItem({url: 'test.gif?' + T.time,type: 'blob'});
+        //window.z = await Nenge.FetchItem({url: 'test.zip?' + T.time,type: 'blob'});
         //document.body.appendChild(T.$ct('img', '', '', {src: F.URL(m, 'gif')}));
         //console.log(await T.gif2webp(m, {quality: 75,method: 4,lossless: !0,exact: !0,}));
         //console.log(T.show_gif((await T.im2webp(m,75)),T.time));
