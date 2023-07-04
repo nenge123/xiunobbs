@@ -169,42 +169,44 @@
                 return input;
             },
             tinymce_uploads(editor) {
-                return ;
-                let input = T.tinymce_upload(async files => {
-                    if (files.length > 0) {
-                        let mask = T.CF('mask');
-                        let zipblob = await T.toZip(files, (current, total, filename) => {
-                            console.log(current, total, filename);
-                            mask[1].value = T.I.PER(current, total, !0);
-                            mask[2].innerHTML = filename;
-                        });
-                        let zipFile = new File([zipblob], files[0].name + '.zip', { type: F.getMime('zip') });
-                        let post = I.post({ 'attachFile': zipFile });
-                        T.ajax({
-                            url: location.href,
-                            post,
-                            postProgress(current, total) {
-                                mask[1].value = T.I.PER(current, total, !0);
-                                mask[2].innerHTML = T.GL('uploading...');
-                            },
-                            progress(current, total) {
-                                mask[1].value = T.I.PER(current, total, !0);
-                                mask[2].innerHTML = T.GL('request...');
-                            },
-                            success(text, headers) {
-                                mask[0].remove();
-                                console.log(text, headers);
-                            },
-                            error() {
-                                mask[0].remove();
-                            }
-                        });
-                        //   T.download('abc.zip',zipblob);
-                    }
-                }, '*', !0);
+                editor.windowManager.open({
+                    title:'Upload',
+                    body: {
+                        type:'panel',
+                        items:[
+                            {
+                                type: 'input', // component type
+                                name: 'password', // identifier
+                                inputMode: 'text',
+                                label: '密码', // text for the label
+                                placeholder: 'example', // placeholder text for the input
+                                enabled:!0, // disabled state
+                              },
+                              {
+                                type: 'htmlpanel', // an HTML panel component
+                                html: '文件会自动转换为压缩文件,并且你可以设置密码.附件支持在线预览内部图片等.'
+                              }
+                        ]
+                    },
+                    buttons: [
+                        {
+                            type: 'cancel',
+                            name:'cancel',
+                            text: 'Cancel',
+                            enabled:!0,
+                        },
+                        {
+                            type: 'submit',
+                            name:'submit',
+                            text: 'Upload',
+                            enabled:!0,
+                        }
+                    ],
+                });
             },
             tinymce_open_uploadimg(editor) {
-                let win = tinymce.activeEditor.windowManager.open({
+                var ImgFile,ImgType,uploadFile;
+                editor.windowManager.open({
                     title:'Uploading image',
                     body: {
                         type: 'panel', // The root body type - a Panel or TabPanel
@@ -212,7 +214,7 @@
                             {
                                 type: 'imagepreview', // component type
                                 name: 'preview', // identifier
-                                styles: 'max-width:100%', // optional CSS height to constrain the image preview to
+                                height: '280px', // optional CSS height to constrain the image preview to
                             },{
                                 type: 'slider', // component type
                                 name: 'quality', // identifier
@@ -247,9 +249,6 @@
                             type: 'custom',
                             name: 'uploadimg',
                             text: "Browse for an image",
-                            onClick() {
-                                alert(1);
-                            }
                         },
                         {
                             type: 'cancel',
@@ -272,11 +271,11 @@
                         const apidata = dialogApi.getData();
                         if (details.name == 'uploadimg') {
                             T.tinymce_upload(async files => {
-                                let ImgFile = files[0];
+                                ImgFile = files[0];
                                 var quality = parseInt(apidata.quality);
                                 var imgData;
                                 let ext = await F.CheckExt(ImgFile);
-                                win.ImgType = ext;
+                                ImgType = ext;
                                 if (ext == 'gif') {
                                     if(ImgFile.size>1024*1024*1.5){
                                         dialogApi.setEnabled('imguploadbtn',!1);
@@ -291,40 +290,38 @@
                                 } else {
                                     imgData = await T.encode_webp(ImgFile,quality);
                                 }
-                                win.ImgFile = ImgFile;
                                 if(apidata.preview.url)F.removeURL(apidata.preview.url);
                                 var width = imgData[1];
                                 var height = imgData[2];
-                                win.uploadFile = imgData[0];
+                                uploadFile = imgData[0];
                                 dialogApi.setData({
                                     preview: { url: F.URL(imgData[0],'webp') },
                                     imgwh:{width:width+"",height:height+""},
                                     imgSize:(imgData[0].size/1024).toFixed(0)+'KB',
-                                    imgtitle:win.uploadFile.name
+                                    imgtitle:uploadFile.name
                                 });
                                 //dialogApi.setEnabled('quality',!0);
                                 dialogApi.setEnabled('imgtitle',!0);
                                 dialogApi.setEnabled('imguploadbtn',T.max_upload_size>imgData[0].size);
                             }, 'image/*');
                         }
-                        console.log(dialogApi, details);
 
                     },
                     async onChange(dialogApi, details){
                         const data = dialogApi.getData();
                         console.log(dialogApi, details,data);
                         if(details.name=='quality'){
-                            if(win.ImgFile){
+                            if(ImgFile){
                                 var quality = data.quality.toString();
                                 var ImgData;
-                                let ext = win.ImgType;
+                                let ext = ImgType;
                                 if (ext == 'gif') {
-                                    ImgData = await T.im2webp(win.ImgFile,quality);
+                                    ImgData = await T.im2webp(ImgFile,quality);
                                 } else {
-                                    ImgData = (await T.encode_webp(win.ImgFile,quality));
+                                    ImgData = (await T.encode_webp(ImgFile,quality));
                                 }
                                 if(data.preview.url)F.removeURL(data.preview.url);
-                                win.uploadFile = ImgData[0];
+                                uploadFile = ImgData[0];
                                 dialogApi.setData({
                                     preview: { url: F.URL(ImgData[0],'webp') },
                                     imgSize:(ImgData[0].size/1024).toFixed(0)+'KB'
@@ -336,44 +333,48 @@
                     },
                     async onSubmit(dialogApi, details){
                         const data = dialogApi.getData();
+                        if(uploadFile&&uploadFile.size<1024*1024*2&&uploadFile instanceof File){
+                            let post = I.post({ 'attchfile': uploadFile });
+                            let mask = T.progress_mask();
+                            T.ajax({
+                                url: location.href,
+                                post,
+                                postProgress(per,current, total) {
+                                    mask[1].value = parseInt(per);
+                                    mask[2].innerHTML = T.GL('uploading...');
+                                },
+                                progress(per,current, total) {
+                                    mask[1].value = parseInt(per);
+                                    mask[2].innerHTML = T.GL('request...');
+                                },
+                                success(text, headers) {
+                                    mask[0].remove();
+                                    if(headers['content-type'] == 'application/json'){
+                                        I.toArr(JSON.parse(text),entry=>{
+                                            if(!entry[1]){
+                                                editor.insertContent('[attach]'+entry[0]+'[/attach]');
+                                            }else{
+                                                editor.insertContent('<img src="'+entry[1][0]+'" alt="'+entry[1][1]+'"/>');
+                                            }
+                                            T.$('[name="attachid"]').value+=entry[0]+',';
+                                        });
+                                        dialogApi.close();
+                                    }
+                                    console.log(text, headers);
+                                },
+                                error() {
+                                    mask[0].remove();
+                                    dialogApi.close();
+                                }
+                            });
+
+                        }
                         console.log(dialogApi, details,data);
-                        console.log(win.uploadFile);
-                        alert(win.uploadFile.name);
+                    },
+                    onCancel(){
+                        ImgFile=null,ImgType=null,uploadFile=null;
                     }
                 });
-                return;
-                let input = T.tinymce_upload(async files => {
-                    //let [width,height,mime] = await T.getImageSize(files[0])
-                    let imgfile = await T.toWebp(files[0]);
-                    //else{
-                    //   if(!T.image2webp_load)await T.addJS(T.JSpath+'common_webp.js');
-                    //    imgfile = new File([await T.image2webp(files[0],width,height)],files[0].name,{type:F.getMime('webp')});
-                    //}
-                    var imgs = new Image(); imgs.src = F.URL(imgfile);
-                    document.body.appendChild(imgs);
-                    console.log(imgfile);
-                    return;
-                    let post = I.post({ 'attachImages': imgfile });
-                    T.ajax({
-                        url: location.href,
-                        post,
-                        postProgress(current, total) {
-                            mask[1].value = T.I.PER(current, total, !0);
-                            mask[2].innerHTML = T.GL('uploading...');
-                        },
-                        progress(current, total) {
-                            mask[1].value = T.I.PER(current, total, !0);
-                            mask[2].innerHTML = T.GL('request...');
-                        },
-                        success(text, headers) {
-                            mask[0].remove();
-                            console.log(text, headers);
-                        },
-                        error() {
-                            mask[0].remove();
-                        }
-                    });
-                }, 'image/*');
             }
             /*
             tinymce.activeEditor.windowManager.open({

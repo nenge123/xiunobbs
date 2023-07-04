@@ -126,8 +126,9 @@ class db_mysqli
 				'lastid' => $this->prepare_lastid()
 			));
 			if ($sth instanceof \mysqli_stmt)$this->prepare_close($sth->get_result());
+		}else{
+			return $sth;
 		}
-		else $sth = null;
 		return current($this->QueryData);
 	}
 	public function update($sql, $param)
@@ -158,7 +159,7 @@ class db_mysqli
 	}
 	public function result_prepare_array($sth,$arr)
 	{
-		$result = [];
+		$result = array();
 		foreach ($arr as $k => $v) {
 			$sth->execute(is_array($v)?$v:array($v));
 			$result_data = array(
@@ -573,6 +574,7 @@ class DB
 			$sql .= ' AS' . self::quote('newdata', !1) . 'ON DUPLICATE KEY UPDATE ' . implode(',', array_map(fn ($v) => self::quote($v, 1) . '=' . self::quote($v, 1, 'newdata'), $keys)) . ' ';
 		}
 		$query['sql'] = $sql;
+		#echo $sql;exit;
 		return $query;
 	}
 	public static function quote($str, $space = false, $pre = '')
@@ -718,23 +720,22 @@ class DB
 	{
 		$db = self::app();
 		if (!empty($db->tablelist[$table])) return $db->tablelist[$table];
-		$class = 'Nenge\\table\\table_' . $table;
+		$arr = explode(':',$table);
+		if(count($arr)>1){
+			$table = array_pop($arr);
+			$plugin = array_pop($arr);
+		}
+		$class = 'table\\table_' . $table;
 		if (!class_exists($class, !1)) {
 			if (!empty($plugin)) {
 				$path = APP::app()->data['path']['plugin']. $plugin . '/table/';
 			} else {
-				$path =  __DIR__. '\\table\\';
+				$path =  dirname(__DIR__). '\\table\\';
 			}
 			include_once $path . $table . '.php';
 			$db->tablelist[$table] = new $class;
 		}
 		return $db->tablelist[$table];
-	}
-	public static function p($str)
-	{
-		if (is_string($str)) $str = explode(':', $str);
-		list($plugin, $table) = $str;
-		return self::t($table, $plugin);
 	}
 	public static function getSql()
 	{
@@ -750,7 +751,7 @@ class DB
 }
 
 
-namespace Nenge\table;
+namespace table;
 use \Nenge\DB;
 /**
  * table类 数据出来基础

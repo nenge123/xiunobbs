@@ -22,6 +22,7 @@ class APP implements \ArrayAccess
         #初始化 配置
         #注册 类自动加载
         spl_autoload_register(array($this, 'register_autoload'), true, true);
+        register_shutdown_function(array($this,'shutdown'));
         if (empty($conflink)) $conflink = $this->settings['root'] . 'config.inc.php';
         if (is_file($conflink)) {
             $this->conf = (array)include($conflink);
@@ -233,7 +234,7 @@ class APP implements \ArrayAccess
             }
         }
     }
-    public function exit_clear()
+    public function shutdown()
     {
         if (!empty($_FILES)) {
             $tmp = $this->data['path']['upload'] . 'tmp/';
@@ -539,7 +540,7 @@ class APP implements \ArrayAccess
     }
     public static function exit($msg = false, $url = ''): never
     {
-        self::app()->exit_clear();
+        self::app()->shutdown();
         if ($url) header('Location:' . $url);
         else if (!empty($msg)) echo $msg;
         exit;

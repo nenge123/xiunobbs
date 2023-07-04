@@ -13,6 +13,14 @@ if(!empty($router_value)&&is_numeric($router_value)){
         if(!empty($access['allowread'])){
             #有权访问帖子
             if($myapp->data['method'] == 'POST'){
+                if(!empty($_FILES['attchfile'])){
+                    //print_r($_FILES['attachImages']);
+                    $insertData = array('uid'=>$myapp->data['user']['uid']);
+                    if(isset($_POST['filesize']))$insertData['filesize'] = intval($_POST['filesize']);
+                    if(isset($_POST['nowpos']))$insertData['nowpos'] = intval($_POST['nowpos']);
+                    $myapp->json(Nenge\DB::t('attach')->save_attach($_FILES['attchfile'],$insertData));
+                    $myapp->exit();
+                }
                 if(!empty($_POST['message'])){
                     $attachlist  = [];
                     if(!empty($_POST['attachid'])){

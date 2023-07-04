@@ -1,5 +1,5 @@
 <?php
-namespace Nenge\table;
+namespace table;
 class table_settings extends base{
     function __construct()
     {

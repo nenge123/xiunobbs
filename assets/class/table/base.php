@@ -1,5 +1,5 @@
 <?php
-namespace Nenge\table;
+namespace table;
 use \Nenge\DB;
 /**
  * table类 数据出来基础

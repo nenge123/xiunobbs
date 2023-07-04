@@ -1,5 +1,5 @@
 <?php
-namespace Nenge\table;
+namespace table;
 use Nenge\APP;
 use Nenge\DB;
 class table_table_count extends base{

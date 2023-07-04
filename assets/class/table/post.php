@@ -1,5 +1,5 @@
 <?php
-namespace Nenge\table;
+namespace table;
 use Nenge\DB;
 class table_post extends base{
     public array $list = array();

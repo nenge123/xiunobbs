@@ -1,6 +1,6 @@
 <?php
 
-namespace Nenge\table;
+namespace table;
 
 use Nenge\DB;
 use Nenge\language;

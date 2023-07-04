@@ -466,10 +466,10 @@ const Nenge = new class NengeCores {
                         break;
                 }
             });
-            ARG.progress && T.on(request, evt[0], e => ARG.progress(I.PER(e.loaded, e.total), e.total, e.loaded, 0, request));
-            ARG.postProgress && T.on(request.upload, evt[0], e => ARG.postProgress(I.PER(e.loaded, e.total), e.total, e.loaded, e));
-            I.toArr(evt, v => I.none(ARG[v]) || (T.on(request, val, ARG[v]), I.DP(ARG, v)));
-            ARG.upload && I.toArr(evt, v => I.none(ARG.upload[v]) || (T.on(request, val, ARG.upload[v]), I.DP(ARG.upload, v)));
+            I.func(ARG[evt[0]]) && T.on(request, evt[0], e => ARG[evt[0]](I.PER(e.loaded, e.total), e.total, e.loaded, 0, request));
+            I.func(ARG.postProgress) && T.on(request.upload, evt[0], e => ARG.postProgress(I.PER(e.loaded, e.total), e.total, e.loaded, e));
+            ARG.request&&I.toArr(evt, v => I.none(ARG.request[v]) || (T.on(request, v, ARG.request[v]), I.DP(ARG.request, v)));
+            ARG.upload && I.toArr(evt, v => I.none(ARG.upload[v]) || (T.on(request.upload, v, ARG.upload[v]), I.DP(ARG.upload, v)));
             let formData, type = ARG.type || "",
                 headers = ARG.headers || {},
                 ajtime = ARG.noajax ? {} : {

@@ -62,9 +62,9 @@
 
 - `:: getLink($table = false)` 返回驱动底层类对象
 
-## `Nenge\table\base` 数据库table类基础
+## `table\base` 数据库table类基础
 ```php
-    namespace Nenge\table;
+    namespace table;
     use Nenge\DB;
     class table_attach extends base{
         function __construct()

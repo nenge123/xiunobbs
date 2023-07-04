@@ -1,5 +1,5 @@
 <?php
-namespace Nenge\table;
+namespace table;
 class table_user extends base{
     public array $list = array();
     function __construct()

@@ -1,5 +1,5 @@
 <?php
-namespace Nenge\table;
+namespace table;
 use Nenge\DB;
 class table_forum_access extends base{
     function __construct()
