@@ -16,9 +16,8 @@ if(!empty($router_value)&&is_numeric($router_value)){
                 if(!empty($_FILES['attchfile'])){
                     //print_r($_FILES['attachImages']);
                     $insertData = array('uid'=>$myapp->data['user']['uid']);
-                    if(isset($_POST['filesize']))$insertData['filesize'] = intval($_POST['filesize']);
-                    if(isset($_POST['nowpos']))$insertData['nowpos'] = intval($_POST['nowpos']);
-                    $myapp->json(Nenge\DB::t('attach')->save_attach($_FILES['attchfile'],$insertData));
+                    $result = Nenge\DB::t('attach')->save_attach($_FILES['attchfile'],$insertData);
+                    $myapp->json($result);
                     $myapp->exit();
                 }
                 if(!empty($_POST['message'])){

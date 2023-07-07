@@ -53,46 +53,6 @@ class table_attach extends base
         }
         return $result + $this->fetch_by_aids($newaids);
     }
-    public function merge_file($file, $data = array())
-    {
-        $myapp = \Nenge\APP::app();
-        $uid = !empty($data['uid']) ? $data['uid'] : 0;
-        $filearr = explode('.',$file['name']);
-        $fileext = array_pop($filearr);
-        $filename = $uid.date('_Y-m-d_').$file['name'].'.attach';
-        $path = $myapp->data['path']['tmp'].$filename;
-        $filesize = $data['filesize'];
-        $nowpos = $data['nowpos'];
-        $bsize = filesize($path);
-        $endsize = $nowpos+$file['size'];
-        if($bsize<$filesize){
-            if(!$nowpos||$bsize<=$nowpos){
-                $fp = fopen($path,'ab');
-                $content = file_get_contents($file['tmp_name']);
-                $result = fwrite($fp,$content);
-                fclose($fp);
-                if($filesize>$endsize){
-                    return array('result'=>$result,'orgsize'=>$bsize,'endsize'=>$endsize,'pos'=>$nowpos);
-                }
-            }else{
-                return array('result'=>'pass','orgsize'=>$bsize,'endsize'=>$bsize,'pos'=>$nowpos);
-            }
-        }else{
-            return array('result'=>'success');
-        }
-        if($filesize==$endsize){
-            $newfile = date('Y-m') . '\\' . date('d-' . $uid . 'His') . substr(md5($file['name']), 0, 5) . '.attach';
-            $filepath = $myapp->data['path']['attach'].$newfile;
-            $root = dirname($filepath);
-            if (!is_dir($root)) {
-                \Nenge\APP::app()->mkdir($root);
-            }
-            if(rename($path,$filepath)){
-                return array('orgfilename' => $file['name'], 'filename' => str_replace('\\', '/', $newfile), 'filesize' => $filesize, 'filetype' =>$fileext, 'width' => 0, 'height' =>0);
-            }
-        }
-        return array('result'=>'error');
-    }
     public function save_attach($file, $data = array())
     {
         $uid = !empty($data['uid']) ? $data['uid'] : 0;
@@ -100,20 +60,19 @@ class table_attach extends base
             if (is_array($file['tmp_name'])) {
                 foreach ($file['tmp_name'] as $k => $v) {
                     if ($file['error'][$k] == 0 && is_uploaded_file($v)) {
-                        $result[] = $this->move_file($file['tmp_name'][$k], $file['name'][$k], $file['type'][$k], $file['size'][$k], $uid);
+                        $result[] = $this->move_file_to_attach($file['tmp_name'][$k], $file['name'][$k], $file['type'][$k], $file['size'][$k], $uid);
                     }
                 }
             } else if ($file['error'] == 0 && is_uploaded_file($file['tmp_name'])) {
-                if($file['type']=='application/x-path'){
-                    $result[] =  $this->merge_file($file,$data);
-                    unset($data['nowpos']);
-                }else{
-                    $result[] = $this->move_file($file['tmp_name'], $file['name'], $file['type'], $file['size'], $uid);
+                if ($file['type'] == 'application/x-path') {
+                    $result[] =  $this->merge_file_to_attach($file, $uid);
+                } else {
+                    $result[] = $this->move_file_to_attach($file['tmp_name'], $file['name'], $file['type'], $file['size'], $uid);
                 }
             }
         }
         if (!empty($result)) {
-            if(empty($result[0]['orgfilename'])) return $result[0];
+            if (empty($result[0]['orgfilename'])) return $result[0];
             $inserdata = array();
             foreach ($result as $k => $v) {
                 if (!empty($v)) {
@@ -131,48 +90,93 @@ class table_attach extends base
                 $result = array();
                 $apath = \Nenge\APP::app()->data['site']['attach'];
                 foreach ($inserdata as $k => $v) {
+                    if (empty($v['orgfilename'])){
+                        $result['error'][] = $v;
+                        continue;
+                    }
                     $datas[] = array_values($v);
                     $file[] = $v['isimage'] ? array($apath . $v['filename'], $v['orgfilename']) : '';
                 }
                 $data = $this->insert($datas);
                 foreach ($data as $k => $v) {
                     if (empty($file[$k])) {
-                        $result[$v['lastid']] = '';
+                        $result['attachs'][] = $v['lastid'];
                     } else {
-                        $result[$v['lastid']] = $file[$k];
+                        $result['images'][$v['lastid']] = $file[$k];
                     }
                 }
                 return $result;
             }
         }
     }
-    public function move_file($tmp, $name, $type, $size, $uid)
+    public function merge_file_to_attach($tmp, $uid)
     {
-        $file = date('Y-m') . '\\' . date('d-' . $uid . 'His') . substr(md5($name), 0, 5) . '.';
+        //逻辑思路按文件顺序合拼
+        if(empty($_POST['md5hash'])) return array('result'=>'参数不足');
+        $myapp = \Nenge\APP::app();
+        #$filesize = intval($_POST['filesize']);
+        $md5hash = basename($_POST['md5hash']);
+        $filename = $uid.'_'.$md5hash. '.attach';
+        $path = $myapp->data['path']['tmp'] . $filename;
+        #$nowfilesize = @filesize($path)?:0;
+        #$endsize = $nowpos + $tmp['size'];
+        #$nowpos =  intval($_POST['nowpos']);
+        $fp = fopen($path, 'ab');
+        //$content = file_get_contents($tmp['tmp_name']);
+        fwrite($fp, file_get_contents($tmp['tmp_name']));
+        fclose($fp);
+        $filehash = md5_file($path); 
+        if ($filehash == $md5hash) {
+            if($mime = $this->getMime($path)){
+                $newfile = $this->get_attach_create_name($path,$uid).$mime;
+                $filepath = $myapp->data['path']['attach'] . $newfile;
+                $filesize = filesize($path);
+                $root = dirname($filepath);
+                if (!is_dir($root)) {
+                    $myapp->mkdir($root);
+                }
+                if (rename($path, $filepath)) {
+                    return array('orgfilename' => $tmp['name'], 'filename' => str_replace('\\', '/', $newfile), 'filesize' => $filesize, 'filetype' => $mime, 'width' => 0, 'height' => 0);
+                }
+            }else{
+                ///unlink($path);
+            }
+        }else{
+            return array('result' => 'success');
+        }
+    }
+    public function move_file_to_attach($tmp, $name, $type, $size, $uid)
+    {
+        $file = $this->get_attach_create_name($tmp,$uid);
         $width = 0;
         $height = 0;
-        $mime = $this->getMime($tmp);
-        if (stripos($mime, 'image/') !== false) {
-            $imginfo = getimagesize($tmp);
+        #print_r(getimagesize($tmp));exit;
+        if ($imginfo = getimagesize($tmp)) {
             $width = $imginfo[0];
             $height = $imginfo[1];
-            $file .= str_replace('image/', '', $mime);
+            if(isset($this->imgtype[$imginfo[2]])){
+                $file.=$this->imgtype[$imginfo[2]];
+            }else{
+                $mimeName = str_replace('image/', '',$imginfo['mime']);
+            if($mimeName=='jpeg'){
+                $file.="jpg";
+            }else{
+                $file.=$mimeName;
+            }  
+
+            }                                                              
             $mime = 'image';
-        } else if (stripos($mime, 'zip') !== false) {
-            $file .= 'zip';
-            $mime = 'zip';
-        } else if (stripos($mime, '7z') !== false) {
-            $file .= '7z';
-            $mime = '7z';
-        } else if (stripos($mime, 'rar') !== false) {
-            $file .= 'rar';
-            $mime = 'rar';
-        } else {
-            $file .= 'attach';
-            $mime = 'other';
+        } else if ($mime = $this->getMime($tmp)) {
+            $file .=$mime;
+            if($mime=='attach')$mime='other';
+        }else{
+            return array('result'=>'附件只支持压缩文件或者图片文件!','errorfie'=>$name);
         }
         $path = \Nenge\APP::app()->data['path']['attach'] . $file;
         $root = dirname($path);
+        #echo $this->getMime($tmp);
+        #echo str_replace('image/', '',$type);
+        #echo $file;exit;
         if (!is_dir($root)) {
             \Nenge\APP::app()->mkdir($root);
         }
@@ -180,24 +184,49 @@ class table_attach extends base
             return array('orgfilename' => $name, 'filename' => str_replace('\\', '/', $file), 'filesize' => $size, 'filetype' => $mime, 'width' => $width, 'height' => $height);
         }
     }
+    public function get_attach_create_name($tmp,$uid)
+    {
+        return date('Y\\\m\\\d') . '\\' . date('His').'_'.str_pad($uid,3,'0',STR_PAD_LEFT).'_'. md5_file($tmp) . '.';
+    }
     public function getMime($link)
     {
-        $mimelist = array(
-            'application/x-zip-compressed'=>'/^377ABCAF271C/',
-            'application/x-rar-compressed'=>'/^52617221/',
-            'application/x-7z-compressed'=>'/^504B0304/',
-            'image/png'=>'/^89504E470D0A1A0A/',
-            'image/gif'=>'/^47494638(3761|3961)/',
-            'image/jpg'=>'/^FFD8FF/',
-            'image/webp'=>'/^52494646\w{8}57454250/',
-            'image/bmp'=>'/^424D\w{4}0{8}/',
-        );
-        $fp = fopen($link,'rb');
-        $buf = bin2hex(fread($fp,16));
+        $fp = fopen($link, 'rb');
+        $buf = bin2hex(fread($fp, 16));
         fclose($fp);
-        foreach($mimelist as $k=>$v){
-            if(preg_match($v,$buf)) return $k;
+        foreach ($this->mimelist as $k => $v) {
+            if (preg_match($v, $buf)) return $k;
         }
-        return 'application/octet-stream';
+        #echo $buf;
+        return 'attach';
     }
+    public $mimelist = array(
+        'zip' => "/^504b0304/",
+        'rar' => "/^52617221/",
+        '7z' => "/^424dw{4}0{8}/",
+        //'png' => "/^89504e470d0a1a0a/",
+        //'gif' => "/^47494638(3761|3961)/",
+        //'jpg' => "/^ffd8ffe000104a464946/",
+        //'webp' => "/^52494646w{8}57454250/",
+        //'bmp' => "/^424dw{4}0{8}/",
+    );
+    public $imgtype = array(
+        IMAGETYPE_GIF => 'gif',
+        IMAGETYPE_JPEG => 'jpg',
+        IMAGETYPE_PNG => 'png',
+        IMAGETYPE_SWF => 'swf',
+        IMAGETYPE_PSD => 'psd',
+        IMAGETYPE_BMP => 'bmp',
+        IMAGETYPE_TIFF_II => 'tiff',
+        IMAGETYPE_TIFF_MM => 'tiff',
+        IMAGETYPE_JPC => 'jpc',
+        IMAGETYPE_JP2 => 'jp2',
+        IMAGETYPE_JPX => 'jpx',
+        IMAGETYPE_JB2 => 'jb2',
+        IMAGETYPE_SWC => 'swc',
+        IMAGETYPE_IFF => 'iff',
+        IMAGETYPE_WBMP => 'wbmp',
+        IMAGETYPE_XBM => 'xbm',
+        IMAGETYPE_ICO => 'ico',
+        IMAGETYPE_WEBP => 'webp'
+    );
 }

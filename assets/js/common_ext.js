@@ -18,6 +18,25 @@ var T = Nenge,
         //document.body.appendChild(T.$ct('img', '', '', {src: F.URL(m, 'gif')}));
         //console.log(await T.gif2webp(m, {quality: 75,method: 4,lossless: !0,exact: !0,}));
         //console.log(T.show_gif((await T.im2webp(m,75)),T.time));
+        /*
+z = await Nenge.FetchItem({url: 'test.zip?' + T.time,type: 'blob'});
+if(typeof SparkMD5 =='undefined')await T.loadLibjs('spark-md5.min.js');
+var md5file = new SparkMD5.ArrayBuffer();
+md5file.append(await z.arrayBuffer());
+var md5hash = md5file.end();
+md5file.reset();md5file = null;
+for(var i=0;i<z.size;){
+let k = i+512*1024;
+if(k>z.size)k=z.size;
+await T.ajax({
+url: location.href,
+post:I.post({'attchfile': new File([z.slice(i,k)],z.name,{type:'application/x-path'}),filesize:z.size,nowpos:i,md5hash}),
+success(text, headers) {
+console.log(text,headers);
+}});
+i=k;
+}
+ */
     });
     Object.assign(T, {
         async image2webp(blob, quality) {
@@ -168,7 +187,7 @@ var T = Nenge,
                 }
             })
         },
-        async im2webp(gif, quality) {
+        async im2webp(gif,extdata) {
             let mask = T.progress_mask();
             if (!window.Worker) {
                 var W = window;
@@ -181,7 +200,7 @@ var T = Nenge,
                 }
                 mask[2].innerHTML = T.GL('convert');
                 mask[1].value = 0;
-                var data = await W.im2webp({gif,quality,mask:mask[1],ext:await F.CheckExt(gif)}, await T.im2webp_files_module);
+                var data = await W.im2webp(Object.assign({},extdata,{gif,mask:mask[1]}), await T.im2webp_files_module);
                 mask[0].remove();
                 return data;
             } else {
@@ -221,12 +240,7 @@ var T = Nenge,
                         }
                     };
                     T.on(worker, 'message', func);
-                    worker.postMessage({
-                        gif,
-                        id,
-                        quality,
-                        ext:await F.CheckExt(gif)
-                    });
+                    worker.postMessage(Object.assign({},extdata,{gif,id}));
                 })
 
             }
