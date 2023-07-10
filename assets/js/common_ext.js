@@ -177,7 +177,7 @@ i=k;
             return T.FetchItem({
                 url: T.JSpath + 'zip/wasm-im.zip',
                 unpack: !0,
-                version: 8,
+                version: 1,
                 store: T.LibStore,
                 progress(a, b, c) {
                     if (mask) {
@@ -330,5 +330,104 @@ i=k;
             document.body.appendChild(mask);
             return [mask, T.$('.mask-progress', mask), T.$('b', mask)];
         },
+    });
+    Object.assign(T.action,{
+        progress_mask() {
+            var mask = T.$ct('div', '<label class="mask-label" style="height:20px"><b class="mask-title">' + T.GL('progress') + ':</b><progress class="mask-progress" max="100" value="0"></progress></label>', 'mask-content');
+            document.body.appendChild(mask);
+            return [mask, T.$('.mask-progress', mask), T.$('.mask-title', mask)];
+        },
+        attach_ajax(post,fn,text){
+            let mask = T.CF('progress_mask');
+            fn = fn|| (e=>console.log(e));
+            T.ajax({
+                url: location.href,
+                post,
+                postProgress(per, current, total) {
+                    mask[1].value = parseInt(per);
+                    mask[2].innerHTML = text||T.GL('uploading...');
+                },
+                progress(per, current, total) {
+                    mask[1].value = parseInt(per);
+                    mask[2].innerHTML = text||T.GL('request...');
+                },
+                success(text, headers) {
+                    mask[0].remove();
+                    fn('close');
+                    return T.CF('attach_request',text, headers,fn)
+                },
+                error() {
+                    mask[0].remove();
+                    fn('close');
+                }
+            });
+
+
+        },
+        attach_request(text, headers,fn){
+            var result;
+            if (headers['content-type'] == 'application/json') {
+                result = JSON.parse(text);
+                    console.log(result);
+                    if(result.attachs){
+                        fn('attachs',result.attachs.map(v=>'[attach]' + v + '[/attach]').join(''),result.attachs.join(','));
+                    }else if(result.images){
+                        I.toArr(result.images, entry => {
+                            if (!entry[1]) {
+                                fn('attachs','[attach]' + entry[0] + '[/attach]',entry[0]);
+                            } else {
+                                fn('images','<img src="' + entry[1][0] + '" alt="' + entry[1][1] + '"/>',entry[0]);
+                            }
+                        });
+                    }else if(result.result){
+                        fn('msg',result.result,result);
+                    }else{
+                        return console.log(result);
+                    }
+            }else{
+                fn('return',text,headers);
+                console.log(text,headers);
+            }
+        },
+        async md5file(blob){
+            if(typeof SparkMD5 =='undefined')await T.loadLibjs('spark-md5.min.js');
+            if(I.blob(blob))blob = await blob.arrayBuffer();
+            else if(blob.buffer)blob = blob.buffer;
+            var md5file = new SparkMD5.ArrayBuffer();
+            md5file.append(blob);
+            var md5hash = md5file.end();
+            md5file.reset();
+            md5file = null;
+            return md5hash;
+        },
+        attach_expload(fn, Accept, multiple) {
+            let input = T.$ce('input');
+            input.type = 'file';
+            if (Accept) input.accept = Accept;
+            if (multiple) input.multiple = !0;
+            input.onchange = e => {
+                fn(e.target.files);
+                input.remove();
+            };
+            input.click();
+            return input;
+        },
+        async files2zip(files, progress,password) {
+            var T = this;
+            if (!window.zip) await T.loadLibjs(T.JSpath + T.F.zipsrc);
+            const zipFileWriter = new zip.BlobWriter();
+            const zipWriter = new zip.ZipWriter(zipFileWriter,{password});
+            if (!files) return zipWriter;
+            if (typeof files.length != 'undefined') {
+                T.I.toArr(files).map(file => zipWriter.add(file.name, new zip.BlobReader(file), { onprogress(current, total) { progress && progress(current, total, file.name) } }));
+            } else if (T.I.blob(files)) {
+                T.I.toArr(files).map(file => zipWriter.add(file[0], new zip.Uint8ArrayReader(file[1]), { onprogress(current, total, b) { console.log(current, total, b); progress && progress(current, total, file[0]) } }));
+            } else {
+                return zipWriter;
+            }
+            await zipWriter.close({ onprogress(current, total) { progress && progress(current, total, 'zip' + T.GL('progress')) } });
+            return await zipFileWriter.getData();
+        }
+
     });
 }).call(Nenge);

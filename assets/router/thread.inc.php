@@ -1,6 +1,7 @@
 <?php
 defined('XIUNO')||die('return to <a href="">Home</a>');
 $myapp->data['title'] = $language['thread_not_exists'];
+$settings = &$myapp->data['settings'];
 if(!empty($router_value)&&is_numeric($router_value)){
     $myapp->session_verify();
     $thread = Nenge\DB::t('thread')->fetch(array('tid'=>$router_value));
@@ -14,13 +15,23 @@ if(!empty($router_value)&&is_numeric($router_value)){
             #有权访问帖子
             if($myapp->data['method'] == 'POST'){
                 if(!empty($_FILES['attchfile'])){
-                    //print_r($_FILES['attachImages']);
                     $insertData = array('uid'=>$myapp->data['user']['uid']);
+                    if(!empty($settings['attach_rmbs'])&&!empty($_POST['rmbs'])){
+                        $insertData['rmbs'] = intval($settings['attach_rmbs']>$_POST['rmbs']?$_POST['rmbs']:$settings['attach_rmbs']);
+                    }
+                    if(!empty($settings['attach_golds'])&&!empty($_POST['golds'])){
+                        $insertData['golds'] = intval($settings['attach_golds']>$_POST['golds']?$_POST['golds']:$settings['attach_golds']);
+                    }
+                    if(!empty($settings['attach_credits'])&&!empty($_POST['credits'])){
+                        $insertData['credits'] = intval($settings['attach_credits']>$_POST['credits']?$_POST['credits']:$settings['attach_credits']);
+                    }
+                    if(!empty($_POST['comment'])){
+                        $insertData['comment'] = substr($_POST['comment'],0,100);
+                    }
                     $result = Nenge\DB::t('attach')->save_attach($_FILES['attchfile'],$insertData);
                     $myapp->json($result);
                     $myapp->exit();
-                }
-                if(!empty($_POST['message'])){
+                }else if(!empty($_POST['message'])){
                     $attachlist  = [];
                     if(!empty($_POST['attachid'])){
                         $attachlist = Nenge\DB::t('attach')->aids(array('aid'=>explode(',',$_POST['attachid'])));;
@@ -142,7 +153,7 @@ if($myapp->data['method']=='POST'){
             }
         }
     }elseif(!empty($_POST['page'])){
-        list($postlist,$postFirst,$postAttach)= $myapp->F('get_postlist',$thread,intval($_POST['page']),$myapp->data['settings']['thread_size'],$threadQuery);
+        list($postlist,$postFirst,$postAttach)= $myapp->F('get_postlist',$thread,intval($_POST['page']),$settings['thread_size'],$threadQuery);
         if(empty($postlist)){
             $myapp->json(array(
                 'code'=>-1,
@@ -307,5 +318,5 @@ $myapp->data['title']= $thread['subject'];
 if(!empty($myapp->DB('Update','thread',array('+:views'=>1),array('tid'=>$thread_id)))){
     $thread['views'] += 1;
 }
-include $myapp->getTemplate($myapp->data['settings']['thread_template']);
+include $myapp->getTemplate($settings['thread_template']);
 */

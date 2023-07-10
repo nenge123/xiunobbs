@@ -787,11 +787,11 @@ const Nenge = new class NengeCores {
             )
         )
     }
-    async toZip(files, progress) {
+    async toZip(files, progress,password) {
         var T = this;
         if (!window.zip) await T.loadLibjs(T.JSpath + T.F.zipsrc);
         const zipFileWriter = new zip.BlobWriter();
-        const zipWriter = new zip.ZipWriter(zipFileWriter);
+        const zipWriter = new zip.ZipWriter(zipFileWriter,{password});
         if (!files) return zipWriter;
         if (typeof files.length != 'undefined') {
             T.I.toArr(files).map(file => zipWriter.add(file.name, new zip.BlobReader(file), { onprogress(current, total) { progress && progress(current, total, file.name) } }));
@@ -1608,8 +1608,8 @@ const Nenge = new class NengeCores {
             return this.getname(name).split('.').pop().toLowerCase();
         }
         getKeyName(name) {
-            let s = this.getname(name).split('.');
-            return s.pop(), s.join('.');
+            let p = this.getname(name).split('.');
+            return p.slice(0,p.length>1?p.length-1:1).join('.');
         }
         getMime(type, chartset) {
             let F = this,
