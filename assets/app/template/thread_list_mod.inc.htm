@@ -1,0 +1,21 @@
+<?php if($myapp['user']['gid'] > 0 && $myapp['user']['gid'] < 5) { ?>
+<div class="text-center">
+	<?php if(param(0) != 'thread') { ?>
+	<label class="mr-3">
+		<input type="checkbox" data-target='input[name="modtid"]' class="checkall mt-2 mr-2" value="" aria-label="{lang checkall}" />{lang checkall}
+	</label>
+	<?php } ?>
+	
+	<div class="btn-group mod-button my-3" role="group" aria-label="">
+		<!--{hook thread_list_mod_delete_before.htm}-->
+		<button class="btn btn-secondary delete" data-modal-url="{{ url("mod-delete") }}" data-modal-title="{lang delete}" data-modal-arg=".threadlist" data-modal-size="md">{lang delete}</button>
+		<!--{hook thread_list_mod_delete_after.htm}-->
+		<button class="btn btn-secondary move" data-modal-url="{{ url("mod-move") }}" data-modal-title="{lang move}" data-modal-arg=".threadlist" data-modal-size="md">{lang move}</button>
+		<!--{hook thread_list_mod_top_before.htm}-->
+		<button class="btn btn-secondary top" data-modal-url="{{ url("mod-top") }}" data-modal-title="{lang top}" data-modal-arg=".threadlist" data-modal-size="md">{lang top}</button>
+		<!--{hook thread_list_mod_top_after.htm}-->
+		<button class="btn btn-secondary _close" data-modal-url="{{ url("mod-close") }}" data-modal-title="{lang close}" data-modal-arg=".threadlist" data-modal-size="md">{lang close}</button>
+		<!--{hook thread_list_mod_close_after.htm}-->
+	</div>
+</div>
+<?php } ?>

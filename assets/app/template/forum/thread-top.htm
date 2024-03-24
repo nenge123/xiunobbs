@@ -1,0 +1,28 @@
+		<!--{if !empty($threadlist['top'])}-->
+
+		<div class="card">
+			<div class="card-header">
+				<ul class="nav nav-tabs card-header-tabs">
+					<li class="nav-item">
+						<h6 class="nav-link active mb-0">置顶</h6>
+					</li>
+				</ul>
+			</div>
+			<div class="card-body py-1">
+				<ul class="list-unstyled  mb-0"><!--{loop $threadlist['top'] $thread}-->
+
+					<li class="tap top_3" data-href="thread-{{ $thread['tid'] }}.htm" data-tid="435">
+						<div class="d-flex justify-content-between my-2">
+							<div class="break-all text-truncate">
+								<i class="icon-top-{{ $thread['top'] }}"></i>
+								<a href="{{ url('thread-'.$thread['tid']) }}">{{ $thread['subject'] }}</a>
+							</div>
+							<div class="text-nowrap">
+								<span class="text-muted align-middle">{{ \date('Y-m-d',$thread['create_date']) }}</span>
+							</div>
+						</div>
+					</li><!--{/loop}-->
+
+				</ul>
+			</div>
+		</div><!--{/if}-->

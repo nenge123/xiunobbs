@@ -1,0 +1,10 @@
+await (await fetch('https://edge.microsoft.com/translate/auth')).text()
+
+https://api-edge.cognitive.microsofttranslator.com/translate?from=en&to=zh-CHS&api-version=3.0&includeSentenceLength=true
+from: en
+to: zh-CHS
+api-version: 3.0
+includeSentenceLength: true
+
+POST
+	[{Text:''}]

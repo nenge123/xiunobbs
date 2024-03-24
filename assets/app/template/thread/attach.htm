@@ -1,0 +1,18 @@
+
+							<!--{if !empty($post['filelist'])}-->
+
+                            <fieldset class="fieldset">
+								<legend>{lang thread_upload_file}</legend>
+								<ul class="attachlist"><!--{loop $post['filelist'] $attach}-->
+
+                                    <li aid="{{ $attach['aid'] }}">
+										<a href="{{ url($threadhref.'aid-'.$attach['aid']) }}" target="_blank">
+											<i class="icon filetype {{ $attach['filetype'] }}"></i>
+											<b>{{ $attach['orgfilename'] }}</b><!--{if !empty($access['allowdelete'])}-->
+											<a href="javascript:void(0)" class="delete ml-3"><i class="icon-remove"></i>{lang thread_delete_attach}</a><!--{/if}-->
+
+                                        </a>
+									</li><!--{/loop}-->
+
+                                </ul>
+							</fieldset><!--{/if}-->

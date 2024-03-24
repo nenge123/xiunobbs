@@ -1,0 +1,39 @@
+<!--{if empty($_SERVER['HTTP_AJAX_FETCH'])}--><!--{template('forum/header')}-->
+<ol class="breadcrumb d-none d-md-flex">
+	<li class="breadcrumb-item"><a href="{{ url('index') }}" aria-label="{lang index_page}"><i class="icon-home"></i></a></li>
+	<li class="breadcrumb-item"><a href="{{ url('forum') }}">{lang forum_nav}</a></li><!--{if !empty($forum)}-->
+
+	<li class="breadcrumb-item"><a href="{{ url($forumindex) }}">{{ $forum['name'] }}</a></li><!--{/if}--><!--{if !empty($thread)}-->
+
+	<li class="breadcrumb-item active"><a href="{{ url($threadindex) }}">{{ $thread['subject'] }}</a></li><!--{/if}--><!--{hook thread_breadcrumb.htm}-->
+
+</ol>
+<div class="jumbotron">
+	<h1 class="display-4">{{ errortitle }}</h1><!--{if is_string($myapp['errormessage'])}-->
+
+	<p class="lead">{{ errormessage }}</p><!--{else}-->
+	<!--{/if}-->
+	<hr class="my-4">
+	<a class="btn btn-primary btn-lg" href="{if !empty($threadindex)}{{ $threadindex }}{else}{{ url('forum') }}{/if}" role="button">{lang thread_go_back}</a>
+</div><!--{template('forum/footer')}--><!--{else}-->
+<div class="modal fade bd-example-modal-lg" id="modal-{{ time }}" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">{{ errortitle }}</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<p>{{ errormessage }}</p>
+			</div>
+			<div class="modal-footer"><!--{if empty($myapp['user']['uid'])}-->
+
+				<button type="button" class="btn btn-success" data-ajax="api-login" data-ajaxid="#modal-{{ time }}">{lang modal_login}</button>
+				<!--{/if}-->
+				<button type="button" class="btn btn-primary" data-dismiss="modal">{lang modal_ok}</button>
+			</div>
+		</div>
+	</div>
+</div><!--{/if}-->

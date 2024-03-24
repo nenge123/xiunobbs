@@ -1,0 +1,39 @@
+<!--{template('forum/header')}-->
+
+<div class="jumbotron">
+	<h1 class="display-4">{{ \settings_value('site_name',$language['Nengenet']) }}</h1>
+	<p class="lead">这是基于原始xiunobbs-v4数据库结构,重制版本!</p>
+	<hr class="my-4">
+	<p>懵逼树下你和我,你摘懵逼果,我接懵逼果,懵逼果树下笑呵呵.</p>
+	<a class="btn btn-primary btn-lg" href="{{ url('forum') }}" role="button">立即开始</a>
+</div>
+<div class="row">
+	<div class="col-lg-2 pr-0 hidden-md hidden-sm">
+		<div class="card ">
+		<div class="card-body p-3">
+		<div class="nav thread-left-nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+			  <li class="nav-item">
+			  <a class="nav-link active" href="{{ url('forum') }}">
+				<svg t="1655706696395" class="icon mr-2 bg-white rounded avatar-2  hidden-sm hidden-md" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3460"><path d="M672 672m-240 0a240 240 0 1 0 480 0 240 240 0 1 0-480 0Z" fill="#E6F1FD" p-id="3461"></path><path d="M925.2 338.5c-22.6-53.7-55-101.9-96.3-143.3-41.3-41.3-89.5-73.8-143.2-96.3-55-23.1-113.4-34.8-173.5-34.8h-2c-60.6 0.3-119.3 12.3-174.5 35.9-53.3 22.8-101.1 55.2-142 96.5-40.8 41.3-73 89.3-95.1 142.8-23 55.4-34.6 114.3-34.3 174.8 0.3 69.4 16.9 138.3 48 199.9v152c0 25.4 20.6 46 46 46h152.1c61.5 31.1 130.4 47.7 199.9 48h2.1c59.9 0 118-11.6 172.7-34.3 53.5-22.3 101.6-54.3 142.8-95.2 41.3-40.9 73.8-88.7 96.5-142C948 633.3 960 574.6 960.3 514c0-60.8-11.8-119.9-35.1-175.5z m-160 428.9c-67.6 67-157.5 103.9-253.1 103.9h-1.6c-58.2-0.3-116.1-14.7-167.2-42l-8.1-4.4h-136V689l-4.4-8.1c-27.2-51.1-41.7-109-42-167.2-0.4-96.3 36.4-186.6 104-254.8 67.4-68.1 157.5-105.8 253.8-106.2h1.6c48.3 0 95.1 9.3 139.3 27.9 43.1 18 81.7 44.1 115 77.3 33.1 33.2 59.2 71.9 77.2 115 18.8 44.6 28.2 92 27.9 140.8-0.7 96.2-38.4 186.3-106.4 253.7z" fill="#53A4FC" p-id="3462"></path><path d="M738.8 568c-30.1 0-54.4-25-54.4-56s24.3-56 54.4-56c30.1 0 54.4 25 54.4 56 0.1 31-24.3 56-54.4 56zM512.1 568c-30.1 0-54.4-25-54.4-56s24.3-56 54.4-56c30.1 0 54.4 25 54.4 56-0.1 31-24.4 56-54.4 56z" fill="#53A4FC" p-id="3463"></path><path d="M230.9 512a54.4 56 0 1 0 108.8 0 54.4 56 0 1 0-108.8 0Z" fill="#53A4FC" p-id="3464"></path></svg>
+				{lang forum_last_thread}</a>
+			  </li>
+			<li class="nav-item">
+				<a class="nav-link  " href="{{ url('forum-0-tid') }}">
+					<span class="hidden-sm hidden-md"><svg t="1655706935711" class="icon mr-2 rounded bg-white avatar-2" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6372"><path d="M153.12 120.32h716.93v255.2H153.12z" fill="#FDD668" p-id="6373"></path><path d="M902.06 948.13L511.59 822.74 121.12 948.13V88.32h780.94zM511.59 755.52l326.47 104.83v-708H185.12v708z" p-id="6374"></path><path d="M547.77 405.48h46.6l12 86.36L614 552h1c3.64-20.11 7.4-40.53 11.23-60.13l19.34-86.36h38.3l19.92 86.36c3.83 19.34 7.08 39.77 10.91 60.13h1.34c2.3-20.36 4.79-40.53 7.09-60.13l12.25-86.36h43.28l-32.82 189.54h-57.32l-17.24-82.53q-4.6-21.86-7.34-44h-1.27c-2.3 14.23-4.6 29.49-7.41 44l-16.53 82.53h-56.3z" p-id="6375"></path><path d="M439.01 405.48h120.33v37.66h-74.69v35.17h63.45v38.23h-63.45v40.28h77.49v38.23H439.01V405.48zM244.46 405.48h46.4l47.14 90.7 18.58 42.06h1.28c-2.56-20.17-6.13-47.42-6.13-70.08v-62.68H395v189.57h-46.31l-46.91-91.47L283.2 462h-1.27c2 21.19 5.87 47.17 5.87 70.15v62.93h-43.34zM239.32 220.75H425.3v64H239.32z" p-id="6376"></path></svg></span>
+					{lang forum_new_thread}</a>
+			</li>
+			<div class="divide"></div>
+			<div class="forumList overflow-auto">
+			<li fid="1" data-active="fid-1">
+			<a class="nav-link" href="forum-1.htm"><img class="avatar-2 mr-2 rounded" src="upload/forum/1.png">公告</a>
+			</li>
+			</div>
+		</div>
+		</div>
+		</div>
+	</div>
+	<div class="col-lg-7 main"></div>
+	<div class="col-lg-3 d-none d-lg-block aside"></div>
+</div>
+
+<!--{template('forum/footer')}-->

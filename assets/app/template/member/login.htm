@@ -1,0 +1,58 @@
+<!--{if empty($_SERVER['HTTP_AJAX_FETCH'])}--><!--{template('forum/header')}-->
+
+<ol class="breadcrumb d-none d-md-flex">
+    <li class="breadcrumb-item"><a href="{{ url('index') }}" aria-label="{lang index_page}"><i class="icon-home"></i></a></li>
+    <li class="breadcrumb-item"><a href="{{ url('forum') }}">{lang member_login}</a></li>
+</ol><!--{/if}-->
+
+
+<div class="card">
+    <div class="card-header">
+        {lang user_login}
+        <!--{hook user_login_title_after.htm}-->
+    </div>
+    <div class="card-body ajax_modal_body">
+        <form action="{{ url('user-login') }}" method="post" id="form">
+            <div class="form-group input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="icon icon-user icon-fw"></i></span>
+                </div>
+                <input type="text" class="form-control" placeholder="{lang email}" id="email" name="email">
+                <div class="invalid-feedback"></div>
+            </div><!--{hook user_login_email_after.htm}-->
+ 
+            <div class="form-group input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="icon icon-lock icon-fw"></i></span>
+                </div>
+                <input type="password" class="form-control" placeholder="{lang password}" id="password" name="password">
+                <div class="invalid-feedback"></div>
+            </div><!--{hook user_login_password_after.htm}-->
+ 
+            <div class="form-group input-group">
+                <label>
+                    <input type="checkbox" name="cookies">
+                    {lang member_remember_me}
+                </label>
+                <div class="invalid-feedback"></div>
+            </div><!--{hook user_login_password_after.htm}-->
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-block" id="submit" data-loading-text="{lang submiting}...">{lang login}</button>
+            </div><!--{hook user_login_submit_after.htm}-->
+
+            <div class="media">
+                <div><!--{hook user_login_form_footer_left.htm}--></div>
+                <div class="media-body text-right"><!--{hook user_login_form_footer_right_start.htm}-->
+
+                    <a href="{{ url('user-create') }}" class="text-muted"><small>{lang user_create}</small></a>
+                    <a href="{{ url('user-resetpw') }}" class="text-muted ml-3"><small>{lang forgot_pw}</small></a>
+                    <!--{hook user_login_form_footer_right_end.htm}-->
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<!--{hook user_login_card_after.htm}-->
+
+</div><!--{if empty($_SERVER['HTTP_AJAX_FETCH'])}--><!--{template('forum/footer')}--><!--{/if}-->

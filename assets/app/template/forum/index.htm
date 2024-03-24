@@ -1,0 +1,137 @@
+<!--{template('forum/header')}--><!--{hook index_start.htm}-->
+<div class="row"><!--{if !empty($threadlist = $myapp->get_forum_threadlist())}-->
+
+	<div class="col-lg-9 main"><!--{hook index_main_start.htm}-->
+
+		<ol class="breadcrumb d-none d-md-flex">
+			<li class="breadcrumb-item"><a href="./"><i class="icon-home" aria-hidden="true"></i></a></li>
+			<li class="breadcrumb-item active"><a href="{{ url('forum') }}">{lang forum_nav}</a></li><!--{hook forum_breadcrumb.htm}-->
+
+		</ol><!--{subtemplate('forum/thread-top')}-->
+
+		<div class="card card-threadlist">
+			<div class="card-header">
+				<ul class="nav nav-tabs card-header-tabs">
+					<li class="nav-item">
+						<a class="nav-link{if router_value('order')==$forumact[0]} active{/if}" href="{{ url($forumhome.$forumact[0]) }}">{lang forum_last_thread}</a>
+					</li>
+					<li class="nav-item ml-2">
+						<a class="nav-link{if router_value('order')==$forumact[1]} active{/if}" href="{{ url($forumhome.$forumact[1]) }}">{lang forum_new_thread}</a>
+					</li><!--{hook index_thread_list_nav_item_after.htm}-->
+
+				</ul>
+			</div>
+			<div class="card-body"><!--{hook thread_list_inc_start.htm}-->
+
+				<ul class="list-unstyled threadlist mb-0"><!--{hook index_threadlist_before.htm}--><!--{subtemplate('forum/thread-list')}--><!--{hook index_threadlist_after.htm}-->
+
+				</ul><!--{hook thread_list_inc_end.htm}-->
+
+			</div>
+		</div><!--{if !empty($threadlist['pagination'])}--><!--{hook index_page_before.htm}-->
+
+		<nav class="my-3">
+			<ul class="pagination justify-content-center flex-wrap">
+				<li class="page-item{if router_value('page')==1 } active{/if}">
+					<a href="{{ url($forumhome.$threadorder) }}" class="page-link">{lang page_first}</a>
+				</li><!--{loop $threadlist['pagination'] $pagenum}-->
+				
+				<li class="page-item{if router_value('page')==$pagenum } active{/if}">
+					<a href="{{ url($forumhref.$pagenum.$threadorder) }}" class="page-link">{{ $pagenum }}</a>
+				</li><!--{/loop}-->
+
+				<li class="page-item{if router_value('page')==$threadlist['pagecount'] } active{/if}">
+					<a href="{{ url($forumhref.$threadlist['pagecount'].$threadorder) }}" class="page-link">{lang page_last}</a>
+				</li>
+			</ul>
+		</nav><!--{hook index_page_end.htm}--><!--{/if}-->
+
+	</div>
+	<div class="col-lg-3 d-none d-lg-block aside"><!--{if router_value('fid')}-->
+
+		<a role="button" class="btn btn-primary btn-block mb-3" href="{{ url('thread-create-'.$forum['fid']) }}">{lang thread_create_new}</a>
+		<div class="card card-forum-info">
+			<div class="card-body text-center">
+				<img class="logo-5 mb-2" src="{{ get_forum_icon_src($forum['fid']) }}">
+				<h5>{{ $forum['name'] }}</h5><!--{hook forum_brief_before.htm}-->
+
+				<div class="text-left line-height-2">{{ $forum['brief'] }}</div><!--{hook forum_brief_before.htm}-->
+
+			</div>
+			<div class="card-footer p-2">
+				<table class="w-100 small">
+					<tr align="center">
+						<td>
+							<span class="text-muted">{lang forum_threads}</span><br>
+							<b><?php echo $forum['threads'];?></b>
+						</td>
+						<td>
+							<span class="text-muted">{lang forum_today_posts}</span><br>
+							<b><?php echo $forum['todayposts'];?></b>
+						</td>
+						<td>
+							<span class="text-muted">{lang forum_today_threads}</span><br>
+							<b><?php echo $forum['todaythreads'];?></b>
+						</td><!--{hook forum_todaythreads_after.htm}-->
+
+					</tr>
+				</table>
+			</div>
+		</div><!--{hook forum_mod_before.htm}--><!--{if !empty($forum['moderators']) || !empty($forum['announcement'])}-->
+
+		<div class="card card-mod-info">
+			<div class="card-body"><!--{if !empty($forum['announcement'])}-->
+
+				<h6 class="card-title">{lang forum_anouncement}：</h6>
+				<p class="small">
+					{{ $forum['announcement'] }}
+				</p><!--{/if}--><!--{if !empty($forum['moderators'])}-->
+
+				<h6 class="card-title">{lang forum_moderator}：</h6>
+				<div class="row"><!--{loop $forum['moderators'] $key $moderator}-->
+					<div class="col-3 mb-1 text-center">
+						<a href="#"><img src="{{ get_avatar_src($forum['moduids'][$key]) }}" alt="..." width="32" height="32" class="img-circle"></a><br>
+						<a href="{{ url('user-'.$forum['moduids'][$key]) }}" class="small text-muted text-nowrap">{{ $moderator }}</a>
+					</div><!--{/loop}-->
+
+				</div>
+				<!--{/if}-->
+
+			</div>
+		</div><!--{/if}--><!--{hook forum_mod_after.htm}--><!--{else}-->
+		<a role="button" class="btn btn-primary btn-block mb-3" href="{{ url('thread-create') }}">{lang thread_create_new}</a>
+		<!--{hook index_site_brief_before.htm}-->
+		<div class="card card-site-info">
+			<!--{hook index_site_brief_start.htm}-->
+			<div class="m-3">
+				<h5 class="text-center">{{ \settings_value('sitename',$language['Nengenet']) }}</h5>
+				<div class="small line-height-3">{{ \settings_value('sitebrief',$language['Nengenet_brief']) }}</div>
+			</div>
+			<div class="card-footer p-2">
+				<table class="w-100 small">
+					<tr align="center">
+						<td>
+							<span class="text-muted">{lang forum_threads}</span><br>
+							<b>{{ $myapp->t('thread')->count() }}</b>
+						</td>
+						<td>
+							<span class="text-muted">{lang forum_posts}</span><br>
+							<b>{{ $myapp->t('post')->count() }}</b>
+						</td>
+						<td>
+							<span class="text-muted">{lang forum_users}</span><br>
+							<b>{{ $myapp->t('user')->count() }}</b>
+						</td>
+						<td>
+							<span class="text-muted">{lang forum_online}</span><br>
+							<b>{{ $myapp->t('user')->count('WHERE `login_date` > ? ',[$myapp['time'] - settings_value('update_online',900)]) }}</b>
+						</td>
+					</tr>
+				</table>
+			</div><!--{hook index_site_brief_end.htm}-->
+
+		</div><!--{hook index_site_brief_after.htm}--><!--{/if}-->
+
+	</div><!--{/if}-->
+
+</div><!--{hook index_end.htm}--><!--{template('forum/footer')}--><!--{hook index_js.htm}-->

@@ -1,0 +1,11 @@
+{
+    "name":"安装程序",
+    "index":0,
+    "style":true,
+    "class":true,
+    "lang":true,
+    "router":true,
+    "template":true,
+    "available":true,
+    "require":"install_lock"
+}

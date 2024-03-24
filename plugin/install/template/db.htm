@@ -1,0 +1,102 @@
+<!--{template('install:header')}-->
+
+<style>
+	.row .card-body .form-group{align-items: flex-end;}
+</style>
+<form action="<!--{url install-db 'lang='.$lang}-->" method="post" id="form" xn-ajax="setup_db">
+
+<div class="row mt-3">
+	<div class="col-lg-8 offset-lg-2">
+		<div class="card">
+			<div class="card-body">
+				<h3 class="card-title">{lang step_2_title}</h3>
+				<div class="form-group row">
+					<label class="col-sm-3 form-control-label">{lang db_host}：</label>
+					<div class="col-sm-9">
+						<input type="text" name="host" class="form-control" value="<!--{echo $dbconf['host'] localhost}-->">
+						<div class="invalid-feedback"></div>
+					</div>
+				</div>
+				<div class="form-group row"<!--{if !empty($create_error)}--> style="color:red;"<!--{/if}-->>
+					<label class="col-sm-3 form-control-label">{lang db_name}：</label>
+					<div class="col-sm-9">
+						<input type="text" name="dbname" class="form-control" value="<!--{echo $dbconf['dbname'] root}-->">
+						<div class="invalid-feedback"></div>
+					</div>
+				</div>
+				<div class="form-group row"<!--{if !empty($connect_error)}--> style="color:red;"<!--{/if}-->>
+					<label class="col-sm-3 form-control-label">{lang db_user}：</label>
+					<div class="col-sm-9">
+						<input type="text" name="user" class="form-control" value="<!--{echo $dbconf['user'] root}-->">
+						<div class="invalid-feedback"></div>
+					</div>
+				</div>
+				<div class="form-group row"<!--{if !empty($connect_error)}--> style="color:red;"<!--{/if}-->>
+					<label class="col-sm-3 form-control-label">{lang db_pass}：</label>
+					<div class="col-sm-9">
+						<input type="text" name="pw" class="form-control" value="<!--{echo $dbconf['pw'] }-->">
+						<div class="invalid-feedback"></div>
+					</div>
+				</div>
+				<div class="form-group row">
+					<label class="col-sm-3 form-control-label">{lang db_tablepre}：</label>
+					<div class="col-sm-9">
+						<input type="text" name="pre" class="form-control" value="<!--{echo $dbconf['pre'] bbs_}-->" placeholder="bbs_">
+						<div class="invalid-feedback"></div>
+					</div>
+				</div>
+				<div class="form-group row">
+					<label class="col-sm-3 form-control-label">{lang db_charset}：</label>
+					<div class="col-sm-9">
+						<input type="text" name="charset" class="form-control" value="<!--{echo $dbconf['charset'] utf8mb4}-->" placeholder="utf8mb4">
+						<div class="invalid-feedback"></div>
+					</div>
+				</div>
+				<div class="form-group row">
+					<label class="col-sm-3 form-control-label">{lang db_port}：</label>
+					<div class="col-sm-9">
+						<input type="text" name="port" class="form-control" value="<!--{echo $dbconf['port'] 3306}-->" placeholder="{lang db_port_value}">
+						<div class="invalid-feedback"></div>
+					</div>
+				</div>
+				<div class="form-group row">
+					<label class="col-sm-3 form-control-label">{lang db_cover}：</label>
+					<div class="col-sm-9 text-center">
+						<div<!--{if !empty($cover_error)}--> style="color:red;"<!--{/if}-->>{lang db_cover_txt}</div>
+						<input type="checkbox" name="cover" class="form-control" value="1" placeholder="{lang db_cover_value}">
+					</div>
+				</div>
+				<h4>{lang step_3_title}</h4>
+				<div class="form-group row">
+					<label class="col-sm-3 form-control-label">{lang admin_email}：</label>
+					<div class="col-sm-9">
+						<input type="text" name="email" autocomplete="email" class="form-control" value="admin@admin.com">
+						<div class="invalid-feedback"></div>
+					</div>
+				</div>
+				<div class="form-group row">
+					<label class="col-sm-3 form-control-label">{lang admin_username}：</label>
+					<div class="col-sm-9">
+						<input type="text" name="username" autocomplete="username" class="form-control" value="admin">
+						<div class="invalid-feedback"></div>
+					</div>
+				</div>
+				<div class="form-group row">
+					<label class="col-sm-3 form-control-label">{lang admin_pw}：</label>
+					<div class="col-sm-9">
+						<input type="password" name="password" autocomplete="current-password" class="form-control" value="">
+						<div class="invalid-feedback"></div>
+					</div>
+				</div>
+				
+			</div>
+	
+			<div class="text-center m-3">
+				<a class="btn btn-secondary" href="{url install-env 'lang='.$lang}">{lang prev_step}</a>
+				<button type="submit" class="btn btn-primary" id="submit" data-loading-text="{lang installing_about_moment}..." default-text="{lang install_on}">{lang install_on}</button>
+			</div>
+		</div>
+	</div>
+</div>
+</form>
+<!--{template('install:footer')}-->

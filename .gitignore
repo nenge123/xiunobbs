@@ -1,0 +1,6 @@
+config.inc.php
+upload
+cache
+web.config
+.htaccess
+assets/app/cache

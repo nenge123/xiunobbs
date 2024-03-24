@@ -1,0 +1,147 @@
+
+<div class="card card-postlist">
+    <div class="card-body">
+        <div class="card-title">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <b>{lang thread_reply}</b> (<span class="posts">{{ $thread['posts'] }}</span>)<a href="{{ url($threadlistorder) }}">{lang thread_order_desc}</a>
+                </div>
+                <!--{hook thread_post_list_title_middle.htm}-->
+                <div>
+                    <!--{hook thread_post_list_title_right.htm}-->
+                </div>
+            </div>
+        </div><!--{if !empty($postlist['pagination'])}-->
+
+		<nav class="my-3">
+			<ul class="pagination justify-content-center flex-wrap">
+				<li class="page-item{if router_value('page')==1 } active{/if}">
+					<a href="{{ url($threadindex.$threadorder) }}" class="page-link">{lang page_first}</a>
+				</li><!--{loop $postlist['pagination'] $pagenum}-->
+				
+				<li class="page-item{if router_value('page')==$pagenum } active{/if}">
+					<a href="{{ url($threadhref.$pagenum.$threadorder) }}" class="page-link">{{ $pagenum }}</a>
+				</li><!--{/loop}-->
+
+				<li class="page-item{if router_value('page')==$postlist['pagecount'] } active{/if}">
+					<a href="{{ url($threadhref.$postlist['pagecount'].$threadorder) }}" class="page-link">{lang page_last}</a>
+				</li>
+			</ul>
+		</nav><!--{/if}-->
+        <ul class="list-unstyled postlist"><!--{hook post_list_inc_start.htm}--><!--{loop $postlist['list'] $pid $post}-->
+
+			<li class="media post" data-pid="{{ $pid }}" data-uid="{{ $post['uid'] }}">
+					<a href="{{ url("user-$post[uid]") }}" class="mr-3" tabindex="-1">
+						<img class="avatar-3" src="{{ get_avatar_src($post['uid']) }}">
+					</a>
+					<!--{hook post_list_inc_avatar_after.htm}-->
+					<div class="media-body">
+						<div class="d-flex justify-content-between small text-muted">
+							<div>
+								<!--{hook post_list_inc_username_before.htm}-->
+								<span class="username"><!--{if empty($post['username'])}-->
+									<a href="#">{lang member_guestname}</a><!--{else}-->
+
+									<a href="{{ url("user-$post[uid]") }}" class="text-muted font-weight-bold">{{ $post['username'] }}</a><!--{/if}-->
+
+								</span>
+								<!--{hook post_list_inc_username_after.htm}-->
+								
+								<!--{hook post_list_inc_create_date_before.htm}-->
+								<span class="date text-grey ml-2">{{ $post['create_date_fmt'] }}</span>
+								<!--{hook post_list_inc_create_date_after.htm}-->
+							</div>
+							<div class="text-right text-grey">
+								<!--{hook post_list_inc_quote_before.htm}-->
+								<!--{if !empty($access['allowpost'])}-->
+								<a href="javascript:void(0)" data-tid="{{ $post['tid'] }}" data-pid="{{ $pid }}" class="text-grey post_reply mr-3"><i class="icon-reply" title="{lang quote}"></i> <span class="d-none">{lang quote}</span></a>
+								<!--{/if}-->
+								<!--{hook post_list_inc_quote_after.htm}-->
+								
+								<!--{hook post_list_inc_update_before.htm}-->
+								<!--{if !empty($access['allowupdate'])}-->
+								<a href="{{ url("post-update-$post[pid]") }}" class="text-grey post_update mr-3"><i class="icon-edit" title="{lang edit}"></i> <span class="d-none">{lang edit}</span></a>
+								<!--{/if}-->
+								<!--{hook post_list_inc_update_after.htm}-->
+							
+								<!--{hook post_list_inc_delete_before.htm}-->
+								<!--{if !empty($access['allowdelete'])}-->
+								<a data-href="{{ url("post-delete-$post[pid]") }}" data-confirm-text="{lang confirm_delete}" href="javascript:void(0);" class="text-grey post_delete _confirm mr-3"><i class="icon-remove" title="{lang delete}"></i> <span class="d-none">{lang delete}</span></a>
+								<!--{/if}-->
+								<!--{hook post_list_inc_delete_after.htm}-->
+								<!--{hook post_list_inc_floor_before.htm}-->
+								<!--{if !empty($post['floor'])}-->
+								<span class="floor-parent">
+									<span class="floor mr-0">{{ $post['floor'] }}</span>{lang floor}
+								</span>
+								<!--{/if}-->
+								<!--{hook post_list_inc_floor_after.htm}-->
+							</div>
+						</div>
+						<div class="message mt-1 break-all">
+						
+							<!--{hook post_list_inc_subject_before.htm}-->
+							<!--{if !empty($post['subject'])}-->
+								<h6><a href="{{ url("thread-$post[tid]") }}" target="_blank">{{ $post['subject'] }}</a></h6>
+							<!--{/if}-->
+							<!--{hook post_list_inc_subject_after.htm}-->
+							
+							<!--{hook post_list_inc_message_before.htm}-->
+							{{ $post['message_fmt'] }}
+							<!--{hook post_list_inc_message_after.htm}-->
+							
+							<!--{hook post_list_inc_filelist_before.htm}--><!--{subtemplate('thread/attach')}-->
+							<!-- post_file_list_html($post['filelist']) }} -->
+							<!--{hook post_list_inc_filelist_after.htm}-->
+							
+						</div>
+					</div>
+				</li><!--{/loop}-->
+
+			<!--{hook post_list_inc_end.htm}--><!--{if !empty($access['allowpost'])}-->
+            <li class="post newpost media">
+                <a href="{{ url('user-'.$myapp['user']['uid']) }}" class="mr-3" tabindex="-1">
+                    <img class="avatar-3" src="{{ get_avatar_src($myapp['user']['uid']) }}">
+                </a>
+                <div class="media-body">
+                    <div class="d-flex justify-content-between small text-muted">
+                        <div>
+                            <div><!--{if !empty($myapp['user']['username'])}-->{{ $myapp['user']['username'] }}<!--{else}-->{lang thread_guest}<!--{/if}--></div>
+                        </div>
+                        <div>
+                            <span class="floor" id="newfloor">{{ $thread['lastposts'] }}</span>{lang floor}
+                        </div>
+                    </div>
+                    <div>
+                        <form action="{{ url($threadhref.'post') }}" method="post" data-ajax="true" id="quick_reply_form" class="d-block">
+                            <input type="hidden" name="hash" value="{{ posthash }}" />
+                            <input type="hidden" name="time" value="{{ time }}" />
+                            <input type="hidden" name="doctype" value="1" />
+                            <input type="hidden" name="return_html" value="1" />
+                            <input type="hidden" name="quotepid" value="0" />
+                            
+                            <div class="message mt-1">
+                                <textarea class="form-control" placeholder="{lang message}" name="message" id="message"></textarea>
+                            </div>
+                            <div class="text-muted mt-2 small">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <!--{hook thread_quick_reply_left_start.htm}-->
+                                        <button type="submit" class="btn btn-sm btn-secondary" id="submit" data-loading-text="{lang submiting}..."> {lang post_create} </button>
+                                        <!--{hook thread_quick_reply_left_end.htm}-->
+                                    </div>
+                                    <div>
+                                        <!--{hook thread_quick_reply_right_start.htm}-->
+                                        <a class="icon-mail-forward text-muted" href="{{ url("post-create-$tid") }}" id="advanced_reply"> {lang advanced_reply}</a>
+                                        <!--{hook thread_quick_reply_right_end.htm}-->
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </li><!--{/if}-->
+                    
+        </ul>
+    </div>
+</div>

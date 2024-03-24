@@ -1,0 +1,19 @@
+<!--{template('install:header')}-->
+<div class="row mt-3">
+	<div class="col-lg-8 offset-lg-2">
+		<div class="card">
+			<div class="card-body">
+				<h3 class="card-title"></h3>
+				<div class="form-group row">
+					<label class="col-sm-5 form-control-label">{lang choose_lang}</label>
+					<div class="col-sm-5">
+						<!--{loop $lang_data $v}-->
+							<a href="?/{{ $v }}/env/" class="btn btn-primary">{lang $v}</a>&nbsp;
+						<!--{/loop}-->
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!--{template('install:footer')}-->

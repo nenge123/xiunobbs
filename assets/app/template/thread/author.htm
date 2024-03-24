@@ -1,0 +1,57 @@
+
+		<div class="card card-thread">
+			<div class="card-body">
+				<div class="media">
+					<a href="{{ url('user-'.$thread['uid']) }}" tabindex="-1">
+						<img class="avatar-3 mr-3" src="{{ get_avatar_src($thread['uid']) }}">
+					</a>
+					<div class="media-body">
+						<!--{hook thread_subject_before.htm}-->
+						<h4 class="break-all">
+							<!--{hook thread_subject_start.htm}-->
+							{{ $thread['subject'] }}
+							<!--{hook thread_subject_end.htm}-->
+						</h4>
+						<!--{hook thread_subject_after.htm}-->
+						<div class="d-flex justify-content-between small">
+							<div>
+								<!--{hook thread_username_before.htm}-->
+								<span class="username">
+									<a href="{{ url('user-'.$thread['uid']) }}" class="text-muted font-weight-bold">{{ $thread['username'] }}</a>
+								</span>
+								<span class="date text-grey ml-2">{{ $thread['create_date_fmt'] }}</span>
+								<span class="text-grey ml-2"><i class="icon-eye"></i>{{ $thread['views'] }}</span>
+								<!--{hook thread_views_after.htm}-->
+							</div>
+							<div>
+								<!--{hook thread_update_before.htm}-->
+								<!--{if !empty($access['allowupdate'])}-->
+								<a href="{{ url("post-update-$thread[firstpid]") }}" class="text-grey mr-2 post_update"><i class="icon-edit"></i> {lang edit}</a>
+								<!--{/if}-->
+								
+								<!--{if !empty($access['allowdelete'])}-->
+								<a data-href="{{ url("post-delete-$thread[firstpid]") }}" href="javascript:void(0);" class="text-grey post_delete" isfirst="1"><i class="icon-remove"></i> {lang delete}</a>
+								<!--{/if}-->
+								<!--{hook thread_delete_after.htm}-->
+							</div>
+						</div>
+					</div>
+				</div>
+				<hr />
+				<div class="message break-all" isfirst="1">
+				<!--{if !empty($post = $authorpost)}-->
+					<!--{hook thread_message_before.htm}-->
+					{{ $post['message'] }}
+					<!--{hook thread_message_after.htm}--><!--{subtemplate('thread/attach')}-->
+					<!--{hook thread_filelist_after.htm}-->
+					
+				<!--{/if}-->
+				</div>
+				<!--{hook thread_plugin_before.htm}-->
+				<div class="plugin d-flex justify-content-center mt-3">
+					<!--{hook thread_plugin_body.htm}-->
+				</div>
+				<!--{hook thread_plugin_after.htm}-->
+
+			</div>
+		</div>

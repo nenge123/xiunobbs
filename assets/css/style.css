@@ -1,0 +1,9 @@
+.navbar-nav .nav-block {
+  width: 2.5rem;
+  height: 2.5rem;
+  background: #000000;
+  border-radius: 3px;
+  padding: 3px !important;
+  outline: none;
+  margin: 0px 0px 0px 0.5em;
+}

@@ -1,0 +1,36 @@
+<!--{if empty($_SERVER['HTTP_AJAX_FETCH'])}--><!--{template('forum/header')}-->
+
+<ol class="breadcrumb d-none d-md-flex">
+    <li class="breadcrumb-item"><a href="{{ url('index') }}" aria-label="{lang index_page}"><i class="icon-home"></i></a></li>
+    <li class="breadcrumb-item"><a href="{{ url('forum') }}">{lang forum_nav}</a></li><!--{if !empty($forum)}-->
+
+    <li class="breadcrumb-item"><a href="{{ url($forumindex) }}">{{ $forum['name'] }}</a></li><!--{/if}--><!--{if !empty($thread)}-->
+
+    <li class="breadcrumb-item active"><a href="{{ url($threadindex) }}">{{ $thread['subject'] }}</a></li><!--{/if}--><!--{hook thread_breadcrumb.htm}-->
+
+</ol><!--{/if}-->
+
+<div class="jumbotron">
+    <h1 class="display-4">{{ errortitle }}</h1><!--{if is_string($myapp['errormessage'])}-->
+
+    <p class="lead">{{ errormessage }}</p><!--{elseif is_array($myapp['errormessage'])}--><!--{loop $myapp['errormessage'] $key $value}-->
+
+    <p class="lead">
+        <b>{{ $language['member_need_'.$key] }}:</b>
+        <span>{{ $value }}</span>
+        <b>{lang member_local}:</b>
+        <span><!--{if !empty($myapp->data['user'][$key])}-->{{ $myapp->data['user'][$key] }}<!--{else}-->{lang member_unknow_money}<!--{/if}--></span>    
+    </p><!--{/loop}--><!--{/if}--><!--{if empty($myapp['allowdown'])}-->
+
+    <button class="btn btn-primary btn-lg" type="button">{lang member_not_money_no_happy}</button><!--{else}-->
+
+    <form method="post" href="{{ downloadhref }}" target="_blank">
+        <input type="hidden" name="hash" value="{{ get_time_hash($attach['aid']) }}">
+        <input type="hidden" name="time" value="{{ time }}">
+        <button class="btn btn-primary btn-lg" type="submit">{lang download}</button>
+    </form><!--{/if}--><!--{if empty($_SERVER['HTTP_AJAX_FETCH'])}-->
+
+    <hr class="my-4">
+    <a class="btn btn-primary btn-lg" href="{if !empty($threadindex)}{{ $threadindex }}{else}{{ url('forum') }}{/if}" role="button">{lang thread_go_back}</a><!--{/if}-->
+
+</div><!--{if empty($_SERVER['HTTP_AJAX_FETCH'])}--><!--{template('forum/footer')}--><!--{/if}-->

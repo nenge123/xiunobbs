@@ -1,0 +1,128 @@
+{{ get_plugin_method('common_forum_header') }}<!--{hook header_start.htm}-->
+<!DOCTYPE html>
+<html lang="{{ i18n }}">
+<head><!--{hook header_meta_before.htm}-->
+
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<meta name="keywords" content="{{ keywords }}" />
+	<meta name="description" content="{{ description }}" />
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" >
+	<title>{{ title }}</title><!--{hook header_link_before.htm}-->
+
+	<link rel="shortcut icon" href="{{ site.images }}favicon.ico" />
+	<link rel="icon" sizes="32x32" href="{{ site.images }}favicon.ico">
+	<link rel="Bookmark" href="{{ site.images }}favicon.ico" /><!--{hook header_bootstrap_before.htm}-->
+
+	<link rel="stylesheet" href="{{ site.vendor }}bootstrap-v4.0.0/css/bootstrap.css"><!--{hook header_bootstrap_after.htm}--><!--{hook header_bootstrap_bbs_before.htm}-->
+	<link rel="stylesheet" href="style.scss">
+	<link rel="stylesheet" href="{{ site.css }}bootstrap-bbs.css"><!--{hook header_bootstrap_bbs_after.htm}--><!--{hook header_link_after.htm}-->
+
+</head>
+<body><!--{hook header_body_start.htm}--><!--{hook header_nav_start.htm}-->
+
+	<header class="navbar navbar-expand-lg navbar-dark bg-dark" id="header">
+		<div class="container">
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav" aria-controls="navbar_collapse" aria-expanded="false" aria-label="{lang toggler_menu}">
+				<span class="navbar-toggler-icon"></span>
+			</button><!--{hook header_nav_logo_before.htm}-->
+			
+			<a class="navbar-brand text-truncate" href="{{ site.root }}">
+				<img src="{{ site.images }}logo.png" class="logo-2">
+				<span class="hidden-lg">{{ \settings_value('mobile_title') }}</span>
+			</a><!--{hook header_nav_logo_after.htm}--><!--{if !$myapp['user']['uid']}-->
+
+			<a class="navbar-brand hidden-lg" href="{{ url('user-login') }}" aria-label="{lang login}"> <i class="icon-user icon"></i></a><!--{else}-->
+
+			<a class="navbar-brand hidden-lg" href="{{ url("thread-create-$fid") }}" aria-label="{lang thread_create}"><i class="icon-edit icon"></i></a><!--{/if}--><!--{hook header_nav_user_icon_after.htm}-->
+
+			<div class="collapse navbar-collapse" id="nav">
+				<!-- 左侧：版块 -->
+				<ul class="navbar-nav mr-auto"><!--{hook header_nav_forum_start.htm}-->
+
+					<li class="nav-item home" fid="0" data-active="fid-0"><a class="nav-link" href="."><i class="icon-home d-md-none"></i>{lang index_page}</a></li><!--{hook header_nav_home_link_after.htm}--><!--{hook header_nav_forumlist_loop_start.htm}--><!--{if !empty($forumnav = $myapp->get_forum_nav())}--><!--{if count($forumnav)>4}-->
+
+					<li class="nav-item dropdown">
+						<a class="nav-link" id="dropdown-forum" data-toggle="dropdown" aria-expanded="false"  href="#"><!--{lang forum_nav}--></a>
+						<button type="button" class="d-sm-none">{lang nav_collapse}</button>
+						<ul class="dropdown-menu shadow-sm bg-dark" aria-labelledby="dropdown-forum"><!--{loop $forumnav $navfid $nav}--><!--{if !empty($nav['name'])}-->
+
+							<li class="dropdown-item text-white bg-dark">
+								<a class="nav-link{if router_value('fid')==$navfid} active{/if}" href="{{ url('forum-'.$navfid) }}">{{ $nav['name'] }}</a><!--{if !empty($nav['submenu'])}-->
+
+								<button type="button" class="d-sm-none">{lang nav_collapse}</button>
+								<ul class="dropdown-submenu shadow-sm bg-dark"><!--{loop $nav['submenu'] $subfid $name}-->
+
+									<li class="dropdown-item text-white bg-dark"><a class="nav-link" href="{{ url('forum-'.$subfid) }}">{{ $name }}</a></li><!--{/loop}-->
+
+								</ul><!--{/if}-->
+
+							</li><!--{/if}--><!--{/loop}-->
+
+						</ul>
+					</li>
+				<!--{else}--><!--{loop $forumnav $navfid $nav}--><!--{if !empty($nav['name'])}-->
+
+					<li class="nav-item">
+						<a class="nav-link{if router_value('fid')==$navfid} active{/if}" href="{{ url('forum-'.$navfid) }}">{{ $nav['name'] }}</a><!--{if !empty($nav['submenu'])}-->
+
+						<button type="button" class="d-sm-none">{lang nav_collapse}</button>
+						<ul class="submenu"><!--{loop $nav['submenu'] $subfid $name}-->
+
+							<li class="nav-item"><a class="nav-link" href="{{ url('forum-'.$subfid) }}">{{ $name }}</a></li><!--{/loop}-->
+
+						</ul><!--{/if}-->
+
+					</li><!--{/if}--><!--{/loop}--><!--{/if}--><!--{/if}--><!--{if !empty($customnav = $myapp->plugin_read('nav_toplist'))}--><!--{loop $customnav $nav}-->
+
+					<li class="nav-item">
+						<a class="nav-link" href="{{ $nav['href'] }}">{{ $nav['name'] }}</a><!--{if !empty($nav['submenu'])}-->
+
+						<button type="button" class="d-sm-none">{lang nav_collapse}</button>
+						<ul class="submenu"><!--{loop $nav['submenu'] $subnav}-->
+
+							<li class="nav-item">
+								<a class="nav-link" href="{{ $subnav['href'] }}">{{ $subnav['name'] }}</a><!--{if !empty($subnav['submenu'])}-->
+
+								<button type="button" class="d-sm-none">{lang nav_collapse}</button>
+								<ul class="submenu"><!--{loop $subnav['submenu'] $endnav}-->
+			
+									<li class="nav-item">
+										<a class="nav-link" href="{{ $endnav['href'] }}">{{ $endnav['name'] }}</a>
+									</li><!--{/loop}-->
+									
+								</ul><!--{/if}-->
+
+							</li><!--{/loop}-->
+							
+						</ul><!--{/if}-->
+
+					</li><!--{/loop}--><!--{/if}--><!--{hook header_nav_forumlist_loop_end.htm}--><!--{hook header_nav_forum_end.htm}-->
+
+				</ul>
+				<!-- 右侧：用户 -->
+				<ul class="navbar-nav">
+					<li class="nav-item dropdown">
+						<a href="#" id="dropdown-nav-settings" class="nav-link nav-block"  data-toggle="dropdown" aria-expanded="false"><img class="avatar-ctrl" src="{{ get_avatar_src($myapp['user']['uid']) }}"></a>
+						<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdown-nav-settings"><!--{hook header_nav_user_start.htm}--><!--{if empty($myapp['user']['uid'])}-->
+	
+							<li><a href="#" ajax-href="{{ url('user-login') }}"><i class="icon-user"></i> {lang login}</a></li><!--{else}-->
+
+							<li class="nav-item username"><a class="nav-link" href="{{ url('my') }}"><img class="avatar-1" src="<?php echo $user['avatar_url'];?>"> {{ $myapp['user']['username'] }}</a></li><!-- 管理员 --><!--{if $myapp['user']['gid'] == 1}-->
+							
+							<li class="nav-item"><a class="nav-link" href="admin/"><i class="icon-home"></i> {lang admin_page}</a></li><!--{/if}--><!--{hook header_nav_admin_page_after.htm}-->
+							
+							<li class="nav-item"><a class="nav-link" href="{{ url('user-logout') }}"><i class="icon-sign-out"></i> {lang logout}</a></li>
+							<!--{/if}--><!--{hook header_nav_user_end.htm}-->
+
+						</ul>
+					</li>
+
+				</ul>
+			</div>
+		</div>
+	</header><!--{hook header_nav_end.htm}-->
+
+	<main id="body">
+		<div class="container"><!--{hook body_start.htm}-->

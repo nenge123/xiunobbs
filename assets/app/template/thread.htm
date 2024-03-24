@@ -1,0 +1,62 @@
+<!--{template('forum/header')}--><!--{hook thread_start.htm}-->
+
+<div class="row">
+	<div class="col-lg-9 main"><!--{hook thread_breadcrumb_before.htm}-->
+		<ol class="breadcrumb d-none d-md-flex">
+			<li class="breadcrumb-item"><a href="{{ url('index') }}" aria-label="{lang index_page}"><i class="icon-home"></i></a></li>
+			<li class="breadcrumb-item"><a href="{{ url('forum') }}">{lang forum_nav}</a></li>
+			<li class="breadcrumb-item"><a href="{{ url($forumindex) }}">{{ $forum['name'] }}</a></li>
+			<li class="breadcrumb-item active"><a href="{{ url($threadindex) }}">{{ $thread['subject'] }}</a></li><!--{hook thread_breadcrumb.htm}-->
+
+		</ol><!--{hook thread_breadcrumb_after.htm}--><!--{subtemplate('thread/author')}--><!--{hook thread_postlist_before.htm}--><!--{subtemplate('thread/postlist')}-->
+		
+
+		
+		<a role="button" class="btn btn-secondary btn-block xn-back col-lg-6 mx-auto mb-3" href="javascript:history.back();">{lang back}</a>
+		
+	</div>
+	<div class="col-lg-3 d-none d-lg-block aside">
+	
+		<a role="button" class="btn btn-primary btn-block mb-3" href="{{ url('thread-create-'.$fid) }}">{lang thread_create_new}</a>
+		
+		<div class="card card-user-info">
+			<div class="m-3 text-center">
+				<a href="{{ url("user-$thread[uid]") }}" tabindex="-1">
+					<img class="avatar-5" src="{{ get_avatar_src($thread['uid']) }}">
+				</a>
+				<h5><a href="{{ url('user-'.$thread['uid']) }}">{{ $thread['username'] }}</a></h5>
+				<!--{hook thread_user_username_after.htm}-->
+			</div>
+			<div class="card-footer p-2">
+				<table class="w-100 small">
+					<tr align="center">
+						<td>
+							<span class="text-muted">{lang threads}</span><br>
+							<b>{{ $thread['userthreads'] }}</b>
+						</td>
+						<!--{hook thread_user_threads_after.htm}-->
+						<td>
+							<span class="text-muted">{lang posts}</span><br>
+							<b>{{ $thread['userposts'] }}</b>
+						</td>
+						<!--{hook thread_user_posts_after.htm}-->
+						<td>
+							<span class="text-muted">{lang create_rank}</span><br>
+							<b>{{ $thread['uid'] }}</b>
+						</td>
+						<!--{hook thread_user_uid_after.htm}-->
+					</tr>
+				</table>
+			</div>
+		</div>
+		
+		<!--{hook thread_user_after.htm}-->
+		
+	</div>
+</div>
+
+<!--{hook thread_end.htm}-->
+
+<!--{template('forum/footer')}-->
+
+<!--{hook thread_js.htm}-->

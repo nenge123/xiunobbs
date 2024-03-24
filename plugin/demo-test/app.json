@@ -1,0 +1,10 @@
+{
+    "name":"实例插件",
+    "index":0,
+    "style":true,
+    "class":true,
+    "lang":true,
+    "router":true,
+    "template":true,
+    "available":true
+}
