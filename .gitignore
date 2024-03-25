@@ -6,4 +6,6 @@ web.config
 assets/app/cache
 push.sh
 plugin/tinymece/js
+plugin/tinymece/js/
+plugin/tinymece/js/*
 p.php
