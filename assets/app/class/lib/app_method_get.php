@@ -269,23 +269,26 @@ trait app_method_get{
     public function get_plugin_class(int $pluginid,string $method='',array $params=array()):mixed
     {
         if(!isset($this->plugin_class[$pluginid])):
+            $this->plugin_class[$pluginid] = '';
             $pluginName = '\\plugin\\'.$this->plugin['list'][$pluginid]['dir'].'\\common';
             $pluginName = str_replace('-','_',$pluginName);
             $pluginName = str_replace('#','_',$pluginName);
             if(!class_exists($pluginName,false)):
                 include($this->get_plugin_dir($pluginid,'class').'common.class.php');
             endif;
-            $this->plugin_class[$pluginid] = new $pluginName();
+            $callable = $pluginName.'::app';
+            if(is_callable($callable)):
+                call_user_func($callable,$this->plugin['list'][$pluginid]['dir']);
+                $this->plugin_class[$pluginid] = $pluginName;
+            endif;
         endif;
         if(!empty($this->plugin_class[$pluginid])):
             if(!empty($method)):
-                $func = array($this->plugin_class[$pluginid],$method);
-                if(is_callable($func)):
-                    return call_user_func_array($func,$params);
-                endif;
+                return call_user_func($this->plugin_class[$pluginid].'::call_method',$method,...$params);
             endif;
-            return $this->plugin_class[$pluginid];
+            return call_user_func($this->plugin_class[$pluginid].'::app');
         endif;
+        return false;
     }
     /**
      * 对插件方法进行无返回遍历

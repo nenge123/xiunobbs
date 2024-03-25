@@ -36,9 +36,9 @@ if(is_numeric($tid)):
 		$access = $myapp->plugin_set('thread_access',$access,$thread);
 		if(empty($access['allowread'])):
 			#没有阅读权限
-			$myapp->data['errortitle'] = $myapp->getLang('thread_unable_read');
-			$myapp->data['errormessage'] = $myapp->getLang('thread_unable_read_message');
-			include $myapp->template('thread/error');
+			$myapp->data['msgtitle'] = $myapp->getLang('thread_unable_read');
+			$myapp->data['msgcontent'] = $myapp->getLang('thread_unable_read_msg');
+			include $myapp->template('msg/ajax');
 			$myapp->exit();
 		endif;
 		if(router_value(2)=='aid'):
@@ -119,9 +119,9 @@ if(is_numeric($tid)):
 		$myapp->exit();
 	else:	
 		#帖子不存在
-		$myapp->data['errortitle'] = $myapp->getLang('thread_unknow');
-		$myapp->data['errormessage'] = $myapp->getLang('thread_unknow_message');
-		include $myapp->template('thread/error');
+		$myapp->data['msgtitle'] = $myapp->getLang('thread_unknow');
+		$myapp->data['msgcontent'] = $myapp->getLang('thread_unknow_message');
+		include $myapp->template('msg/ajax');
 		$myapp->exit();
 	endif;
 endif;

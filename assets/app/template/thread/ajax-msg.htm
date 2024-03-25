@@ -1,0 +1,27 @@
+<!--{if empty($_SERVER['HTTP_AJAX_FETCH'])}--><!--{template('msg/ajax')}--><!--{else}-->
+<div class="modal fade bd-example-modal-lg" id="modal-{{ time }}" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">{{ msgtitle }}</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body"><!--{if !empty($myapp['msgext'])}--><!--{if empty($myapp['user'])}-->
+				<p class="alert alert-danger">{lang member_required_login}</p><!--{else}--><!--{loop $myapp['msgext'] $key $value}-->
+
+				<p class="alert {if $value>$myapp['user'][$key]}alert-succes{else}{/if}">{{ \getExtName($key) }}{lang member_required_ext}:{{ $value }}<br>{lang member_have_ext}:{{ user.$key }}</p><!--{/loop}--><!--{/if}--><!--{/if}--><!--{if !empty($myapp['msgcontent'])}-->
+
+				{{ msgcontent }}<!--{/if}-->
+
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" data-dismiss="modal">{lang modal_ok}</button><!--{if empty($myapp['user']['uid'])}-->
+
+				<button type="button" class="btn btn-success" data-ajax="api-login" data-ajaxid="#modal-{{ time }}">{lang modal_login}</button>
+				<!--{/if}-->
+			</div>
+		</div>
+	</div>
+</div><!--{/if}-->

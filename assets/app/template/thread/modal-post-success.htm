@@ -2,13 +2,13 @@
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="modal-title">{{ errortitle }}</h5>
+				<h5 class="modal-title">{{ msgtitle }}</h5>
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
 			<div class="modal-body">
-				<p>{{ errormessage }}</p>
+				<p>{{ msgcontent }}</p>
 			</div>
 			<div class="modal-footer">
 				<a href="{{ url($threadindex.'-'.$threadact[1]) }}" class="btn btn-primary" data-method="refresh">{lang modal_refresh}</a>

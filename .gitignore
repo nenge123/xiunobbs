@@ -4,3 +4,6 @@ cache
 web.config
 .htaccess
 assets/app/cache
+push.sh
+plugin/tinymece/js
+p.php

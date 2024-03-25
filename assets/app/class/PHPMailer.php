@@ -2139,7 +2139,7 @@ class PHPMailer
                     }
                     if ($tls) {
                         if (!$this->smtp->startTLS()) {
-                            $message = $this->getSmtpErrorMessage('connect_host');
+                            $message = $this->getSmtpmsgcontent('connect_host');
                             throw new Exception($message);
                         }
                         //We must resend EHLO after TLS negotiation
@@ -2173,7 +2173,7 @@ class PHPMailer
         }
         if ($this->exceptions) {
             // no exception was thrown, likely $this->smtp->connect() failed
-            $message = $this->getSmtpErrorMessage('connect_host');
+            $message = $this->getSmtpmsgcontent('connect_host');
             throw new Exception($message);
         }
 
@@ -4084,7 +4084,7 @@ class PHPMailer
      * @param string $base_key
      * @return string
      */
-    private function getSmtpErrorMessage($base_key)
+    private function getSmtpmsgcontent($base_key)
     {
         $message = $this->lang($base_key);
         $error = $this->smtp->getError();

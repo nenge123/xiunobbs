@@ -246,8 +246,8 @@ class cache{
                  */
                 if (!$appData['available']) continue;
                 if ($appData['require']):
-                    $requiredata = $pluginData['require'];
-                    if(is_string($pluginData['require'])):
+                    $requiredata = $appData['require'];
+                    if(is_string($requiredata)):
                         $requiredata = explode(',', $requiredata);
                         $requiredata = array_map(fn($m)=>explode('|',$m.'|'),$requiredata);
                         $requiredata = array_column($requiredata,1,0);
@@ -333,7 +333,7 @@ class cache{
                             foreach(get_class_methods($className) as $method):
                                 $classArr = explode('_',$method);
                                 if($classArr[0]!='common'&&empty($classArr[1]))continue;
-                                if(in_array($classArr,array('read','set','html'))):
+                                if(in_array($classArr[0],array('read','reset','html'))):
                                     $plugins['method'][$method][] = $keyid;
                                 endif;
                             endforeach;

@@ -22,9 +22,8 @@
 
 	<script src="{{ site.vendor }}jQuery/jquery-3.1.0.js?{{ v }}"></script>
 	<script src="{{ site.vendor }}bootstrap-v4.0.0/js/bootstrap.js?{{ v }}"></script>
-	<script src="{{ site.vendor }}floating-ui/core@1.6.0/floating-ui.core.umd.min.js?{{ v }}"></script>
-	<script src="{{ site.vendor }}floating-ui/dom@1.6.3/floating-ui.dom.umd.min.js?{{ v }}"></script>
 	<script src="{{ site.js }}common.js?{{ v }}"></script><!--{hook footer_js_after.htm}-->
+	{{ plugin_echo('footer') }}
 
 </body><!--{hook footer_body_after.htm}--><!--{hook footer_end.htm}-->
 </html>{{ get_plugin_method('common_forum_footer') }}

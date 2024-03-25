@@ -11,8 +11,8 @@
 defined('WEBROOT') or die('return to <a href="">Home</a>');
 if($myapp->data['user']['uid']>0):
     #已登录
-    $myapp->data['errortitle'] = $myapp->getLang('member_login');
-    $myapp->data['errormessage'] = $myapp->getLang('member_is_login_msg');
+    $myapp->data['msgtitle'] = $myapp->getLang('member_login');
+    $myapp->data['msgcontent'] = $myapp->getLang('member_is_login_msg');
     include $myapp->template('member/modal-msg');
     $myapp->exit();
 endif;

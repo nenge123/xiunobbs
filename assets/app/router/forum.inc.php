@@ -33,8 +33,8 @@ endif;
     #插件改变权限
     $access = $myapp->plugin_set('forum_access',$access,$fid);
     if(empty($access['allowread'])):
-        $myapp->data['errortitle'] = $myapp->getLang('forum_unable_read');
-        $myapp->data['errormessage'] = $myapp->getLang('forum_unable_read_message');
+        $myapp->data['msgtitle'] = $myapp->getLang('forum_unable_read');
+        $myapp->data['msgcontent'] = $myapp->getLang('forum_unable_read_message');
         include $myapp->template('forum/error');
         $myapp->exit();
     endif;

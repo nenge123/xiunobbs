@@ -438,7 +438,7 @@ class APP implements ArrayAccess
     }
     public function plugin_set(string $method,mixed $data,...$params)
     {
-        $method = 'set_'.$method;
+        $method = 'reset_'.$method;
         if($keys = $this->get_plugin_keys($method)):
             foreach ($keys as $id):
                 $this->get_plugin_class($id,$method,$data,...$params);
@@ -698,11 +698,12 @@ class APP implements ArrayAccess
     }
     public function handler_error($errno, $errstr, $errfile, $errline)
     {
+        if(isset($this->data['error_no_report']))return false;
         if(strpos($errstr,'file_get_contents')===0||strpos($errstr,'include')===0||strpos($errstr,'fopen')===0):
             preg_match('/\((.+)\)/',$errstr,$matchs);
             if(!empty($matchs[1])):
                 $str = $this->getLang('failed_open').$this->safePath($matchs[1]);
-                $this->show_error($str,$this->getLang('error_file'),2001);
+                   $this->show_error($str,$this->getLang('error_file'),1111);
                 return true;
             endif;
         endif;
@@ -721,7 +722,7 @@ class APP implements ArrayAccess
             endif;
         endif;
         if (!defined('DEBUG')) return false;
-        echo '<code title="'.$this->safePath($errfile).'('.$errline.')'.PHP_EOL.$errstr.'"><b>' .$errstr . '</b><b style="color:red;">(' . $errline . ')</b></code>';
+        echo '<code class="alert alert-danger">'.$this->safePath($errfile).'('.$errline.')'.PHP_EOL.$errstr.'<br>' .$errstr . '</b></code>';
         return true;
     }
     public function handler_exception(\Throwable  $exception)

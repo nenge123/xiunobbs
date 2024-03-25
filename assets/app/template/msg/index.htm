@@ -1,0 +1,22 @@
+<!--{template('forum/header')}-->
+<ol class="breadcrumb d-none d-md-flex">
+	<li class="breadcrumb-item"><a href="{{ url('index') }}" aria-label="{lang index_page}"><i class="icon-home"></i></a></li><!--{if !empty($forum)}-->
+
+    <li class="breadcrumb-item"><a href="{{ url('forum') }}">{lang forum_nav}</a></li>
+	<li class="breadcrumb-item{if empty($thread)&&empty($myapp['breadcrumb'])} active{/if}"><a href="{{ url($forumindex) }}">{{ $forum['name'] }}</a></li><!--{/if}--><!--{if !empty($thread)}-->
+
+	<li class="breadcrumb-item{if empty($myapp['breadcrumb'])} active{/if}"><a href="{{ url($threadindex) }}">{{ \mb_substr($thread['subject'],0,10) }}</a></li><!--{/if}--><!--{if !empty($myapp['breadcrumb'])}-->
+	
+	<li class="breadcrumb-item active"><a href="{{ $myapp['breadcrumb']['href'] }}">{{ $myapp['breadcrumb']['name'] }}</a></li><!--{/if}-->
+</ol>
+<div class="jumbotron">
+	<h1 class="display-4">{{ msgtitle }}</h1>
+	<div class="lead"><!--{subtemplate('msg/content')}-->
+
+	</div>
+	<hr class="my-4">
+	<a class="btn btn-primary" href="{if !empty($threadindex)}{{ $threadindex }}{else}{{ url('forum') }}{/if}" role="button">{lang thread_go_back}</a><!--{if empty($myapp['user']['uid'])}-->
+
+    <button type="button" class="btn btn-success" data-ajax="api-login" data-ajaxid="#modal-{{ time }}">{lang modal_login}</button>
+    <!--{/if}-->
+</div><!--{template('forum/footer')}-->

@@ -20,6 +20,7 @@ class settings extends table{
             array('i18','zh-cn'),
             array('template_nocache',0),
             array('timezone','Asia/Shanghai'),
+            array('thread_attach_cost',''),#array 附件付费设置
         );
     }
     public function all()

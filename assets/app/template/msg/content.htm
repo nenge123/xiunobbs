@@ -1,0 +1,14 @@
+<!--{if !empty($myapp['extcost'])}--><!--{loop $myapp['extcost'] $key $value}-->
+
+<p class="alert {if $value<$myapp['user'][$key]}alert-success{else}alert-danger{/if}">{{ \getExtName($key) }}{lang member_required_ext}:{{ $value }}{if isset($myapp['user'][$key])},{lang member_have_ext}:{{ user.$key }}{/if}</p><!--{/loop}--><!--{/if}--><!--{if !empty($myapp['msgcontent'])}-->
+
+<div class="alert alert-info">{{ msgcontent }}</div><!--{/if}--><!--{if !empty($myapp['attach'])}-->
+
+<form method="post" action="{{ url($myapp['attach_link']) }}" target="_blank">
+    <input type="hidden" name="hash" value="{{ get_time_hash($myapp['attach']['aid']) }}">
+    <input type="hidden" name="time" value="{{ time }}">
+    <label>
+        <b>{lang thread_click_download}:</b>
+        <button class="btn btn-primary btn-sm" type="submit" data-timeset="{{ attach_limit_time }},{{ attach_max_time }}" data-ajaxid="#modal-{{ time }}">{{ $myapp['attach']['orgfilename'] }}</button>
+    </label>
+</form><!--{/if}-->

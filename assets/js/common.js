@@ -111,12 +111,15 @@
                     e.preventDefault();
                     e.stopPropagation();
                     if(this.disable)return;
-                    this.disable = true;
+                    this.disabled = true;
                     let target = e.target;
                     let href = target.action;
                     let method = target.method||'get';
+                    let post = method&&method.toLowerCase()=='post'?new FormData(target):null;
                     let ajax = await N.modal_ajax({
-                        href,ajax:true,body:method&&method.toLowerCase()=='post'?new FormData(target):null,
+                        href,
+                        ajax:true,
+                        body:post,
                         success:(a,b)=>{
                             //对表单更新
                             if(b&&b instanceof XMLHttpRequest){
@@ -134,16 +137,18 @@
                             }
                         }
                     },this);
-                    this.disable = false;
+                    this.disabled = false;
                 });
             },
             elm_a(elm){
                 elm.on('click',async function(e){
                     e.preventDefault();
                     e.stopPropagation();
-                    if(this.disable)return;
-                    let href = elm.getAttribute('data-ajax');
-                    this.disable = false;
+                    await N.modal_ajax({
+                        ajax:true,
+                        href:this.href,
+
+                    });
 
                 });
             },
@@ -152,7 +157,7 @@
                     e.preventDefault();
                     e.stopPropagation();
                     if(this.disable)return;
-                    this.disable = true;
+                    this.disabled = true;
                     let elmf = e.target;
                     let bodydata;
                     if(elmf instanceof HTMLFormElement){
@@ -172,7 +177,7 @@
                             $(ajaxid).modal('hide');
                         }
                     }
-                    this.disable = false;
+                    this.disabled = false;
                 });
 
             }
@@ -195,8 +200,38 @@
             });
             Array.from(dom.querySelectorAll('[data-method]'),elm=>{
                 let method = elm.getAttribute('data-method');
-                elm.on('click',N.method[method]);
+                elm.on('click',this.method[method]);
             });
+            Array.from(dom.querySelectorAll('[data-timeset]'),elm=>{
+                elm.text = elm.textContent;
+                elm.disabled = true;
+                let now = Math.floor(Date.now()/1000);
+                let timeset = Array.from(elm.getAttribute('data-timeset').split(','),v=>parseInt(v));
+                elm.textContent = elm.text+'('+(timeset[0]-now)+')';
+                elm.timer = setInterval(()=>{
+                    now = Math.floor(Date.now()/1000);
+                    if(timeset[0]>now){
+                        elm.disabled = true;
+                        elm.textContent = elm.text+'('+(timeset[0]-now)+')';
+                    }else if(timeset[1]){
+                        if(timeset[1]-now>0){
+                            elm.disabled = false;
+                            elm.textContent = elm.text+'('+(now-timeset[1])+')';
+                        }else{
+                            elm.disabled = true;
+                            elm.textContent = this.getLang('thread_attach_longtime');
+                            clearInterval(elm.timer);
+                        }
+                    }else{
+                        elm.disabled = false;
+                        clearInterval(elm.timer);
+                    }
+
+                },1000);
+            });
+        }
+        getLang(name,param){
+            return 'ghghf';
         }
         constructor(){
             Object.assign(EventTarget.prototype, {
@@ -245,6 +280,10 @@
             this.paser();
         }
     }
-    Object.defineProperty(exports,'Nenge',{get:()=>new NengeModule});
-    exports.N = exports.Nenge;
-})(this);
+    const N = new NengeModule;
+    Object.defineProperties(exports,{
+        Nenge:{
+            get:()=>N,
+        }
+    });
+})(self);

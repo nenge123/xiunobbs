@@ -35,6 +35,18 @@ function getOnlineCount()
     return APP::app()->t('user')->count('WHERE `login_date` > ? ',[APP::app()->data['time'] - settings_value('update_online',900)]);
 }
 /**
+ * 根据key返回积分对应语言
+ *
+ * @param string $name
+ * @return string
+ */
+function getExtName(string $name=''):string{
+    if(!empty(APP::app()->getLang('ext_'.$name))):
+        return APP::app()->getLang('ext_'.$name);
+    endif;
+    return APP::app()->getLang('ext_other');
+}
+/**
  * 是否支持扩展
  */
 function isExtension($extension)
