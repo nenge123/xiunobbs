@@ -1,0 +1,13 @@
+{
+    "name": "用户组升级增强版",
+    "brief": "本插件可设置用户升级方式有 积分 、积分+发帖 、积分+发帖+回帖 、发帖所得积分 、回帖所得积分 、每日首帖奖励等。",
+    "version": "1.7",
+    "bbs_version": "4.0",
+    "installed": 1,
+    "enable": 1,
+    "hooks_rank": {
+        "thread_create_thread_end.php": -100,
+        "post_post_end.php": -100
+    },
+    "dependencies": []
+}

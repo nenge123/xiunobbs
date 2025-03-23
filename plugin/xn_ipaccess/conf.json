@@ -1,0 +1,10 @@
+{
+    "name": "每日 IP 操作限制",
+    "brief": "限制每日 IP 发帖量、查看帖子量、注册量、连续发帖数、文件上传个数、大小等，防止灌水和滥用。由Tillreetree改进，不对管理员和VIP用户进行限制。",
+    "version": "1.3",
+    "bbs_version": "4.0",
+    "installed": 1,
+    "enable": 1,
+    "hooks_rank": [],
+    "dependencies": []
+}

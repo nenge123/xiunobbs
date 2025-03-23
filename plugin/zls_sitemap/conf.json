@@ -1,0 +1,10 @@
+{
+    "name": "Sitemap",
+    "brief": "生成sitemap.xml文件,www.xiuno.top",
+    "version": "1.1",
+    "bbs_version": "4.0.3",
+    "installed": 1,
+    "enable": 1,
+    "hooks_rank": [],
+    "overwrites_rank": []
+}

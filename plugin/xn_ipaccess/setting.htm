@@ -1,0 +1,86 @@
+<?php include _include(ADMIN_PATH.'view/htm/header.inc.htm');?>
+
+<div class="card card-body">
+	<form action="<?php echo url('plugin-setting-xn_ipaccess');?>" method="post" id="form">
+		<h4>每日IP 限制设置</h4>
+		<p>以下设置<b>不</b>对管理员和VIP用户（使用<code>tt_vip</code>插件）起作用，是有意的设计。</p>
+		<p>0 代表不限制。</p>
+		<div class="row">
+			<div class="form-group col-lg-2 col-md-3 col-6">
+				<label class="form-control-label">每日注册用户数：</label>
+				<?php echo $input['users']; ?>
+			</div>
+			<div class="form-group col-lg-2 col-md-3 col-6">
+				<label class="form-control-label">每日登录次数：</label>
+				<?php echo $input['logins']; ?>
+			</div>
+			<div class="form-group col-lg-2 col-md-3 col-6">
+				<label class="form-control-label">每日发送邮件数：</label>
+				<?php echo $input['mails']; ?>
+			</div>
+			<div class="form-group col-lg-2 col-md-3 col-6">
+				<label class="form-control-label">每日查看主题数：</label>
+				<?php echo $input['read_thread']; ?>
+			</div>
+			<div class="form-group col-lg-2 col-md-3 col-6">
+				<label class="form-control-label">每日主题数：</label>
+				<?php echo $input['threads']; ?>
+			</div>
+			<div class="form-group col-lg-2 col-md-3 col-6">
+				<label class="form-control-label">每日回帖数：</label>
+				<?php echo $input['posts']; ?>
+			</div>
+			<div class="form-group col-lg-2 col-md-3 col-6">
+				<label class="form-control-label">每日附件个数：</label>
+				<?php echo $input['attachs']; ?>
+			</div>
+			<div class="form-group col-lg-2 col-md-3 col-6">
+				<label class="form-control-label">每日附件大小总数：</label>
+				<?php echo $input['attachsizes']; ?>
+			</div>
+			<div class="form-group col-lg-2 col-md-3 col-6">
+				<label class="form-control-label">连续发表主题上限：</label>
+				<?php echo $input['seriate_threads']; ?>
+			</div>
+			<div class="form-group col-lg-2 col-md-3 col-6">
+				<label class="form-control-label">连续回帖上限：</label>
+				<?php echo $input['seriate_posts']; ?>
+			</div>
+			<div class="form-group col-lg-2 col-md-3 col-6">
+				<label class="form-control-label">连续注册用户数上限：</label>
+				<?php echo $input['seriate_users']; ?>
+			</div>
+		</div>
+
+		<button type="submit" class="btn btn-primary btn-block" id="submit" data-loading-text="<?php echo lang('submiting');?>...">
+			<?php echo lang('confirm');?>
+		</button>
+	</form>
+</div>
+
+
+<?php include _include(ADMIN_PATH.'view/htm/footer.inc.htm');?>
+
+<script>
+
+	var jform = $("#form");
+	var jsubmit = $("#submit");
+	var referer = '<?php echo http_referer();?>';
+	jform.on('submit', function () {
+		jform.reset();
+		jsubmit.button('loading');
+		var postdata = jform.serialize();
+		$.xpost(jform.attr('action'), postdata, function (code, message) {
+			if (code == 0) {
+				$.alert(message);
+				jsubmit.text(message).delay(2000).button('reset').location(referer);
+				return;
+			} else {
+				$.alert(message);
+				jsubmit.button('reset');
+			}
+		});
+		return false;
+	});
+
+</script>

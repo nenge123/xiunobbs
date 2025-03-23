@@ -1,0 +1,61 @@
+<style>
+.uptodown {
+    outline: none;
+    position: fixed;
+    background-color: #fff;
+    width: 40px;
+    height: 40px;
+    color: #999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    box-shadow: 0 0 6px rgba(0,0,0,.12);
+    cursor: pointer;
+    z-index: 5
+}
+
+.d-fixed {
+    right: 70px;
+	width: 50px;
+}
+@media (max-width: 992px) {
+.d-fixed {
+    right: 0px;
+}
+
+}
+</style>
+<div id="scroll_to_top" class="d-fixed " style="position: fixed; _position: absolute; bottom: 180px;   height: 0px;display: none;">
+	<a href="javascript:void(0);" class="uptodown" title="回到顶部"><i class="icon-angle-up"></i></a>
+</div>
+<div id="scroll_to_end" class="d-fixed " style="position: fixed; _position: absolute; bottom: 80px;   height: 50px;display: none;">
+	<a href="javascript:void(0);" class="uptodown" title="直达底部"><i class="icon-angle-down"></i></a>
+</div>
+
+<script>
+//回到顶部
+var jscroll_to_top = $('#scroll_to_top');
+$(window).scroll(function() {
+	if ($(window).scrollTop() > 0) {
+	   jscroll_to_top.fadeIn('slow');
+	} else {
+		jscroll_to_top.fadeOut('slow');
+	}
+});
+jscroll_to_top.on('click', function() {
+	$('html,body').animate({scrollTop: 0}, 'slow');
+});
+//直达底部
+var jscroll_to_end = $('#scroll_to_end');
+$(window).scroll(function() {
+	if ($(window).scrollTop() < ($(document).height()-$(window).height()) ) {
+	   jscroll_to_end.fadeIn('slow');
+	} else {
+		jscroll_to_end.fadeOut('slow');
+	}
+});
+jscroll_to_end.on('click', function() {
+	$('html,body').animate({scrollTop: $(document).height() }, 'slow');
+});
+</script>

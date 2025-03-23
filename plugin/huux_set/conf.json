@@ -1,0 +1,11 @@
+{
+    "name": "拓展设置",
+    "brief": "在后台设置选项中增加扩展设置<br />(FOR 4.0正式版)",
+    "version": "1.1",
+    "bbs_version": "4.0",
+    "installed": 1,
+    "enable": 1,
+    "hooks_rank": [],
+    "overwrites_rank": [],
+    "dependencies": []
+}

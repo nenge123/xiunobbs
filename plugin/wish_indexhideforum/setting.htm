@@ -1,0 +1,65 @@
+<?php include _include(ADMIN_PATH.'view/htm/header.inc.htm');?>
+
+<div class="row">
+	<div class="col-lg-10 mx-auto">
+		<div class="card">
+			<div class="card-body">
+				<form action="<?php echo url("plugin-setting-wish_indexhideforum");?>" method="post" id="form">
+				    <h6><b>注意：配置后，需要清除缓存，前台才会显示！</b></h6>
+					<div class="form-group row">
+						<div class="col-sm-10">&nbsp;</div>
+						<div class="col-sm-10">
+							<h6>可以输入多个版块，多个版块之间用英文逗号隔开</h6>
+							<b>设置不在首页显示的版块ID：</b>&nbsp;<input name="wish_indexhideforum_hide_forums" size='59' type="text" value="<?php echo !empty($setting['wish_indexhideforum']['hide_forums'])?$setting['wish_indexhideforum']['hide_forums']:'';?>">
+							&nbsp;&nbsp;<a href="<?php echo url('forum-list');?>" target="_blank">查看版块列表</a>
+						</div>
+						<div class="col-sm-10">&nbsp;</div>
+						<div class="col-sm-10">
+							<b>&nbsp;&nbsp;&nbsp;&nbsp;在导航中显示对应版块名：&nbsp;</b>&nbsp;<input name="wish_indexhideforum_show_in_nav" type="checkbox" value="yes"
+																   style="-ms-transform: scale(1.5);-moz-transform: scale(1.5);-webkit-transform: scale(1.5);-o-transform: scale(1.5);"
+							<?php echo empty($setting['wish_indexhideforum']['show_in_nav']) || $setting['wish_indexhideforum']['show_in_nav']=='yes'?'checked':'';?>>
+						</div>
+						<div class="col-sm-10">&nbsp;</div>
+						<div class="col-sm-10">
+							<b>同时也隐藏版块置顶的帖子：&nbsp;</b>&nbsp;<input name="wish_indexhideforum_also_hide_tops" type="checkbox" value="yes"
+																										  style="-ms-transform: scale(1.5);-moz-transform: scale(1.5);-webkit-transform: scale(1.5);-o-transform: scale(1.5);"
+							<?php echo empty($setting['wish_indexhideforum']['also_hide_tops']) || $setting['wish_indexhideforum']['also_hide_tops']=='yes'?'checked':'';?>>
+						</div>
+					</div>
+
+					
+					<div class="form-group row">
+						<div class="col-sm-10">
+							<button type="submit" class="btn btn-primary btn-block col-sm-10" id="submit" data-loading-text="<?php echo lang('submiting');?>..."><?php echo lang('confirm');?></button>
+							<a role="button" class="btn btn-secondary btn-block mt-3 col-sm-10" href="javascript:history.back();"><?php echo lang('back');?></a>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<?php include _include(ADMIN_PATH.'view/htm/footer.inc.htm');?>
+
+<script>
+var jform = $("#form");
+var jsubmit = $("#submit");
+var referer = '<?php echo http_referer();?>';
+jform.on('submit', function(){
+	jform.reset();
+	jsubmit.button('loading');
+	var postdata = jform.serialize();
+	$.xpost(jform.attr('action'), postdata, function(code, message) {
+		if(code == 0) {
+			$.alert(message);
+			jsubmit.text(message).delay(2000).button('reset').location(referer);
+			return;
+		} else {
+			$.alert(message);
+			jsubmit.button('reset');
+		}
+	});
+	return false;
+});
+</script>

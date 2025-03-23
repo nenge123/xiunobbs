@@ -1,0 +1,1 @@
+case 'secure': include _include(APP_PATH.'plugin/xiunobbs_cn_secure/route/user_secure.php'); break;

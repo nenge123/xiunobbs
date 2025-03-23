@@ -1,0 +1,11 @@
+{
+    "name": "IP归属地",
+    "brief": "用户管理列表显示注册IP归属地",
+    "version": "1.0",
+    "bbs_version": "1.0",
+    "installed": 1,
+    "enable": 1,
+    "hooks_rank": [],
+    "overwrites_rank": [],
+    "dependencies": []
+}

@@ -1,0 +1,11 @@
+{
+    "name": "指定版块不在首页显示",
+    "brief": "可以设置某些版块不在首页显示。承接各类网站开发，插件开发定制，模板定制，二次开发等。<br />使用交流：<a href='http://bbs.91wc.net/xiuno-hide-index-forum.htm' target='_blank'>http://bbs.91wc.net</a><br /><a href='http://www.91wc.net' target='_blank'>唯诚网络出品</a>&nbsp;&nbsp;<a href='http://wpa.qq.com/msgrd?v=3&uin=1198845956&site=qq&menu=yes' target='_blank'>QQ: 1198845956</a>",
+    "version": "1.0",
+    "bbs_version": "4.0",
+    "installed": 1,
+    "enable": 1,
+    "hooks_rank": [],
+    "overwrites_rank": [],
+    "dependencies": []
+}

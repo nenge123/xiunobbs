@@ -1,0 +1,3 @@
+<?php if(isset($user['uid'])){if($user['pwd_risk'] <> 0){ ?>
+	<div id="notich" class="alert badge-danger container" role="alert" style="margin-top: 10px;margin-bottom: 0px;"><i class="icon-warning"></i> 当前账号在<?php echo date("Y-m-d H:i:s", $user['check_date']) ?>被恶意爆破<?php echo $user['tried_log'] ?>次后成功登录，为了保障您的账号安全，请进行安全认证后修改密码！</div>
+<?php }} ?>

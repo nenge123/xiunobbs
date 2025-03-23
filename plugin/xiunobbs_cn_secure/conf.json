@@ -1,0 +1,10 @@
+{
+    "name": "修罗登录保护",
+    "brief": "<a href='//xiunobbs.cn' target='_blank' style='display: block; background-color:#c6303e;color: #FFFFFF;'>xiunobbs.cn站长交流论坛</a>登录账号超过10次密码错误，下次登录成功强制验证邮箱并提示修改密码。",
+    "version": "1.0",
+    "bbs_version": "4.0",
+    "installed": 1,
+    "enable": 0,
+    "hooks_rank": [],
+    "dependencies": []
+}
