@@ -44,11 +44,11 @@ return array(
 		)
 	),
 	'plugin' => array(
-		'url'=>url('plugin'), 
+		'url'=>MyApp::url('plugin'), 
 		'text'=>lang('plugin'), 
 		'icon'=>'icon-cogs',
 		'tab'=> array (
-			'local'=>array('url'=>url('plugin-local'), 'text'=>lang('admin_plugin_local_list')),
+			'local'=>array('url'=>MyApp::url('plugin'), 'text'=>lang('admin_plugin_local_list')),
 		)
 	)
 );

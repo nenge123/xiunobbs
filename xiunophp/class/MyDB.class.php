@@ -31,6 +31,48 @@ class MyDB
 	public $innodb_first; // 优先 InnoDB
 	public array $tables = array();
 	public static $_db;
+	/**
+	 * 返回最后插入的主键值  
+	 * 即 insert_id
+	 */
+	const MODE_INSERT_ID  = -1;
+	/**
+	 * 返回数据更新的影响行数
+	 */
+	const MODE_ROWS_VALUE  = 0;
+	/**
+	 * 返回带索引字段的多行数据
+	 */
+	const MODE_ALL_ASSOC = 1;
+	/**
+	 * 返回带数字索引的多行数据
+	 */
+	const MODE_ALL_NUM = 2;
+	/**
+	 * 返回混合索引的多行数据
+	 */
+	const MODE_ALL_BOTH = 3;
+	/**
+	 * 返回带字段索引的单行数据
+	 */
+	const MODE_ASSOC = 4;
+	/**
+	 * 返回带数字索引的单行数据
+	 */
+	const MODE_NUM = 5;
+	/**
+	 * 返回带混合索引的单行数据
+	 */
+	const MODE_BOTH = 6;
+	/**
+	 * 返回单行首列数据
+	 */
+	const MODE_COLUMN_VALUE = 7;
+	/**
+	 * 以迭代器形式返回多行数据  
+	 * 处理超大量文本数据时,务必采用
+	 */
+	const MODE_ITERATOR = 10;
 	public function __construct(array $conf, ?string $scheme = null)
 	{
 		self::$_db = $this;
@@ -152,16 +194,15 @@ class MyDB
 			endif;
 		endif;
 	}
-	public static function query($sql, $mode = 1)
+	public static function query($sql, $mode = self::MODE_ALL_ASSOC)
 	{
 		return self::rlink()->querySQL($sql, $mode);
 	}
-	public static function execute(string $query,array $param,int $mode=1):mixed
+	public static function execute(string $query, array $param, int $mode = self::MODE_ALL_ASSOC): mixed
 	{
-		return self::rlink()->executeSQL($query,$param,$mode);
-		
+		return self::rlink()->executeSQL($query, $param, $mode);
 	}
-	public static function exec($sql, $mode = 0)
+	public static function exec($sql, $mode = self::MODE_ROWS_VALUE)
 	{
 		$sql = trim($sql);
 		$wlink = self::wlink();
@@ -172,15 +213,15 @@ class MyDB
 		endif;
 		$pre = strtoupper(substr(trim($sql), 0, 7));
 		if ($pre == 'INSERT ' || $pre == 'REPLACE') {
-			$mode = -1;
+			$mode = self::MODE_INSERT_ID;
 		} elseif ($pre == 'UPDATE ' || $pre == 'DELETE ') {
-			$mode = 0;
+			$mode = self::MODE_ROWS_VALUE;
 		}
 		return $wlink->execSQL($sql, $mode);
 	}
 	public function sql_find_one($sql)
 	{
-		return $this->query($sql, 4) ?: false;
+		return $this->query($sql,self::MODE_ASSOC) ?: false;
 	}
 
 	public function sql_find($sql, $key = NULL)
@@ -322,7 +363,7 @@ class MyDB
 	/**
 	 * 修罗旧有 插入数据处理函数
 	 */
-	public static function xn_sql_insert($arr=array())
+	public static function xn_sql_insert($arr = array())
 	{
 		$keys = array();
 		$values = array();
@@ -334,25 +375,24 @@ class MyDB
 		endforeach;
 		$keystr = implode(',', $keys);
 		$valstr = implode(',', $values);
-		$sql = ' ('.$keystr.') VALUES ('.$valstr.') ';
-		return [$sql,$param];
+		$sql = ' (' . $keystr . ') VALUES (' . $valstr . ') ';
+		return [$sql, $param];
 	}
 	/**
 	 * 修罗旧有 order处理函数
 	 */
-	public static function xn_sql_order($orderby=array())
+	public static function xn_sql_order($orderby = array())
 	{
 		$s = '';
 		if (!empty($orderby)):
 			$s .= ' ORDER BY ';
 			$comma = '';
 			foreach ($orderby as $k => $v):
-				$s .= $comma . self::quote($k). ' '.($v == 1 ? ' ASC ' : ' DESC ');
+				$s .= $comma . self::quote($k) . ' ' . ($v == 1 ? ' ASC ' : ' DESC ');
 				$comma = ',';
 			endforeach;
 		endif;
 		return $s;
-		
 	}
 	public static function sql_select(string $name, $column = '*')
 	{

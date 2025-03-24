@@ -31,7 +31,7 @@
 					</li>
 					<?php foreach ($menu as $k=>$v) { ?>
 					<li class="nav-item nav-item-<?php echo $k;?>">
-						<a class="nav-link" href="<?php echo $v['url'];?>"><i class="<?php echo $v['icon'];?>"></i> <?php echo $v['text'];?></a>
+						<a class="nav-link <?=MyApp::value('module')==$k?'active':''?>" href="<?php echo $v['url'];?>"><i class="<?php echo $v['icon'];?>"></i> <?php echo $v['text'];?></a>
 					</li>
 					<?php  } ?>
 					

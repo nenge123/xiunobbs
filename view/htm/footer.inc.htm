@@ -27,12 +27,11 @@
 	
 	<?php $browser = get__browser();?>
 	<?php if($browser['name'] == 'ie') { ?>
-	<script src="<?php echo $conf['view_url'];?>js/es6-shim.js<?php echo $static_version;?>"></script>
+	<script src="https://cdn.bootcdn.net/ajax/libs/es6-shim/0.35.8/es6-shim.min.js"></script>
 	<?php } ?>
 	<script src="lang/<?php echo $conf['lang'];?>/bbs.js<?php echo $static_version;?>"></script>
-	<script src="<?php echo $conf['view_url'];?>js/jquery-3.1.0.js<?php echo $static_version;?>"></script>
-	<script src="<?php echo $conf['view_url'];?>js/popper.js<?php echo $static_version;?>"></script>
-	<script src="<?php echo $conf['view_url'];?>js/bootstrap.js<?php echo $static_version;?>"></script>
+	<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+	<script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.0.0/js/bootstrap.bundle.min.js"></script>
 	<script src="<?php echo $conf['view_url'];?>js/xiuno.js<?php echo $static_version;?>"></script>
 	<script src="<?php echo $conf['view_url'];?>js/bootstrap-plugin.js<?php echo $static_version;?>"></script>
 	<script src="<?php echo $conf['view_url'];?>js/async.js<?php echo $static_version;?>"></script>
@@ -48,6 +47,7 @@
 	</script>
 	<script src="<?php echo $conf['view_url'];?>js/bbs.js<?php echo $static_version;?>"></script>
 	<!--{hook footer_js_after.htm}-->
+	<script type="module" src="<?=MyApp::site('view/js/common.js')?>"></script>
 	
 </body>
 <!--{hook footer_body_after.htm}-->

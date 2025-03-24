@@ -1,10 +1,10 @@
 {
     "name": "Xiuno BBS 搜索插件丐版 for 4.1",
-    "brief": "<a href='//xiunobbs.cn' target='_blank' style='display: block; background-color:#c6303e;color: #FFFFFF;'>xiunobbs.cn站长交流论坛</a>丐版,删掉全文搜索,仅仅like检索",
-    "version": "1.0",
-    "bbs_version": "4.1",
-    "installed": 1,
-    "enable": 1,
+    "brief": "<a href='\/\/xiunobbs.cn' target='_blank' style='display: block; background-color:#c6303e;color: #FFFFFF;'>xiunobbs.cn站长交流论坛<\/a>丐版,删掉全文搜索,仅仅like检索",
+    "version": 1,
+    "bbs_version": 4.1,
+    "installed": 0,
+    "enable": 0,
     "hooks_rank": {
         "index_site_brief_after.htm": 10
     },

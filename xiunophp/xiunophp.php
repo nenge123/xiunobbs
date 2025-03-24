@@ -36,6 +36,7 @@ include XIUNOPHP_PATH . 'class/driver/MyPDO.class.php';
 include XIUNOPHP_PATH.'class/MyTable.class.php';
 include XIUNOPHP_PATH.'class/MyDB.class.php';
 include XIUNOPHP_PATH.'class/MyApp.class.php';
+include XIUNOPHP_PATH.'class/plugin.class.php';
 
 // ----------------------------------------------------------> 全局函数
 

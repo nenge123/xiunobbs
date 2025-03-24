@@ -952,6 +952,7 @@ function file_get_contents_try($file, $times = 3) {
 }
 
 function file_put_contents_try($file, $s, $times = 3) {
+	return plugin::parseWrite($file,$s,$times);
 	if(!is_dir(dirname($file))):
 		mkdir(dirname($file),0755,true);
 	endif;
@@ -959,7 +960,7 @@ function file_put_contents_try($file, $s, $times = 3) {
 		$fp = fopen($file, 'wb');
 		if($fp AND flock($fp, LOCK_EX)){
 			$n = fwrite($fp, $s);
-			version_compare(PHP_VERSION, '5.3.2', '>=') AND flock($fp, LOCK_UN);
+			flock($fp, LOCK_UN);
 			fclose($fp);
 			clearstatcache();
 			return $n;

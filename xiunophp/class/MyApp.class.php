@@ -2,11 +2,16 @@
 class MyApp implements \ArrayAccess
 {
 	public static $_app;
-	public array $conf;
+	public array $conf = array();
 	public array $data = array();
 	public function __construct($conf = array())
 	{
 		self::$_app = $this;
+		$this->data = array(
+			'extension' => 'html',
+			'rewriteMode'=>false,
+		);
+		$this->routerExport();
 		define('APP_SITE', $this->convert_site(APP_PATH));
 		$this->setConf($conf);
 		set_exception_handler(function ($exception) {
@@ -24,6 +29,10 @@ class MyApp implements \ArrayAccess
 				$this->data['tmp_path'] = realpath(APP_PATH . $conf['tmp_path']) . DIRECTORY_SEPARATOR;
 			endif;
 		endif;
+	}
+	public static function conf(string $name)
+	{
+		return self::app()->conf[$name] ?? '';
 	}
 	public static function path(string $name = ''): string
 	{
@@ -191,7 +200,7 @@ class MyApp implements \ArrayAccess
 		MyApp::create_dir(dirname($logpath));
 		@error_log($s, 3, $logpath);
 	}
-	 
+
 	/**
 	 * 发送邮件
 	 *
@@ -202,12 +211,13 @@ class MyApp implements \ArrayAccess
 	 * @param string $message
 	 * @param string $charset
 	 */
-	public static function xn_send_mail(array $smtp,string $username,string $email,string $subject,string $message, string $charset = 'UTF-8') {
-		if(!class_exists('PHPMailer\PHPMailer\PHPMailer',false)):
-			include(self::convert_path('phar://'.XIUNOPHP_PATH.'class/phar/PHPMailer.phar/autoload.php'));
+	public static function xn_send_mail(array $smtp, string $username, string $email, string $subject, string $message, string $charset = 'UTF-8')
+	{
+		if (!class_exists('PHPMailer\PHPMailer\PHPMailer', false)):
+			include(self::convert_path('phar://' . XIUNOPHP_PATH . 'class/phar/PHPMailer.phar/autoload.php'));
 		endif;
 		$mail             = new \PHPMailer\PHPMailer\PHPMailer;
-		$mail->setLanguage('zh-cn');//繁体 zh-tw
+		$mail->setLanguage('zh-cn'); //繁体 zh-tw
 		$mail->IsSMTP();
 		$mail->IsHTML(TRUE);
 		$mail->SMTPDebug  = \PHPMailer\PHPMailer\SMTP::DEBUG_OFF;
@@ -224,12 +234,210 @@ class MyApp implements \ArrayAccess
 		$mail->addReplyTo($smtp['email'], $email);
 		$mail->Subject    = $subject;
 		$mail->AltBody    = $message;
-		$message          = str_replace("\\",'',$message);
+		$message          = str_replace("\\", '', $message);
 		$mail->msgHTML($message);
 		$mail->addAddress($email, $username);
-		if(!$mail->send()):
+		if (!$mail->send()):
 			return xn_error(-1, $mail->ErrorInfo);
 		endif;
 		return TRUE;
+	}
+
+	/**
+	 * 注册路由
+	 */
+	private function routerExport(): void
+	{
+		$query = isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : '';
+		$query = urldecode($query);
+		$scriptArr = explode('&', $query);
+		$this->data['querydata'] = array(
+			'query' => $query,
+			'param' => array(),
+		);
+		foreach ($scriptArr as $index => $data):
+			$arr = explode('=', $data);
+			$key = array_shift($arr);
+			$key = trim(urldecode($key));
+			$value = array_shift($arr) ?? '';
+			$value = trim(urldecode($value));
+			if (!empty($key)):
+				if (empty($value) && $index == 0):
+					$this->routerReadPath(trim($key));
+				elseif (is_numeric($value)):
+					$this->data['querydata']['param'][$key] = intval($value);
+				elseif (!is_null($value)):
+					$this->data['querydata']['param'][$key] = $value;
+				endif;
+			endif;
+		endforeach;
+		if (empty($this->data['querydata']['module'])):
+			$this->data['querydata']['module'] = 'index';
+		endif;
+	}
+	private function routerReadPath(string $path): void
+	{
+		$this->data['querydata']['path'] = $path;
+		$path = trim($path, '.\\/');
+		if (!empty($path)):
+			$path = strtolower($path);
+			$pathlist = explode('/', $path);
+			$last = array_pop($pathlist);
+			if (!empty($last)):
+				$extension = pathinfo($last, PATHINFO_EXTENSION);
+				if ($extension):
+					$filename = pathinfo($last, PATHINFO_FILENAME);
+					$filename = trim($filename);
+					$filename = trim($filename, '-');
+					$pathlist[] = $filename;
+					#$router_list = explode('-', trim($filename));
+					#array_push($pathlist, ...$router_list);
+					$this->data['querydata']['filename'] = $filename;
+					$this->data['querydata']['extension'] = $extension;
+				else:
+					$pathlist[] = $last;
+				endif;
+			endif;
+			$this->routerSetValue($pathlist);
+		endif;
+	}
+	private function routerIsUUID(string $uuid): bool
+	{
+		if (preg_match('/^[a-f\d]{8}(-[a-f\d]{4}){3}-[a-f\d]{12}$/', $uuid)):
+			if (empty($this->data['querydata']['uuid'])):
+				$this->data['querydata']['uuid'] = $uuid;
+			endif;
+			return true;
+		endif;
+		return false;
+	}
+	private function routerSetValue(array $list): void
+	{
+		if (!empty($list)):
+			foreach ($list as $key => $value):
+				$value = is_numeric($value) ? intval($value) : trim(basename($value), ' 	$@^*()=+<>\'"`#?&;%./\\~');
+				if ($key == 0 && empty($this->data['querydata']['module'])):
+					if (empty($value)):
+						$this->data['querydata']['module'] = 'index';
+						continue;
+					endif;
+					$valueLen = strlen($value);
+					$this->data['querydata']['value'] = $value;
+					if ($valueLen == 36 && $this->routerIsUUID($value)):
+						$this->data['querydata']['module'] = 'uuid';
+					elseif (is_numeric($value)):
+						$this->data['querydata']['module'] = 'id';
+					else:
+						$newarr = explode(':', $value);
+						$value = array_pop($newarr);
+						$this->data['querydata']['plugin'] = array_pop($newarr);
+						if (stripos($value, '-') !== false && count($list) == 1):
+							$this->routerSetValue(explode('-', $value));
+						elseif (strlen($value) > 32):
+							$this->data['querydata']['module'] = 'text';
+						else:
+							$this->data['querydata']['module'] = $value;
+						endif;
+					endif;
+					continue;
+				endif;
+				if (empty($value)) continue;
+				$this->data['querydata'][] = $value;
+			endforeach;
+		endif;
+	}
+	public static function value(mixed $key)
+	{
+		return self::app()->data['querydata'][$key] ?? '';
+	}
+	public static function param(mixed $key)
+	{
+		if (is_int($key)) return self::value($key);
+		return self::app()->data['querydata']['param'][$key] ?? '';
+	}
+
+	/**
+	 * 返回合法URL参数param
+	 */
+	public function get_url_param(string|array $param = array(), bool $width = false): string
+	{
+		if (empty($param)):
+			$param = array();
+			if ($width):
+				$param = $this->data['querydata']['param'];
+			endif;
+		else:
+			if (!empty($param) && is_string($param)):
+				parse_str($param, $param);
+			else:
+				$param = array();
+			endif;
+			if ($width):
+				$param = array_merge($this->data['querydata']['param'], $param);
+			endif;
+		endif;
+		return http_build_query($param, "", null, PHP_QUERY_RFC3986);
+	}
+	/**
+	 * 返回相对URL
+	 */
+	public function get_url_href(string|array $router = 'index', string|array $param = array(), bool $width = false): string
+	{
+		if (empty($router)):
+			$router = '';
+			if ($this->data['rewriteMode'] && empty($router) && $this->data['extension'] != 'php'):
+				#设置 如index.html默认地址
+				$router = 'index.' . $this->data['extension'];
+			endif;
+		else:
+			if (is_array($router)):
+				$router = implode('/', $router);
+			#$router .= '.' . $this->data['extension'];
+			else:
+				$router = trim($router, '-\/\\.');
+			endif;
+			$exception = pathinfo($router, PATHINFO_EXTENSION);
+			if (empty($exception)):
+				$router .= '.' . $this->data['extension'];
+			endif;
+		endif;
+		$param = $this->get_url_param($param, $width);
+		#index.php 为引导文件
+		if ($this->data['rewriteMode']):
+			#是否支持伪静态重写
+			if (!empty($param)):
+				if (empty($router)):
+					$router = '?' . $param;
+				else:
+					$router .= '&' . $param;
+				endif;
+			endif;
+			return APP_SITE . $router;
+		endif;
+		if (!empty($param)):
+			if (empty($router)):
+				$router = $param;
+			else:
+				$router .= '&' . $param;
+			endif;
+		endif;
+		if (!empty($router)):
+			$router = '?' . $router;
+		endif;
+		if ($this->data['rewriteMode']):
+			return APP_SITE . $router;
+		endif;
+		if(str_ends_with($_SERVER['PHP_SELF'],'index.php')):
+			return dirname($_SERVER['PHP_SELF']).'/'.$router;
+		endif;
+		return $_SERVER['PHP_SELF'] . $router;
+	}
+	public static function url(string|array $router = 'index', string|array $param = array(), bool $width = false):string
+	{
+		return self::app()->get_url_href($router,$param,$width);
+	}
+	public static function purl(string|array $router = '', string|array $param = array(), bool $width = false)
+	{
+		return self::app()->get_url_href(self::value('module').'/'.$router,$param,$width);
 	}
 }

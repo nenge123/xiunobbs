@@ -1,9 +1,11 @@
 <?php
 
 namespace xn_search;
-
 use MyDB;
-
+/**
+ * 完全没必要对程序启用全局函数
+ * 当需要的时候才载入
+ */
 class search
 {
 	//N修改开始

@@ -20,9 +20,10 @@ if(DEBUG < 3) {
 	// 管理员令牌检查 / check admin token
 	admin_token_check();
 }
-
-$route = param(0, 'index');
-
+$route = MyApp::value('module', 'index');
+if(empty($_COOKIE['bbs_admin_token'])):
+	$route = 'index';
+endif;
 switch ($route) {
 	// hook admin_index_route_case_start.php
 	case 'index':		include _include(ADMIN_PATH.'route/index.php'); 	break;
