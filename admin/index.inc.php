@@ -1,6 +1,6 @@
 <?php
 
-!defined('DEBUG') AND exit('Access Denied.');
+!defined('APP_PATH') and exit('Access Denied.');
 
 // hook admin_index_menu_after.php
 
@@ -21,7 +21,7 @@ if(DEBUG < 3) {
 	admin_token_check();
 }
 $route = MyApp::value('module', 'index');
-if(empty($_COOKIE['bbs_admin_token'])):
+if(empty(MyApp::cookies('admin_token'))):
 	$route = 'index';
 endif;
 switch ($route) {

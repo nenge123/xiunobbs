@@ -1,4 +1,4 @@
-<?php include _include(ADMIN_PATH.'view/htm/header.inc.htm');?>
+<?php include _include(ADMIN_PATH.'view/htm/new-header.htm');?>
 
 <!--{hook admin_forum_list_start.htm}-->
 
@@ -6,7 +6,7 @@
 	<div class="col-12">
 		<div class="card">
 			<div class="card-body">
-				<form action="<?php echo url('forum-list');?>" method="post" id="form">
+				<form action="<?=MyApp::purl('list')?>" method="post" id="form">
 					<div class="table-responsive arrlist">
 						<table class="table" style="min-width: 800px">
 							<thead>
@@ -32,8 +32,8 @@
 									</td>
 									<td><input type="text" class="form-control" name="name[<?php echo $_fid;?>]" value="<?php echo $_forum['name']; ?>" placeholder="<?php echo lang('forum_name');?>" /></td>
 									<td><input type="text" class="form-control" name="rank[<?php echo $_fid;?>]" value="<?php echo $_forum['rank']; ?>" placeholder="<?php echo lang('forum_rank');?>" /></td>
-									<td><a class="btn row_edit" role="button" tabindex="0"><?php echo lang('forum_edit');?></a></td>
-									<td><a class="btn row_delete" role="button" tabindex="0"><?php echo lang('forum_delete');?></a></td>
+									<td><a class="btn row_edit" tabindex="0" href="<?=MyApp::purl('update/'.$_forum['fid'])?>"><?php echo lang('forum_edit');?></a></td>
+									<td><a class="btn row_delete" role="button" tabindex="0" href="<?=MyApp::purl('delete/'.$_forum['fid'])?>"><?php echo lang('forum_delete');?></a></td>
 								</tr>
 								<?php } ?>
 							</tbody>
@@ -55,7 +55,7 @@
 
 
 
-<?php include _include(ADMIN_PATH.'view/htm/footer.inc.htm');?>
+<?php include _include(ADMIN_PATH.'view/htm/new-footer.htm');?>
 
 <script>
 
@@ -89,26 +89,6 @@ jform.on('submit', function(){
 // 编辑
 var jarrlist = $('.arrlist');
 var jedit = $('a.row_edit');
-jarrlist.on('click', 'a.row_edit', function() {
-	var jthis = $(this);
-	var jtr = jthis.parents('tr');
-	var rowid = jtr.attr('rowid');
-	window.location = xn.url('forum-update-'+rowid);
-});
-
-// 删除
-var jdelete = $('a.row_delete');
-jarrlist.on('click', 'a.row_delete', function() {
-	var jthis = $(this);
-	var jtr = jthis.parents('tr');
-	var rowid = jtr.attr('rowid');
-	if(rowid == 1) {
-		$.alert('<?php echo lang('forum_cant_delete_system_reserved');?>');
-		return;
-	}
-	jtr.remove();
-	return false;
-});
 // 增加
 var jadd = $('a.row_add');
 jadd.on('click', function() {

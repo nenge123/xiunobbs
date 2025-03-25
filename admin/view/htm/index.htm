@@ -1,5 +1,4 @@
-<?php include _include(ADMIN_PATH.'view/htm/header.inc.htm');?>
-
+<?php include _include(ADMIN_PATH.'view/htm/new-header.htm');?>
 <!--{hook admin_index_start.htm}-->
 
 <div class="row line-height-3">
@@ -28,7 +27,7 @@
 		
 		<div class="card">
 			<div class="card-body">
-				<h5><?php echo lang('server_info');?> <a href="<?php echo url('index-phpinfo');?>"><small>[PHPINFO]</small></a></h5>
+				<h5><?php echo lang('server_info');?> <a href="<?=MyApp::url('index/phpinfo')?>"><small>[PHPINFO]</small></a></h5>
 				<div class="row">
 					<div class="col-md-6"><span class="text-muted"><?php echo lang('os');?>：</span><?php echo PHP_OS; ?></div>
 					<div class="col-md-6"><span class="text-muted">Web Server：</span><?php echo $info['SERVER_SOFTWARE']; ?></div>
@@ -77,16 +76,6 @@
 		
 	</div>
 </div>
-
 <!--{hook admin_index_end.htm}-->
-
-<?php include _include(ADMIN_PATH.'view/htm/footer.inc.htm');?>
-
-<script>
-
-$('#nav li.home').addClass('active');
-
-</script>
-
-
+<?php include _include(ADMIN_PATH.'view/htm/new-footer.htm');?>
 <!--{hook admin_index_js.htm}-->

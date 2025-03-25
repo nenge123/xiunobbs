@@ -5,6 +5,9 @@
 // 有部分用户
 define('XN_ADMIN_BIND_IP', array_value($conf, 'admin_bind_ip'));
 
+/**
+ * 后台检查登录函数
+ */
 function admin_token_check() {
 	global $longip, $conf;
 	$useragent_md5 = md5($_SERVER['HTTP_USER_AGENT']);
@@ -21,7 +24,7 @@ function admin_token_check() {
 	} else {
 		$s = xn_decrypt($admin_token, $key);
 		if(empty($s)) {
-			setcookie('bbs_admin_token', '', 0, '', '', '', TRUE);
+			MyApp::cookies('admin_token', '');
 			//message(-1, lang('admin_token_error'));
 			message(-1, lang('admin_token_expiry'));
 		}
@@ -31,7 +34,7 @@ function admin_token_check() {
 		// Background / more than 3600 automatic withdrawal.
 		//if($_ip != $longip || $_SERVER['REQUEST_TIME'] - $_time > 3600) {
 		if((XN_ADMIN_BIND_IP && $_ip != $longip || !XN_ADMIN_BIND_IP) && $_SERVER['REQUEST_TIME'] - $_time > 3600) {
-			setcookie('bbs_admin_token', '', 0, '', '', '', TRUE);
+			MyApp::cookies('admin_token', '');
 			message(-1, lang('admin_token_expiry'));
 		}
 		
@@ -56,13 +59,13 @@ function admin_token_set() {
 	$s = $longip.'	'.$_SERVER['REQUEST_TIME'];
 	
 	$admin_token = xn_encrypt($s, $key);
-	setcookie('bbs_admin_token', $admin_token, $_SERVER['REQUEST_TIME'] + 3600, '',  '', 0, TRUE);
+	MyApp::cookies('admin_token', $admin_token, $_SERVER['REQUEST_TIME'] + 3600);
 	
 	// hook admin_token_set_end.php
 }
 
 function admin_token_clean() {
-	setcookie('bbs_admin_token', '',$_SERVER['REQUEST_TIME'] - 86400, '', '', 0, TRUE);
+	MyApp::cookies('admin_token', '');
 	
 	// hook admin_token_clean_start.php
 }

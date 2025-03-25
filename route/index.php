@@ -4,7 +4,7 @@
 * Copyright (C) 2015 xiuno.com
 */
 
-!defined('DEBUG') AND exit('Access Denied.');
+!defined('APP_PATH') and exit('Access Denied.');
 
 // hook index_start.php
 

@@ -5,7 +5,7 @@
 	admin/plugin-setting-xn_ipaccess.htm
 */
 
-!defined('DEBUG') AND exit('Access Denied.');
+!defined('APP_PATH') and exit('Access Denied.');
 
 if($method == 'GET') {
 	

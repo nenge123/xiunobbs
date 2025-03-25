@@ -1,6 +1,6 @@
 <?php
 
-!defined('DEBUG') AND exit('Access Denied.');
+!defined('APP_PATH') and exit('Access Denied.');
 
 // 管理后台-所有消息 发送通知
 $action = param(1);

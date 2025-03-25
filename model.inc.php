@@ -10,7 +10,7 @@
 #没有注入点
 include(APP_PATH.'model/kv.func.php');
 include(APP_PATH.'model/queue.func.php');
-include(APP_PATH.'model/session.func.php');
+include(APP_PATH.'model/old.func.php');
 $include_model_files = array (
 	#APP_PATH.'model/kv.func.php',
 	#APP_PATH.'model/queue.func.php',
@@ -24,12 +24,10 @@ $include_model_files = array (
 	APP_PATH.'model/attach.func.php',
 	APP_PATH.'model/check.func.php',
 	APP_PATH.'model/mythread.func.php',
-	APP_PATH.'model/runtime.func.php',
 	APP_PATH.'model/table_day.func.php',
-	APP_PATH.'model/cron.func.php',
+	#APP_PATH.'model/cron.func.php',
 	APP_PATH.'model/form.func.php',
 	APP_PATH.'model/misc.func.php',
-	#APP_PATH.'model/session.func.php',
 	
 	// hook model_inc_file.php
 	

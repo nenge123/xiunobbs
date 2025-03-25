@@ -5,6 +5,17 @@
  */
 class plugin
 {
+	static public array $regexp = array(
+		#'subtemplate' => '/\<\!\-\-\{subtemplate\(\'(.+?)\'\)\}\-\-\>/',
+		'scss' => '/\<link\s*[^>]*?href=\"([\w\d\:\_\-]+\.scss)\"[^>]*\>/i',
+		'css' => '/\<link\s*[^>]*?href=\"css\/([\w\d\:\_\-]+)\.css\"\>/i',
+		#'template' => '/\<\!\-\-\{template\((.+?)\)\}\-\-\>/',
+		'foreach1' => '/\{each ([^\s]+)\s+(\$[^\$]+)\s+(\$[^\$]+?)\}/s',
+		'foreach2' => '/\{each ([^\s]+)\s+(\$[^\$]+?)\}/s',
+		'foreach3' => '/\{each ([^\s]+)\s+(\$[^\$]+)\s*=>\s*(\$[^\$]+?)\}/s',
+		'variable' => '/\{\{ (.+?) \}\}/',
+		#'modulefunc' => '/\{:(\w+[\w\_\d]+?)\((.+?)\)\}/',
+	);
 	/**
 	 * 注入点解释函数
 	 * _include
@@ -12,11 +23,28 @@ class plugin
 	public static function parseFile(string $srcfile)
 	{
 		// 合并插件，存入 tmp_path
+		$srcfile = MyApp::convert_path($srcfile);
+		$ext = '';
+		$file_arr = array();
+		#if (str_starts_with($srcfile, 'phar://')):
+		#	$temppath = preg_replace('/^.+?\.phar\//is', '', $srcfile);
+		#	$pathinfo = pathinfo($temppath);
+		#	$ext = $pathinfo['extension'];
+		#	$file_arr = explode('/', $pathinfo['dirname']);
+		#else:
 		$len = strlen(APP_PATH);
-		$filepath =  trim(substr($srcfile, $len), '. \/\\');
-		$file_arr = explode('/', $filepath);
+		$temppath = substr($srcfile, $len);
+		$pathinfo = pathinfo($temppath);
+		$ext = $pathinfo['extension'];
+		if ($pathinfo['dirname'] != '.'):
+			$file_arr = explode(DIRECTORY_SEPARATOR, $pathinfo['dirname']);
+		endif;
+		#endif;
+		$file_arr[] = $pathinfo['filename'] . '.php';
 		if (in_array($file_arr[0], ['route', 'model', 'view', 'admin'])):
 			$tmpfile = MyApp::tmp_path($file_arr[0] . '/' . implode('_', array_slice($file_arr, 1)));
+		elseif ($file_arr[0] == 'xiunophp'):
+			$tmpfile = MyApp::tmp_path(implode(DIRECTORY_SEPARATOR, $file_arr));
 		elseif ($file_arr[0] == 'plugin'):
 			$tmpfile = MyApp::tmp_path($file_arr[0] . '/' . $file_arr[1] . '/' . implode('_', array_slice($file_arr, 2)));
 		else:
@@ -49,6 +77,12 @@ class plugin
 		}
 		#再一次解析hook
 		$s = self::parseHook($s);
+		if ($ext == 'htm'):
+			#附加终止访问
+			$s = '<?php !defined(\'APP_PATH\') AND exit(\'Access Denied.\');?>' . $s;
+			#模板语法糖
+			$s = self::parseVar($s);
+		endif;
 		self::parseWrite($tmpfile, $s);
 		return $tmpfile;
 	}
@@ -78,7 +112,7 @@ class plugin
 		// 文件路径后半部分
 		$filepath_half = substr($srcfile, $len);
 		foreach (self::read_plugin_enabled() as $dir => $pconf) {
-			$overwrite_file = self::path($dir).'/overwrite/'.$filepath_half;
+			$overwrite_file = self::path($dir) . '/overwrite/' . $filepath_half;
 			if (is_file($overwrite_file)) {
 				$rank = isset($pconf['overwrites_rank'][$filepath_half]) ? $pconf['overwrites_rank'][$filepath_half] : 0;
 				if ($rank >= $maxrank) {
@@ -108,6 +142,103 @@ class plugin
 			}
 		}
 		return $template;
+	}
+	/**
+	 * 模板语法糖
+	 */
+	public static function parseVar(string $template): string
+	{
+
+
+		#语句 替换到省略模式
+		$template = preg_replace(
+			'/\<\!\-\-\{(.+?)\}\-\-\>/s',
+			"{\\1}",
+			$template
+		);
+		#模板文字 语言
+		$template = preg_replace_callback('/\{lang ([^\}]+)\}/', fn($m) => lang(trim($m[1])), $template);
+		#echo
+		$template = preg_replace_callback(
+			'/\{echo (.+?)\}/s',
+			fn($m) => '<?=' . trim($m[1]) . '??\'\'?>',
+			$template
+		);
+		#eval
+		$template = preg_replace_callback(
+			'/\{eval ([^\}]+)\}/s',
+			fn($m) => '<?php ' . trim($m[1]) . ';?>',
+			$template
+		);
+		#if 条件
+		$template = preg_replace_callback(
+			'/{if\s([^\}]+)\}/',
+			fn($m) => '<?php if(' . trim($m[1]) . '):?>',
+			$template
+		);
+		$template = preg_replace_callback(
+			'/{if\(([^\}]+)\)\}/',
+			fn($m) => '<?php if(' . trim($m[1]) . '):?>',
+			$template
+		);
+		#elseif 条件转折
+		$template = preg_replace_callback(
+			'/\{elseif\s(.+?)\}/',
+			fn($m) => '<?php elseif(' . trim($m[1]) . '):?>',
+			$template
+		);
+		$template = preg_replace_callback(
+			'/\{elseif\((.+?)\)\}/',
+			fn($m) => '<?php elseif(' . trim($m[1]) . '):?>',
+			$template
+		);
+		#else 条件否
+		$template = preg_replace(
+			'/\{\/?else\}/',
+			'<?php else:?>',
+			$template
+		);
+		#endif 结束IF
+		$template = preg_replace(
+			'/\{\/if\}/',
+			'<?php endif;?>',
+			$template
+		);
+		#each foreach 循环
+		$template = preg_replace_callback(
+			self::$regexp['foreach1'],
+			array(self::class, 'parse_fn_each'),
+			$template
+		);
+		#each foreach 循环
+		$template = preg_replace_callback(
+			self::$regexp['foreach2'],
+			array(self::class, 'parse_fn_each'),
+			$template
+		);
+		#each foreach 循环
+		$template = preg_replace_callback(
+			self::$regexp['foreach3'],
+			array(self::class, 'parse_fn_each'),
+			$template
+		);
+		#end foreach 结束循环
+		$template = preg_replace(
+			'/\{\/each\}/',
+			'<?php endforeach;?>',
+			$template
+		);
+		$template = preg_replace('/\s*\?\>[\n\r\s\t]*\<\?php\s+/is', ' ', $template);
+		return $template;
+	}
+	static public function parse_fn_each($param): string
+	{
+		if (!empty($param[3])) {
+			$return = '<?php foreach(' . $param[1] . ' as ' . $param[2] . ' => ' . $param[3] . '): ?>';
+		} else {
+			$return = '<?php foreach(' . $param[1] . ' as ' . $param[2] . '): ?>';
+		}
+		return $return;
 	}
 	/**
 	 * 套娃内容列表
@@ -162,7 +293,7 @@ class plugin
 	{
 		if (!isset(self::$pluginlist)):
 			self::$pluginlist = array();
-			$paths = glob(self::path().'*/conf.json', GLOB_NOSORT);
+			$paths = glob(self::path() . '*/conf.json', GLOB_NOSORT);
 			foreach ($paths as $file):
 				$data = self::read_plugin_json($file);
 				if (!empty($data)):
@@ -227,17 +358,17 @@ class plugin
 	{
 		return glob(self::path($dir) . '/hook/*.*');
 	}
-	public static function path($dir='')
+	public static function path($dir = '')
 	{
 		return APP_PATH . 'plugin/' . $dir;
 	}
-	public static function site($dir='')
+	public static function site($dir = '')
 	{
-		return APP_SITE.'plugin/' . $dir;
+		return APP_SITE . 'plugin/' . $dir;
 	}
 	public static function get_plugin_json($dir)
 	{
-		return self::read_plugin_json(self::path($dir). '/conf.json');
+		return self::read_plugin_json(self::path($dir) . '/conf.json');
 	}
 	/**
 	 * 读取hook文件内容
@@ -270,7 +401,7 @@ class plugin
 	}
 	public static function json(array $data)
 	{
-		return json_encode($data,JSON_THROW_ON_ERROR | JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+		return json_encode($data, JSON_THROW_ON_ERROR | JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
 	}
 	public static function  siteid()
 	{

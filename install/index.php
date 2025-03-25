@@ -35,7 +35,7 @@ $_lang = param('lang', 'zh-cn');
 // 第一步，阅读
 if (empty($action)) {
 
-	if ($method == 'GET') {
+	if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 		$input = array();
 		$input['lang'] = form_select('lang', array('zh-cn' => '简体中文', 'zh-tw' => '正體中文', 'en-us' => 'English', 'ru-ru' => 'Русский', 'th-th' => 'ไทย'), $conf['lang']);
 
@@ -61,7 +61,7 @@ if (empty($action)) {
 	include INSTALL_PATH . 'view/htm/license.htm';
 } elseif ($action == 'env') {
 
-	if ($method == 'GET') {
+	if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 		$succeed = 1;
 		$env = $write = array();
 		get_env($env, $write);
@@ -70,7 +70,7 @@ if (empty($action)) {
 	}
 } elseif ($action == 'db') {
 
-	if ($method == 'GET') {
+	if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 
 		$succeed = 1;
 		$mysql_support = function_exists('mysqli_connect');

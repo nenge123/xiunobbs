@@ -1,6 +1,6 @@
 <?php
 
-!defined('DEBUG') AND exit('Access Denied.');
+!defined('APP_PATH') and exit('Access Denied.');
 
 $action = param(1, 'cache');
 
@@ -10,7 +10,7 @@ if($action == 'cache') {
 	
 	// hook admin_other_cache_get_post.php
 	
-	if($method == 'GET') {
+	if($_SERVER['REQUEST_METHOD'] == 'GET') {
 		
 		// hook admin_other_cache_get_end.php
 		

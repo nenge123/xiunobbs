@@ -94,8 +94,12 @@ class route_admin
 		$action = MyApp::value(0);
 		plugin::unlock($route . '_' . $action);
 	}
-	public static function site($dir='')
+	public static function site($dir=''):string
 	{
 		return MyApp::convert_site(ADMIN_PATH.$dir);
+	}
+	public static function path(string $dir):string
+	{
+		return MyApp::convert_path(ADMIN_PATH.$dir);
 	}
 }

@@ -7,7 +7,7 @@
  * @author 浅唱兔君
  */
  
-    !defined('DEBUG') AND exit('Access Denied.');
+    !defined('APP_PATH') and exit('Access Denied.');
     $action = param(1);
     is_numeric($action) AND $action = '';
 

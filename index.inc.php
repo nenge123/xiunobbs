@@ -1,10 +1,10 @@
 <?php
 
-!defined('DEBUG') and exit('Access Denied.');
+!defined('APP_PATH') and exit('Access Denied.');
 
 // hook index_inc_start.php
 
-$sid = sess_start();
+$sid = MyApp::app()->sess_start();
 
 // 语言 / Language
 $_SERVER['lang'] = $lang = include _include(APP_PATH . "lang/$conf[lang]/bbs.php");
@@ -27,6 +27,8 @@ $forumlist = forum_list_cache();
 $forumlist_show = forum_list_access_filter($forumlist, $gid);	// 有权限查看的板块 / filter no permission forum
 $forumarr = arrlist_key_values($forumlist_show, 'fid', 'name');
 
+#print_r($forumlist);exit;
+
 // 头部 header.inc.htm 
 $header = array(
 	'title' => $conf['sitename'],
@@ -38,7 +40,7 @@ $header = array(
 );
 
 // 运行时数据，存放于 cache_set() / runtime data
-$runtime = runtime_init();
+$runtime = model\runtime::init();
 
 // 检测站点运行级别 / restricted access
 check_runlevel();

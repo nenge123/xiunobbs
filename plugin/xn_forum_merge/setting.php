@@ -5,7 +5,7 @@
 	admin/plugin-setting-xn_forum_merge.htm
 */
 
-!defined('DEBUG') AND exit('Access Denied.');
+!defined('APP_PATH') and exit('Access Denied.');
 
 $action = param(3);
 

@@ -1,5 +1,5 @@
 <?php
-!defined('DEBUG') AND exit('Access Denied.');
+!defined('APP_PATH') and exit('Access Denied.');
 
 $action = param(3);
 empty($action) AND $action = 'set';

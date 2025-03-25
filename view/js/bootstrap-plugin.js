@@ -8,7 +8,7 @@ $.alert = function(subject, timeout, options) {
 			<div class="modal-content">\
 				<div class="modal-header">\
 					<h4 class="modal-title">'+lang.tips_title+'</h4>\
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close">\
+					<button type="button" class="close" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close">\
 						<span aria-hidden="true">&times;</span>\
 					</button>\
 				</div>\
@@ -16,13 +16,13 @@ $.alert = function(subject, timeout, options) {
 					<h5>'+subject+'</h5>\
 				</div>\
 				<div class="modal-footer">\
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">'+lang.close+'</button>\
+					<button type="button" class="btn btn-secondary" data-dismiss="modal" data-bs-dismiss="modal">'+lang.close+'</button>\
 				</div>\
 			</div>\
 		</div>\
 	</div>';
 	var jmodal = $(s).appendTo('body');
-	jmodal.modal('show');
+	jmodal.modal('show').on('hide.bs.modal',function(){this.remove()});
 	if(typeof timeout != 'undefined' && timeout >= 0) {
 		setTimeout(function() {
 			jmodal.modal('dispose');
@@ -43,7 +43,7 @@ $.confirm = function(subject, ok_callback, options) {
 			<div class="modal-content">\
 				<div class="modal-header">\
 					<h5 class="modal-title">'+title+'</h5>\
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close">\
+					<button type="button" class="close" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close">\
 						<span aria-hidden="true">&times;</span>\
 					</button>\
 				</div>\
@@ -53,7 +53,7 @@ $.confirm = function(subject, ok_callback, options) {
 				</div>\
 				<div class="modal-footer">\
 					<button type="button" class="btn btn-primary">'+lang.confirm+'</button>\
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">'+lang.close+'</button>\
+					<button type="button" class="btn btn-secondary" data-dismiss="modal" data-bs-dismiss="modal">'+lang.close+'</button>\
 				</div>\
 			</div>\
 		</div>\
@@ -63,7 +63,7 @@ $.confirm = function(subject, ok_callback, options) {
 		jmodal.modal('hide');
 		if(ok_callback) ok_callback();
 	});
-	jmodal.modal('show');
+	jmodal.modal('show').on('hide.bs.modal',function(){this.remove()});;
 	return jmodal;
 }
 

@@ -1,6 +1,6 @@
 <?php
 
-!defined('DEBUG') AND exit('Access Denied.');
+!defined('APP_PATH') and exit('Access Denied.');
 
 $action = param(1);
 
@@ -12,7 +12,7 @@ if(empty($action) || $action == 'list') {
 	
 	// hook admin_group_list_get_post.php
 	
-	if($method == 'GET') {
+	if($_SERVER['REQUEST_METHOD'] == 'GET') {
 		
 		// hook admin_group_list_get_start.php
 		
@@ -25,7 +25,7 @@ if(empty($action) || $action == 'list') {
 		
 		include _include(ADMIN_PATH."view/htm/group_list.htm");
 	
-	} elseif($method == 'POST') {
+	} elseif($_SERVER['REQUEST_METHOD'] == 'POST') {
 		
 		$gidarr = param('_gid', array(0));
 		$namearr = param('name', array(''));
@@ -73,7 +73,7 @@ if(empty($action) || $action == 'list') {
 	
 	// hook admin_group_update_get_post.php
 	
-	if($method == 'GET') {
+	if($_SERVER['REQUEST_METHOD'] == 'GET') {
 		
 		// hook admin_group_update_get_start.php
 		
@@ -101,7 +101,7 @@ if(empty($action) || $action == 'list') {
 		
 		include _include(ADMIN_PATH."view/htm/group_update.htm");
 	
-	} elseif($method == 'POST') {	
+	} elseif($_SERVER['REQUEST_METHOD'] == 'POST') {	
 		
 		$name = param('name');
 		$creditsfrom = param('creditsfrom');

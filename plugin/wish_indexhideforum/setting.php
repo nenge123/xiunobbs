@@ -3,7 +3,7 @@
 	唯诚网络出品91wc.net
 	技术维护QQ：1198845956
 */
-!defined('DEBUG') AND exit('Access Denied.');
+!defined('APP_PATH') and exit('Access Denied.');
 if($method == 'GET') {
     //展示配置数据
 	$setting['wish_indexhideforum'] = setting_get('wish_indexhideforum');

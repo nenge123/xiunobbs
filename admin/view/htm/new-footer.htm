@@ -1,0 +1,23 @@
+</div>
+</main>
+</div>
+</div>
+<!-- bootstrap -->
+<script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+<script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/perfect-scrollbar/1.5.6/perfect-scrollbar.min.js"></script>
+<script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<script type="text/javascript" src="<?=route_admin::site('view/js/main.min.js')?>"></script>
+
+	<!--{hook admin_footer_footer_after.htm}-->
+	<!--{hook admin_footer_js_before.htm}-->
+	
+	<script src="<?=MyApp::site('lang/'.$conf['lang'].'/bbs.js'.MyApp::conf('static_version'))?>"></script>
+	<script src="<?=MyApp::site('view/js/xiuno.js'.MyApp::conf('static_version'))?>"></script>
+	<script src="<?=MyApp::site('view/js/bootstrap-plugin.js'.MyApp::conf('static_version'))?>"></script>
+	<script src="<?=MyApp::site('view/js/async.js'.MyApp::conf('static_version'))?>"></script>
+	<script src="<?=MyApp::site('view/js/form.js'.MyApp::conf('static_version'))?>"></script>
+	<script src="<?=MyApp::site('view/js/bbs.js'.MyApp::conf('static_version'))?>"></script>
+	<!--{hook admin_footer_js_after.htm}-->
+<script type="module" src="<?=route_admin::site('view/js/common.js')?>?rewrite=<?=$conf['url_rewrite_on']?>"></script>
+</body>
+</html>

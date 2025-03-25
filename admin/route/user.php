@@ -1,6 +1,6 @@
 <?php
 
-!defined('DEBUG') AND exit('Access Denied.');
+!defined('APP_PATH') and exit('Access Denied.');
 
 $action = param(1);
 
@@ -46,7 +46,7 @@ if(empty($action) || $action == 'list') {
 
 	// hook admin_user_create_get_post.php
 	
-	if($method == 'GET') {
+	if($_SERVER['REQUEST_METHOD'] == 'GET') {
 
 		// hook admin_user_create_get_start.php
 		
@@ -63,7 +63,7 @@ if(empty($action) || $action == 'list') {
 		
 		include _include(ADMIN_PATH."view/htm/user_create.htm");
 
-	} elseif ($method == 'POST') {
+	} elseif ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 		$email = param('email');
 		$username = param('username');
@@ -106,7 +106,7 @@ if(empty($action) || $action == 'list') {
 	
 	// hook admin_user_update_get_post.php
 	
-	if($method == 'GET') {
+	if($_SERVER['REQUEST_METHOD'] == 'GET') {
 
 		// hook admin_user_update_get_start.php
 		
@@ -125,7 +125,7 @@ if(empty($action) || $action == 'list') {
 		
 		include _include(ADMIN_PATH."view/htm/user_update.htm");
 
-	} elseif($method == 'POST') {
+	} elseif($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 		$email = param('email');
 		$username = param('username');
@@ -174,7 +174,7 @@ if(empty($action) || $action == 'list') {
 
 } elseif($action == 'delete') {
 
-	if($method != 'POST') message(-1, 'Method Error.');
+	if($_SERVER['REQUEST_METHOD'] != 'POST') message(-1, 'Method Error.');
 
 	$_uid = param('uid', 0);
 	

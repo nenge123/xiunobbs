@@ -311,7 +311,7 @@ function post_file_list_html($filelist, $include_delete = FALSE) {
 }
 
 function post_format(&$post) {
-	global $conf, $uid, $sid, $gid, $longip;
+	global $conf, $uid, $gid, $longip;
 	if(empty($post)) return;
 	$post['create_date_fmt'] = humandate($post['create_date']);
 	

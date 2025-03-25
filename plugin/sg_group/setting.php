@@ -3,7 +3,7 @@
 	Xiuno BBS 4.0 用户组升级增强版
 	插件由xiuno非官方提供：http://www.xiuno.top/
 */
-!defined('DEBUG') AND exit('Access Denied.');
+!defined('APP_PATH') and exit('Access Denied.');
 if($method == 'GET') {
 	$kv = setting_get('sg_group');
 	$input = array();

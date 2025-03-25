@@ -1399,7 +1399,7 @@ function _SERVER($k, $def = '') { return isset($_SERVER[$k]) ? $_SERVER[$k] : $d
 function GLOBALS($k, $def = NULL) { return isset($GLOBALS[$k]) ? $GLOBALS[$k] : $def; }
 function G($k, $def = NULL) { return isset($GLOBALS[$k]) ? $GLOBALS[$k] : $def; }
 function _SESSION($k, $def = NULL) {
-	global $g_session; 
+	$g_session = MyApp::data('session');
 	return isset($_SESSION[$k]) ? $_SESSION[$k] : (isset($g_session[$k]) ? $g_session[$k] : $def); 
 }
 

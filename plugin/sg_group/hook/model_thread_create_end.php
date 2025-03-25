@@ -2,7 +2,7 @@
 $credits = $sg_group['create_credits'];
 $message = lang('sg_creditsplus',  array('credits'=>$sg_group['create_credits']));
 if($sg_group['isfirst'] == 1) {
-	$t = $user_create_date['create_date'] - runtime_get('cron_2_last_date');
+	$t = $user_create_date['create_date'] - \model\runtime::getItem('cron_2_last_date');
 	if($t < 0) {
 		$creditsrand = rand($sg_group['creditsfrom'], $sg_group['creditsto']);
 		$credits += $creditsrand;

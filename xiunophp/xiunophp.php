@@ -50,12 +50,6 @@ include XIUNOPHP_PATH.'misc.func.php';
 // hook xiunophp_include_after.php
 empty($conf) AND $conf = array('db'=>array(), 'cache'=>array(), 'tmp_path'=>'./', 'log_path'=>'./', 'timezone'=>'Asia/Shanghai');
 empty($conf['tmp_path']) AND $conf['tmp_path'] = 'tmp';
-if(isset($_SERVER['HTTP_ACCEPT_ENCODING'])&&str_contains($_SERVER['HTTP_ACCEPT_ENCODING'],'gzip')):
-	#客户端支持gzip压缩
-	ob_start('ob_gzhandler');
-else:
-	ob_start();
-endif;
 $myapp = new MyApp($conf);
 
 $ip = ip();

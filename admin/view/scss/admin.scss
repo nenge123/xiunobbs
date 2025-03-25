@@ -1,0 +1,141 @@
+$adminface: 'Material Design Icons';
+$adminfont: normal normal normal 24px / 1 'Material Design Icons';
+@mixin fontfacedata{
+	display: inline-block;
+    font: normal normal normal 24px / 1 "Material Design Icons";
+    font-size: inherit;
+    text-rendering: auto;
+    line-height: inherit;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+body {
+	&[data-theme='default'] {
+		.card {
+			--bs-card-bg: #fff;
+		}
+	}
+	&[data-theme]:not([data-theme='default']) {
+		.card {
+			--bs-body-color: #fff;
+		}
+	}
+}
+.lyear-layout-header,.lyear-layout-sidebar{
+	i[class^="mdi-"]::before,i[class^="icon-"]::before{
+		@include fontfacedata();
+		font-size: 1.25rem;
+		vertical-align: bottom;
+	}
+}
+body[data-headerbg=default]{
+	.lyear-layout-header{
+		.navbar-right{
+			>li{
+				>a{
+					color: var(--bs-emphasis-color);
+				}
+			}
+		}
+	}
+}
+.lyear-layout-sidebar {
+	.sidebar-header>div {
+		width: 100%;
+		height: var(--header-height);
+		overflow: hidden;
+		display: -webkit-box;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		>span {
+			white-space: nowrap;
+		}
+		&::before {
+			content: '\F003B';
+			font: #{$adminfont};
+		}
+	}
+}
+@media (max-width: 1024px) {
+	.lyear-layout-sidebar:not(.lyear-aside-open) {
+		transform: translateX(-100%);
+	}
+	.lyear-layout-sidebar.lyear-aside-open {
+		transform: translateX(0);
+	}
+}
+
+@media (min-width: 1024.1px) {
+	.navbar-left {
+		.lyear-aside-toggler {
+			display: none;
+		}
+	}
+	.lyear-layout-sidebar:not(:hover) {
+		width: 60px;
+		.sidebar-header>div>span{display: none;}
+		.nav-drawer {
+			> li {
+				> a {
+					padding: 12px 28px 12px 29px;
+					height: 48px;
+					span {
+						display: none;
+					}
+				}
+			}
+		}
+		.nav-subnav,
+		.nav-item-has-subnav > a:after {
+			display: none;
+		}
+		.copyright {
+			display: none;
+		}
+	}
+	.lyear-layout-header{
+		padding-left: 60px;
+	}
+	.lyear-layout-content{
+		padding-left: 60px;
+	}
+}
+@media screen and (max-width: 600px) {
+	.container-fluid {
+		padding: 0px !important;
+	}
+}
+.table-responsive {
+	td,
+	th {
+		white-space: nowrap;
+	}
+}
+.lyear-layout-content {
+	overflow: hidden;
+	overflow-y: auto;
+}
+.icon-cog::before{
+	content: '\F0847';
+}
+.icon-comment::before{
+	content: '\F06F0';
+}
+.icon-style::before{
+	content: '\F03D8';
+}
+.icon-wrench::before{
+	content: '\F145E';
+
+}
+.icon-cogs::before{
+	content: '\F0104';
+}
+.icon-user::before{
+	content: '\F000E';
+}
+.icon-lock::before{
+	@include fontfacedata();
+	content: '\F199A';
+}

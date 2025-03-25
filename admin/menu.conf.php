@@ -2,37 +2,37 @@
 
 return array(
 	'setting' => array(
-		'url'=>url('setting-base'), 
+		'url'=>MyApp::url('setting/base'), 
 		'text'=>lang('setting'), 
 		'icon'=>'icon-cog', 
 		'tab'=> array (
-			'base'=>array('url'=>url('setting-base'), 'text'=>lang('admin_setting_base')),
-			'smtp'=>array('url'=>url('setting-smtp'), 'text'=>lang('admin_setting_smtp')),
+			'base'=>array('url'=>MyApp::url('setting/base'), 'text'=>lang('admin_setting_base')),
+			'smtp'=>array('url'=>MyApp::url('setting/smtp'), 'text'=>lang('admin_setting_smtp')),
 		)
 	),
 	'forum' => array(
-		'url'=>url('forum-list'), 
+		'url'=>MyApp::url('forum/list'), 
 		'text'=>lang('forum'), 
 		'icon'=>'icon-comment',
 		'tab'=> array (
 		)
 	),
 	'thread' => array(
-		'url'=>url('thread-list'), 
+		'url'=>MyApp::url('thread/list'), 
 		'text'=>lang('thread'), 
 		'icon'=>'icon-comment',
 		'tab'=> array (
-			'list'=>array('url'=>url('thread-list'), 'text'=>lang('admin_thread_batch')),
+			'list'=>array('url'=>MyApp::url('thread/list'), 'text'=>lang('admin_thread_batch')),
 		)
 	),
 	'user' => array(
-		'url'=>url('user-list'), 
+		'url'=>MyApp::url('user/list'), 
 		'text'=>lang('user'), 
 		'icon'=>'icon-user',
 		'tab'=> array (
-			'list'=>array('url'=>url('user-list'), 'text'=>lang('admin_user_list')),
-			'group'=>array('url'=>url('group-list'), 'text'=>lang('admin_user_group')),
-			'create'=>array('url'=>url('user-create'), 'text'=>lang('admin_user_create')),
+			'list'=>array('url'=>MyApp::url('user/list'), 'text'=>lang('admin_user_list')),
+			'group'=>array('url'=>MyApp::url('group/list'), 'text'=>lang('admin_user_group')),
+			'create'=>array('url'=>MyApp::url('user/create'), 'text'=>lang('admin_user_create')),
 		)
 	),
 	'other' => array(
@@ -40,7 +40,7 @@ return array(
 		'text'=>lang('other'), 
 		'icon'=>'icon-wrench',
 		'tab'=> array (
-			'cache'=>array('url'=>url('other-cache'), 'text'=>lang('admin_other_cache')),
+			'cache'=>array('url'=>MyApp::url('other/cache'), 'text'=>lang('admin_other_cache')),
 		)
 	),
 	'plugin' => array(
