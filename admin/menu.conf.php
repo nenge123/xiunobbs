@@ -8,6 +8,8 @@ return array(
 		'tab'=> array (
 			'base'=>array('url'=>MyApp::url('setting/base'), 'text'=>lang('admin_setting_base')),
 			'smtp'=>array('url'=>MyApp::url('setting/smtp'), 'text'=>lang('admin_setting_smtp')),
+			'time'=>array('url'=>MyApp::url('setting/time'), 'text'=>lang('admin_setting_time')),
+			'rewrite'=>array('url'=>MyApp::url('setting/rewrite'), 'text'=>lang('admin_setting_rewrite')),
 		)
 	),
 	'forum' => array(

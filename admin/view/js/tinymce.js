@@ -72,7 +72,7 @@ export class editor {
 				menubar: true,
 				toolbar_mode: 'floating',
 			},
-			toolbar: ['myattach viewattach savedata save'], // 界面按钮
+			toolbar: ['myattach viewattach savedata'], // 界面按钮
 			//automatic_uploads:true,
 			block_unsupported_drop: false,
 			images_reuse_filename:true,
@@ -414,6 +414,7 @@ export class editor {
 						buttonType: 'primary',
 						align: 'start',
 					},
+					/*
 					{
 						type: 'custom',
 						icon: 'embed',
@@ -422,6 +423,7 @@ export class editor {
 						buttonType: 'primary',
 						align: 'start',
 					}
+					*/
 				],
 				onAction(dialog, option) {
 					switch (option.name) {

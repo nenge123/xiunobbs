@@ -4,7 +4,6 @@ $action = MyApp::value(0);
 
 // 不允许删除的版块 / system keeped forum
 $system_forum = array(1);
-
 // hook admin_forum_start.php
 switch ($action):
 	case 'update':
@@ -144,30 +143,20 @@ switch ($action):
 		endif;
 		break;
 	default:
-
 		// hook admin_forum_list_get_post.php
-
 		if ($_SERVER['REQUEST_METHOD'] == 'GET') {
-
 			// hook admin_forum_list_get_start.php
-
 			$header['title']        = lang('forum_admin');
 			$header['mobile_title'] = lang('forum_admin');
-
 			$maxfid = forum_maxid();
-
 			// hook admin_forum_list_get_end.php
-
-			include _include(ADMIN_PATH . "view/htm/forum_list.htm");
+			include _include(ADMIN_PATH . "view/htm/forum/list.htm");
 		} elseif ($_SERVER['REQUEST_METHOD'] == 'POST') {
-
 			$fidarr = param('fid', array(0));
 			$namearr = param('name', array(''));
 			$rankarr = param('rank', array(0));
 			$iconarr = param('icon', array(''));
-
 			// hook admin_forum_list_post_start.php
-
 			$arrlist = array();
 			foreach ($fidarr as $k => $v) {
 				$arr = array(
@@ -175,7 +164,6 @@ switch ($action):
 					'name' => array_value($namearr, $k),
 					'rank' => array_value($rankarr, $k)
 				);
-
 				if (!isset($forumlist[$k])) {
 					// hook admin_forum_list_add_before.php
 					forum_create($arr);
@@ -185,20 +173,15 @@ switch ($action):
 				}
 				// icon
 				if (!empty($iconarr[$k])) {
-
 					$s = array_value($iconarr, $k);
 					$data = substr($s, strpos($s, ',') + 1);
 					$data = base64_decode($data);
-
 					$iconfile = "../upload/forum/$k.png";
 					file_put_contents($iconfile, $data);
-
 					forum_update($k, array('icon' => $_SERVER['REQUEST_TIME']));
 				}
-
 				// hook admin_forum_list_post_loop_end.php
 			}
-
 			// 删除 / delete
 			$deletearr = array_diff_key($forumlist, $fidarr);
 			foreach ($deletearr as $k => $v) {
@@ -207,13 +190,8 @@ switch ($action):
 				forum_delete($k);
 				// hook admin_forum_list_delete_end.php
 			}
-
 			forum_list_cache_delete();
-
 			// hook admin_forum_list_post_end.php
-
-
-
 			message(0, lang('save_successfully'));
 		}
 		break;

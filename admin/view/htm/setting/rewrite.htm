@@ -1,0 +1,87 @@
+<!--{template(ADMIN_PATH.'view/htm/new-header.htm')}-->
+<!--{hook admin_setting_base_start.htm}-->
+<div class="card">
+	<div class="card-header">
+		<h4 class="card-title"><!--{lang admin_setting_rewrite}--></h4>
+	</div>
+	<div class="card-body">
+		<form action="{{ $_SERVER['REQUEST_URI'] }}" method="post" onpost="true">
+			<!--{hook admin_setting_rewrite_before.htm}-->
+			<div class="form-check form-switch mb-3"><!--{{ \route_admin::input_check('url_rewrite_on') }}--></div>
+			<div class="form-check form-switch mb-3"><!--{{ \route_admin::input_check('cdn_on') }}--></div>
+			<!--{hook admin_setting_rewrite_after.htm}-->
+			<div class="mb-3 text-center">
+				<button type="submit" class="btn btn-primary btn-block" data-loading-text="<!--{lang submiting}-->..."><!--{lang confirm}--></button>
+			</div>
+		</form>
+	</div>
+</div>
+<details class="card">
+	<summary class="card-header">IIS</summary>
+	<div class="card-body">
+		<h4>前台重写 <b>web.config</b></h4>
+		<textarea class="form-control" style="min-height: 400px;width: 100%;">
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;configuration xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:noNamespaceSchemaLocation=&quot;web.xsd&quot;&gt;
+	&lt;system.webServer&gt;
+		&lt;rewrite&gt;
+			&lt;rules&gt;
+				&lt;rule name=&quot;WEB重写&quot; enabled=&quot;true&quot;&gt;
+					&lt;match url=&quot;.*&quot; /&gt;
+					&lt;conditions logicalGrouping=&quot;MatchAny&quot;&gt;
+						&lt;add input=&quot;{REQUEST_FILENAME}&quot; matchType=&quot;IsFile&quot; negate=&quot;true&quot; /&gt;
+						&lt;add input=&quot;{URL}&quot; pattern=&quot;^(tmp|upload|plugin|route||log|lang|view|mode|xiunophp)\/.*\.(htm|html|php)$&quot; /&gt;
+					&lt;/conditions&gt;
+					&lt;action type=&quot;Rewrite&quot; url=&quot;index.php?{R:0}&quot; /&gt;
+				&lt;/rule&gt;
+			&lt;/rules&gt;
+		&lt;/rewrite&gt;
+	&lt;/system.webServer&gt;
+&lt;/configuration&gt;
+</textarea>
+		<h4>admin后台重写 <b>web.config</b></h4>
+		<textarea class="form-control" style="min-height: 400px;width: 100%;">
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;configuration xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:noNamespaceSchemaLocation=&quot;web.xsd&quot;&gt;
+	&lt;system.webServer&gt;
+		&lt;rewrite&gt;
+			&lt;rules&gt;
+				&lt;clear/&gt;
+				&lt;rule name=&quot;admin重写&quot; stopProcessing=&quot;true&quot;&gt;
+					&lt;match url=&quot;.*&quot; /&gt;
+					&lt;conditions logicalGrouping=&quot;MatchAny&quot;&gt;
+						&lt;add input=&quot;{REQUEST_FILENAME}&quot; matchType=&quot;IsFile&quot; negate=&quot;true&quot; /&gt;
+						&lt;add input=&quot;{SCRIPT_FILENAME}&quot; pattern=&quot;(?!index\.php).*\.php$&quot; /&gt;
+					&lt;/conditions&gt;
+					&lt;action type=&quot;Rewrite&quot; url=&quot;index.php?{R:0}&quot; /&gt;
+				&lt;/rule&gt;
+			&lt;/rules&gt;
+		&lt;/rewrite&gt;
+	&lt;/system.webServer&gt;
+&lt;/configuration&gt;
+</textarea>
+	</div>
+</details>
+<details class="card">
+	<summary class="card-header">Apache </summary>
+	<div class="card-body">
+<h4>WEB前台重写<b>.htaccess</b></h4>
+<textarea class="form-control" style="min-height: 200px;width: 100%;">
+RewriteEngine on
+RewriteBase /
+RewriteCond %{REQUEST_URI}  ^\/(tmp|upload|plugin|route||log|lang|view|mode|xiunophp|assets)\/.+(\.htm|\.html|\.php|\/)$ [OR]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)$ index.php?$1 [QSA,NC,NE,L]
+</textarea>
+<h4>ADMIN重写<b>.htaccess</b></h4>
+<textarea class="form-control" style="min-height: 200px;width: 100%;">
+RewriteEngine on
+RewriteBase /admin/
+RewriteCond %{REQUEST_FILENAME} \/index\.php$
+RewriteRule ^(.*)$ index.php?$1 [QSA,NC,NE,L]
+</textarea>
+	</div>
+</details>
+<!--{hook admin_setting_base_end.htm}-->
+<!--{template(ADMIN_PATH.'view/htm/new-footer.htm')}-->
+<!--{hook admin_setting_base_js.htm}-->

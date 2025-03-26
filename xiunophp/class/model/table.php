@@ -1,6 +1,10 @@
 <?php
-
-class MyTable
+namespace model;
+use MyDB;
+/**
+ * 数据表操作类
+ */
+class table
 {
 	public array $conf;
 	public string $key;
@@ -15,6 +19,7 @@ class MyTable
 		);
 		if ($key) $this->key = $key;
 	}
+	// hook model_table_methods.php
 	/**
 	 * 给字段生成带表名反引号
 	 */
@@ -132,7 +137,7 @@ class MyTable
 	 */
 	public function alert($sql,$mode=0)
 	{
-		return $this->exec_wlink(MyDB::sql_alert($this->conf['fulltable']).$sql,$mode);
+		return $this->exec_wlink(MyDB::SQL_ALERT($this->conf['fulltable']).$sql,$mode);
 	}
 	/**
 	 * 多行查询
@@ -283,6 +288,7 @@ class MyTable
 	 */
 	public function update(string $updateStr = '', array $param = array()): int
 	{
+		// hook model_table_update.php
 		return $this->execute_wlink($this->sql_update() . $updateStr, $param, 0) ?: 0;
 	}
 	/**
@@ -293,6 +299,7 @@ class MyTable
 	 */
 	public function update_by_value(array $json, mixed $value): int
 	{
+		// hook model_table_update_by_value.php
 		return $this->update_by_where($json, array($this->key => $value));
 	}
 	/**
@@ -304,11 +311,13 @@ class MyTable
 	public function update_by_where(array $json, array $where = array()): int
 	{
 		if (empty($json)) return 0;
+		// hook model_table_update_by_where.php
 		list($sql, $param) = MyDB::UPDATE_VALUE($json, $where);
 		return $this->update($sql, $param);
 	}
 	public function update_execute(array $json, $endsql = '', $enddata = array()): int
 	{
+		// hook model_table_update_execute.php
 		$sql = MyDB::UPDATE_KEY(array_keys($json));
 		$param = array_values($json);
 		if (!empty($endsql)):
@@ -323,6 +332,7 @@ class MyTable
 	 */
 	public function update_multi(array $keys, string|array $where, array $mapjson): int|false
 	{
+		// hook model_table_update_multi.php
 		$sql = $this->sql_update() . MyDB::UPDATE_KEY($keys);
 		if (!empty($where)):
 			if (is_string($where)):
@@ -348,6 +358,7 @@ class MyTable
 	 */
 	public function insert(string $sql = '', array $param = array(), int $mode = -1): int
 	{
+		// hook model_table_insert.php
 		return $this->execute_wlink($this->sql_insert() . $sql, $param, $mode);
 	}
 	/**
@@ -355,6 +366,7 @@ class MyTable
 	 */
 	public function insert_json(array $json): int
 	{
+		// hook model_table_insert_json.php
 		if (empty($json)) return 0;
 		return $this->insert(
 			MyDB::INSERT_VALUES(array_keys($json), 1),
@@ -364,6 +376,7 @@ class MyTable
 	}
 	public function insert_update($json, string $primary): int
 	{
+		// hook model_table_insert_update.php
 		if (empty($primary) || empty($json[$primary])):
 			return $this->insert_json($json);
 		endif;
@@ -377,6 +390,7 @@ class MyTable
 	 */
 	public function insert_commit_map(array $map, array $data): array|int
 	{
+		// hook model_insert_commit_map.php
 		return $this->executeCommit(
 			$this->sql_insert() . MyDB::INSERT_VALUES($map, 1),
 			$data
@@ -388,6 +402,7 @@ class MyTable
 	 */
 	public function insert_full_map(array $map, array $data)
 	{
+		// hook model_insert_full_map.php
 		$sql  = $this->sql_insert() . MyDB::INSERT_VALUES($map, count($data));
 		$param = array_merge_recursive(...$data);
 		return $this->execute($sql, $param, 0) ?: 0;

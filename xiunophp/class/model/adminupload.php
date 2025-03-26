@@ -71,7 +71,7 @@ class adminupload
 								break;
 							default:
 								if (str_starts_with($_FILES['file']['type'], 'video')):
-									$this->upload_video();
+									#$this->upload_video();
 								endif;
 								break;
 						endswitch;
@@ -105,7 +105,7 @@ class adminupload
 						$ffmpegpath = APP_PATH .'ffmpeg/ffmpeg.php';
 						if (is_file($ffmpegpath)):
 							include($ffmpegpath);
-							(new \myffmpeg())->save($filepath . '.video', $filepath . '.mp4');
+							#(new \myffmpeg())->save($filepath . '.video', $filepath . '.mp4');
 							$this->message(array('url' => $myapp->convert_site($filepath . '.mp4')));
 						endif;
 					else:
@@ -123,6 +123,9 @@ class adminupload
 			$this->message(array('url' => $this->site . $filename));
 		endif;
 	}
+	/**
+	 * 未使用
+	 */
 	public function upload_video(?string $filepath = null)
 	{
 		
@@ -133,7 +136,7 @@ class adminupload
 				$filepath = $_FILES['file']['tmp_name'];
 			endif;
 			if (class_exists('myffmpeg', false)):
-				$myffmpeg = new \myffmpeg();
+				#$myffmpeg = new \myffmpeg();
 				$extstr = $myffmpeg->extinfo($filepath);
 				if (!empty($extstr)):
 					$filename = 'video-' . date('YmdHis') . rand(1000, 9999) . '.';
@@ -193,10 +196,10 @@ class adminupload
 				)
 			);
 		endif;
-		if (str_starts_with($filemime, 'video')):
-			$this->upload_video($this->path . $filename . '.big');
-		else:
-			$fp = fopen($_FILES['file']['tmp_name'], 'rb');
+		#if (str_starts_with($filemime, 'video')):
+		#	$this->upload_video($this->path . $filename . '.big');
+		#else:
+			$fp = fopen($this->path . $filename . '.big', 'rb');
 			$byte = bin2hex(fread($fp, 4));
 			fclose($fp);
 			$extension = match ($byte) {
@@ -207,14 +210,14 @@ class adminupload
 				default => false
 			};
 			if ($extension):
-				$filename = $this->fid . '-' . date('YmdHis-') . rand(1000, 9999) . '.' . $extension;
+				$filename2 = $this->fid . '-' . date('YmdHis-') . rand(1000, 9999) . '.' . $extension;
 				rename(
 					$this->path . $filename . '.big',
-					$this->path . $filename
+					$this->path . $filename2
 				);
-				$this->message(array('url' => $this->site . $filename));
+				$this->message(array('url' => $this->site . $filename2));
 			endif;
-		endif;
+		#endif;
 		@unlink($this->path . $filename . '.big');
 		$this->message(array('message' => '不是压缩文件或者视频文件'));
 	}

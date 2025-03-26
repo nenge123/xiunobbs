@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="configuration">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="system.webServer">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="rewrite">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="rules">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:element name="rule">
+                                                        <xs:complexType>
+                                                            <xs:sequence>
+                                                                <xs:element name="match">
+                                                                    <xs:complexType>
+                                                                        <xs:attribute name="url"
+                                                                            use="required" />
+                                                                    </xs:complexType>
+                                                                </xs:element>
+                                                                <xs:element name="conditions">
+                                                                    <xs:complexType>
+                                                                        <xs:sequence>
+                                                                            <xs:element name="add"
+                                                                                maxOccurs="unbounded">
+                                                                                <xs:complexType>
+                                                                                    <xs:attribute
+                                                                                        name="input"
+                                                                                        use="required" />
+                                                                                    <xs:attribute
+                                                                                        name="matchType" />
+                                                                                    <xs:attribute
+                                                                                        name="negate"
+                                                                                        type="xs:boolean" />
+                                                                                    <xs:attribute
+                                                                                        name="pattern" />
+                                                                                </xs:complexType>
+                                                                            </xs:element>
+                                                                        </xs:sequence>
+                                                                        <xs:attribute
+                                                                            name="logicalGrouping"
+                                                                            use="required" />
+                                                                    </xs:complexType>
+                                                                </xs:element>
+                                                                <xs:element name="action">
+                                                                    <xs:complexType>
+                                                                        <xs:attribute name="type"
+                                                                            use="required" />
+                                                                        <xs:attribute name="url"
+                                                                            use="required" />
+                                                                    </xs:complexType>
+                                                                </xs:element>
+                                                            </xs:sequence>
+                                                            <xs:attribute name="name" use="required" />
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

@@ -9,7 +9,7 @@ class plugin
 		#'subtemplate' => '/\<\!\-\-\{subtemplate\(\'(.+?)\'\)\}\-\-\>/',
 		'scss' => '/\<link\s*[^>]*?href=\"([\w\d\:\_\-]+\.scss)\"[^>]*\>/i',
 		'css' => '/\<link\s*[^>]*?href=\"css\/([\w\d\:\_\-]+)\.css\"\>/i',
-		#'template' => '/\<\!\-\-\{template\((.+?)\)\}\-\-\>/',
+		'template' => '/\<\!\-\-\{template\((.+?)\)\}\-\-\>/',
 		'foreach1' => '/\{each ([^\s]+)\s+(\$[^\$]+)\s+(\$[^\$]+?)\}/s',
 		'foreach2' => '/\{each ([^\s]+)\s+(\$[^\$]+?)\}/s',
 		'foreach3' => '/\{each ([^\s]+)\s+(\$[^\$]+)\s*=>\s*(\$[^\$]+?)\}/s',
@@ -20,35 +20,39 @@ class plugin
 	 * 注入点解释函数
 	 * _include
 	 */
-	public static function parseFile(string $srcfile)
+	public static function parseFile(string $srcfile, string $tmpfile = '')
 	{
 		// 合并插件，存入 tmp_path
 		$srcfile = MyApp::convert_path($srcfile);
 		$ext = '';
-		$file_arr = array();
-		#if (str_starts_with($srcfile, 'phar://')):
-		#	$temppath = preg_replace('/^.+?\.phar\//is', '', $srcfile);
-		#	$pathinfo = pathinfo($temppath);
-		#	$ext = $pathinfo['extension'];
-		#	$file_arr = explode('/', $pathinfo['dirname']);
-		#else:
-		$len = strlen(APP_PATH);
-		$temppath = substr($srcfile, $len);
-		$pathinfo = pathinfo($temppath);
-		$ext = $pathinfo['extension'];
-		if ($pathinfo['dirname'] != '.'):
-			$file_arr = explode(DIRECTORY_SEPARATOR, $pathinfo['dirname']);
-		endif;
-		#endif;
-		$file_arr[] = $pathinfo['filename'] . '.php';
-		if (in_array($file_arr[0], ['route', 'model', 'view', 'admin'])):
-			$tmpfile = MyApp::tmp_path($file_arr[0] . '/' . implode('_', array_slice($file_arr, 1)));
-		elseif ($file_arr[0] == 'xiunophp'):
-			$tmpfile = MyApp::tmp_path(implode(DIRECTORY_SEPARATOR, $file_arr));
-		elseif ($file_arr[0] == 'plugin'):
-			$tmpfile = MyApp::tmp_path($file_arr[0] . '/' . $file_arr[1] . '/' . implode('_', array_slice($file_arr, 2)));
+		if (empty($tmpfile)):
+			$file_arr = array();
+			#if (str_starts_with($srcfile, 'phar://')):
+			#	$temppath = preg_replace('/^.+?\.phar\//is', '', $srcfile);
+			#	$pathinfo = pathinfo($temppath);
+			#	$ext = $pathinfo['extension'];
+			#	$file_arr = explode('/', $pathinfo['dirname']);
+			#else:
+			$len = strlen(APP_PATH);
+			$temppath = substr($srcfile, $len);
+			$pathinfo = pathinfo($temppath);
+			$ext = $pathinfo['extension'];
+			if ($pathinfo['dirname'] != '.'):
+				$file_arr = explode(DIRECTORY_SEPARATOR, $pathinfo['dirname']);
+			endif;
+			#endif;
+			$file_arr[] = $pathinfo['filename'] . '.php';
+			if (in_array($file_arr[0], ['route', 'model', 'view', 'admin'])):
+				$tmpfile = MyApp::tmp_path($file_arr[0] . '/' . implode('_', array_slice($file_arr, 1)));
+			elseif ($file_arr[0] == 'xiunophp'):
+				$tmpfile = MyApp::tmp_path(implode(DIRECTORY_SEPARATOR, $file_arr));
+			elseif ($file_arr[0] == 'plugin'):
+				$tmpfile = MyApp::tmp_path($file_arr[0] . '/' . $file_arr[1] . '/' . implode('_', array_slice($file_arr, 2)));
+			else:
+				$tmpfile = MyApp::tmp_path(implode('_', $file_arr));
+			endif;
 		else:
-			$tmpfile = MyApp::tmp_path(implode('_', $file_arr));
+			$ext = pathinfo($srcfile, PATHINFO_EXTENSION);
 		endif;
 		#DEBUG模式 即时编译 避免频繁的后台 更新缓存
 		if (is_file($tmpfile)):
@@ -67,14 +71,12 @@ class plugin
 		 * 这个值是重置模板值???
 		 */
 		//$g_include_slot_kv = array();
-		for ($i = 0; $i < 10; $i++) {
-			$s = preg_replace_callback(
-				'#<template\sinclude="(.*?)">(.*?)</template>#is',
-				fn($m) => self::parseSlot($m),
-				$s
-			);
-			if (strpos($s, '<template') === FALSE) break;
-		}
+		for ($i = 0; $i < 10; $i++):
+			$s = preg_replace_callback('#<template\sinclude="(.*?)">(.*?)</template>#is', fn($m) => self::parseSlot($m), $s);
+			if (!str_contains($s, '<template')):
+				break;
+			endif;
+		endfor;
 		#再一次解析hook
 		$s = self::parseHook($s);
 		if ($ext == 'htm'):
@@ -82,9 +84,20 @@ class plugin
 			$s = '<?php !defined(\'APP_PATH\') AND exit(\'Access Denied.\');?>' . $s;
 			#模板语法糖
 			$s = self::parseVar($s);
+		else:
+
 		endif;
 		self::parseWrite($tmpfile, $s);
 		return $tmpfile;
+	}
+	/**
+	 * 输出编译JS 返回一个网络URL
+	 */
+	public static function parseJS(string $srcfile, ?string $name = null)
+	{
+		$tmpfile = MyApp::path('view/js/hook/' . ($name ?? basename($srcfile)));
+		self::parseFile($srcfile, $tmpfile);
+		return MyApp::convert_site($tmpfile);
 	}
 	/**
 	 * 读取准备注入文件的内容
@@ -149,11 +162,22 @@ class plugin
 	public static function parseVar(string $template): string
 	{
 
-
+		#内引用模板 必须完整结构
+		$template = preg_replace_callback(
+			self::$regexp['template'],
+			fn($m) => '<?php include(plugin::parseFile(' . $m[1] . ')); ?>',
+			$template
+		);
 		#语句 替换到省略模式
 		$template = preg_replace(
 			'/\<\!\-\-\{(.+?)\}\-\-\>/s',
 			"{\\1}",
+			$template
+		);
+		#快速变量替换 {{ xx }}
+		$template = preg_replace_callback(
+			self::$regexp['variable'],
+			fn($m) => self::parse_fn_variable($m[1]),
 			$template
 		);
 		#模板文字 语言
@@ -204,6 +228,18 @@ class plugin
 			'<?php endif;?>',
 			$template
 		);
+		#endfor 结束for
+		$template = preg_replace(
+			'/\{\/for\}/',
+			'<?php endfor;?>',
+			$template
+		);
+		#for
+		$template = preg_replace_callback(
+			'/\{for\((.+?)\)\}/is',
+			fn($m) => '<?php for(' . trim($m[1]) . '): ?>',
+			$template
+		);
 		#each foreach 循环
 		$template = preg_replace_callback(
 			self::$regexp['foreach1'],
@@ -239,6 +275,36 @@ class plugin
 			$return = '<?php foreach(' . $param[1] . ' as ' . $param[2] . '): ?>';
 		}
 		return $return;
+	}
+	static public function parse_fn_variable($param1): string
+	{
+		$param1 = trim($param1);
+		if (!empty($param1)):
+			switch ($param1[0]):
+				case '$':
+				case '\\':
+					return '<?=' . $param1 . '?>';
+					break;
+				default:
+					#纯数字或字母
+					if (ctype_alnum($param1)):
+						return '<?=MyApp::data(\'' . $param1 . '\')?>';
+					elseif (str_contains($param1, '::')):
+						return '<?=' . $param1 . '?>';
+					elseif (str_ends_with($param1, ')')):
+						return '<?=MyApp::app()->' . $param1 . '??\'\'?>';
+					elseif (preg_match('/^[\w\d\-\_\.]+$/', $param1)):
+						$arr = explode('.', $param1);
+						$arr = array_map(fn($m) => '[\'' . $m . '\']', $arr);
+						return '<?=$myapp->data' . implode('', $arr) . '??\'\'?>';
+					endif;
+					break;
+			endswitch;
+		endif;
+		if (defined('DEBUG') && DEBUG):
+			return '<!-- ' . $param1 . ' -->';
+		endif;
+		return '';
 	}
 	/**
 	 * 套娃内容列表

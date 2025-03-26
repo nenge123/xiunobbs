@@ -20,10 +20,13 @@ return array(
 	'admin_site_setting'=>'站点设置',
 	'admin_setting_base'=>'基本设置',
 	'admin_setting_smtp'=>'SMTP 设置',
+	'admin_setting_time'=>'时间设置',
+	'admin_setting_rewrite'=>'伪静态设置',
 	'admin_other_cache'=>'清理缓存',
 	'admin_clear_tmp'=>'清理临时目录',
 	'admin_clear_cache'=>'清理缓存',
 	'admin_clear_successfully'=>'清理成功',
+	'admin_forum_setting'=>'版块设置',
 	
 	'admin_user_list'=>'用户列表',
 	'admin_thread_batch'=>'主题批量管理',
@@ -84,6 +87,11 @@ return array(
 	'port'=>'端口',
 	'account'=>'账号',
 	'smtp_host'=>'SMTP 主机',
+	'setting_timezone'=>'时区设置',
+	'online_hold_time'=>'session保留多少秒',
+	'online_update_span'=>'session更新频率',
+	'url_rewrite_on'=>'启用伪静态',
+	'cdn_on'=>'cdn访问',
 	
 	// 版块
 	'forum_list'=>'版块列表',

@@ -1,0 +1,29 @@
+<!--{template(ADMIN_PATH.'view/htm/new-header.htm')}-->
+<!--{hook admin_setting_base_start.htm}-->
+<div class="card">
+	<div class="card-header">
+		<h4 class="card-title"><!--{lang admin_setting_base}--></h4>
+	</div>
+	<div class="card-body">
+		<form action="{{ $_SERVER['REQUEST_URI'] }}" method="post" onpost="true">
+			<!--{hook admin_setting_sitename_before.htm}-->
+			<div class="form-floating mb-3"><!--{{ \route_admin::input_required_text('sitename') }}--></div>
+			<!--{hook admin_setting_sitename_after.htm}-->
+			<div class="form-floating mb-3"><!--{{ \route_admin::input_textarea('sitebrief') }}--></div>
+			<!--{hook admin_setting_sitebrief_after.htm}-->
+			<div class="form-check form-switch mb-3"><!--{{ \route_admin::input_check('user_create_on') }}--></div>
+			<div class="form-check form-switch mb-3"><!--{{ \route_admin::input_check('user_create_email_on') }}--></div>
+			<div class="form-check form-switch mb-3"><!--{{ \route_admin::input_check('user_resetpw_on') }}--></div>
+			<div class="form-floating mb-3"><!--{{ \route_admin::input_required_select('runlevel', 5) }}--></div>
+			<!--{hook admin_setting_runlevel_after.htm}-->
+			<div class="form-floating mb-3"><!--{{ \route_admin::input_langlist() }}--></div>
+			<!--{hook admin_setting_base_lang_after.htm}-->
+			<div class="mb-3 text-center">
+				<button type="submit" class="btn btn-primary btn-block" data-loading-text="<!--{lang submiting}-->..."><!--{lang confirm}--></button>
+			</div>
+		</form>
+	</div>
+</div>
+<!--{hook admin_setting_base_end.htm}-->
+<!--{template(ADMIN_PATH.'view/htm/new-footer.htm')}-->
+<!--{hook admin_setting_base_js.htm}-->

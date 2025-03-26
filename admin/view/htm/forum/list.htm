@@ -1,0 +1,118 @@
+<!--{template(ADMIN_PATH.'view/htm/new-header.htm')}-->
+<!--{hook admin_forum_list_start.htm}-->
+<div class="card">
+	<div class="card-header">
+		<h4 class="card-title"><!--{lang admin_forum_setting}--></h4>
+	</div>
+	<div class="card-body">
+		<form action="<?=MyApp::purl('list')?>" method="post" id="form">
+			<div class="table-responsive arrlist">
+				<table class="table table-info table-striped-columns" style="min-width: 800px">
+					<thead>
+						<tr align="center">
+							<th width="90"><!--{lang forum_id}--></th>
+							<th width="60" align="left"><!--{lang forum_icon}--></th>
+							<th><!--{lang forum_name}--></th>
+							<th width="100"><!--{lang forum_rank}--></th>
+							<th width="100" class="text-center"><!--{lang forum_edit}--></th>
+							<th width="100" class="text-center"><!--{lang forum_delete}--></th>
+						</tr>
+						<thead>
+						<tbody>
+							<!--{each $forumlist $_fid $_forum}-->
+							<tr align="center" rowid="{{ $_fid }}">
+								<td class="50">
+							
+			<div class="form-floating mb-3"><!--{{ \route_admin::input_required_number('fid['.$_fid.']',$_forum['fid'],'forum_id') }}--></div>
+							
+							
+							</td>
+								<td align="left" class="uploadimage">
+									<img src="{{ MyApp::site($_forum['icon_url']) }}" class="forum" width="48" id="img_{{ $_fid }}" />
+								</td>
+								<td>
+								
+			<div class="form-floating mb-3"><!--{{ \route_admin::input_required_text('name['.$_fid.']',$_forum['name'],'forum_name') }}--></div>	
+								
+							</td>
+								<td>
+									
+			<div class="form-floating mb-3"><!--{{ \route_admin::input_required_number('rank['.$_fid.']',$_forum['rank'],'forum_rank') }}--></div>
+		
+		</td>
+								<td><a class="btn row_edit" tabindex="0" href="<?=MyApp::purl('update/'.$_forum['fid'])?>"><!--{lang forum_edit}--></a></td>
+								<td><a class="btn row_delete" role="button" tabindex="0" href="<?=MyApp::purl('delete/'.$_forum['fid'])?>"><!--{lang forum_delete}--></a></td>
+							</tr>
+							<!--{/each}-->
+						</tbody>
+				</table>
+			</div>
+			<p><a role="button" class="btn row_add">[+]<!--{lang add_new_line}--></a></p>
+			<p class="text-center">
+				<button type="submit" class="btn btn-primary" id="submit" data-loading-text="<!--{lang submiting}-->..." style="width: 10rem;"><!--{lang confirm}--></button>
+			</p>
+		</form>
+		<p class="small text-grey"><!--{lang tips}-->：<!--{lang forum_edit_tip}--></p>
+	</div>
+</div>
+<!--{hook admin_forum_list_end.htm}-->
+<!--{template(ADMIN_PATH.'view/htm/new-footer.htm')}-->
+<script>
+	//if(!debug) $.alert('<!--{lang forum_edit_tip}-->');
+
+	var maxfid = <?php echo $maxfid;?>;
+
+	var jform = $("#form");
+	var jsubmit = $("#submit");
+
+	jform.base64_encode_file(); // 对文件进行 base64 编码，处理文件上传，很方便
+
+	jform.on('submit', function () {
+		jform.reset();
+		var postdata = jform.serialize();
+		jsubmit.button('loading');
+		$.xpost(jform.attr('action'), postdata, function (code, message) {
+			if (code == 0) {
+				$.alert(message);
+				jsubmit.text(message).delay(3000).location();
+				return;
+			} else {
+				alert(message);
+				jsubmit.button('reset');
+			}
+		});
+		return false;
+	});
+
+	// 编辑
+	var jarrlist = $('.arrlist');
+	var jedit = $('a.row_edit');
+	// 增加
+	var jadd = $('a.row_add');
+	jadd.on('click', function () {
+		var jclone = jarrlist.find('tr').last().clone();
+		jclone.insertAfter(jarrlist.find('tr').last());
+		var jfid = jclone.find('input[name^="fid"]');
+		//var rowid = xn.intval(jfid.val()) + 1;
+		var rowid = ++maxfid;
+		jfid.val(rowid);
+		jclone.attr('rowid', rowid);
+
+		// 清空值
+		jclone.find('input').not('[name^="fid"]').val('');
+
+		// 修改 [] 中的值为 rowid
+		jclone.find('input').attr_name_index(rowid);
+
+		// 图片缩略
+		jclone.find('img.forum').attr('id', 'img_' + rowid).attr('src', '../view/img/forum.png');
+		jclone.find('input[type="file"]').attr('data-assoc', 'img_' + rowid);
+
+		return false;
+	});
+
+
+	$('#nav li.nav-item-forum').addClass('active');
+
+</script>
+<!--{hook admin_forum_list_js.htm}-->

@@ -5,7 +5,6 @@ if (empty(MyApp::cookies('admin_token'))):
 	$action = 'login';
 endif;
 // hook admin_index_start.php
-
 switch ($action):
 	case 'logout':
 		// hook admin_index_logout_start.php
@@ -13,34 +12,23 @@ switch ($action):
 		message(0, jump(lang('logout_successfully'), MyApp::url('index')));
 		break;
 	case 'login':
-
 		// hook admin_index_login_get_post.php
-
+		$header['title'] = lang('admin_login');
 		if ($_SERVER['REQUEST_METHOD'] == 'GET'):
-
 			// hook admin_index_login_get_start.php
-
-			$header['title'] = lang('admin_login');
 			include _include(ADMIN_PATH . "view/htm/index_login.htm");
 		elseif ($_SERVER['REQUEST_METHOD'] == 'POST'):
-
 			// hook admin_index_login_post_start.php
-
-			$password = param('password');
-
-			if (md5($password . $user['salt']) != $user['password']) {
+			$password = MyApp::post('password');
+			if (md5($password . $user['salt']) != $user['password']):
 				xn_log('password error. uid:' . $user['uid'] . ' - ******' . substr($password, -6), 'admin_login_error');
-				#message('password', lang('password_incorrect'));
-				message(0, jump(lang('password_incorrect'), MyApp::url('index/login'), 5));
-			}
-
+				#密码错误
+				MyApp::message('password', lang('password_incorrect'));
+			endif;
 			admin_token_set();
-
 			xn_log('login successed. uid:' . $user['uid'], 'admin_login');
-
 			// hook admin_index_login_post_end.php
-
-			message(0, jump(lang('login_successfully'), MyApp::url('index')));
+			MyApp::message(0, lang('login_successfully'), ['url' => MyApp::url('index')]);
 		endif;
 		break;
 	case 'phpinfo':
@@ -80,9 +68,7 @@ switch ($action):
 		exit;
 		break;
 	default:
-
 		// hook admin_index_empty_start.php
-
 		$header['title'] = lang('admin_page');
 		$info = array();
 		$info['disable_functions'] = ini_get('disable_functions');
@@ -97,18 +83,13 @@ switch ($action):
 		$info['SERVER_SOFTWARE'] = $_SERVER['SERVER_SOFTWARE'] ?? '';
 		$info['HTTP_X_FORWARDED_FOR'] = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? '';
 		$info['REMOTE_ADDR'] = $_SERVER['REMOTE_ADDR'] ?? '';
-
-
 		$stat = array();
 		$stat['threads'] = thread_count();
 		$stat['posts'] = post_count();
 		$stat['users'] = user_count();
 		$stat['attachs'] = attach_count();
 		$stat['disk_free_space'] = function_exists('disk_free_space') ? humansize(disk_free_space(APP_PATH)) : lang('unknown');
-
-
 		// hook admin_index_empty_end.php
-
 		include _include(ADMIN_PATH . 'view/htm/index.htm');
 		break;
 endswitch;

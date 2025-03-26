@@ -1,4 +1,4 @@
-<?php include _include(ADMIN_PATH.'view/htm/new-header.htm');?>
+<!--{template(ADMIN_PATH.'view/htm/new-header.htm')}-->
 
 <!--{hook admin_message_start.htm}-->
 
@@ -7,7 +7,7 @@
 		<div class="card">
 			<div class="card-body">
 				<h4 class="card-title text-center">
-					<i class="icon-<?php echo $code == 0 ? 'ok' : 'warning-sign'; ?>"></i> 
+					<i class="icon-<?$code == 0 ? 'ok' : 'warning-sign'?>"></i> 
 					<?php echo $message;?>
 					
 					<!--{hook admin_message_message_after.htm}-->
@@ -19,6 +19,6 @@
 
 <!--{hook admin_message_end.htm}-->
 
-<?php include _include(ADMIN_PATH.'view/htm/new-footer.htm');?>
+<!--{template(ADMIN_PATH.'view/htm/new-footer.htm')}-->
 
 <!--{hook admin_message_js.htm}-->

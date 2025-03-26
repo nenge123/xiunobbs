@@ -10,11 +10,11 @@ class MyApp implements \ArrayAccess
 		$this->datas = array(
 			'extension' => 'html',
 			'https' => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on',
-			'rewriteopen'=>str_ends_with($_SERVER['PHP_SELF'], 'index.php'),
-			'rewriteroot'=>dirname($_SERVER['PHP_SELF']).'/',
+			'rewriteopen' => str_ends_with($_SERVER['PHP_SELF'], 'index.php'),
+			'rewriteroot' => dirname($_SERVER['PHP_SELF']) . '/',
 			'rewriteMode' => false,
 			'gzip' => str_contains($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip'),
-			'session'=>array(),
+			'session' => array(),
 			'g_session_invalid' => FALSE,
 		);
 		$this->routerExport();
@@ -34,13 +34,18 @@ class MyApp implements \ArrayAccess
 	}
 	public function autoload_register($class)
 	{
-		if (str_starts_with($class, 'model\\')):
-			return require(
-				plugin::parseFile(
-					$this->convert_path(XIUNOPHP_PATH . 'class/' . $class . '.php')
-				)
-			);
-		endif;
+		$arr = explode('\\', $class);
+		$path = $this->convert_path(XIUNOPHP_PATH . 'class/' . implode(DIRECTORY_SEPARATOR, $arr) . '.php');
+		switch ($arr[0]):
+			case 'model':
+				return require(\plugin::parseFile($path));
+			case 'lib':
+				if (is_file($path)):
+					return include($path);
+				endif;
+				break;
+		endswitch;
+		return false;
 	}
 	public function setConf(array $conf)
 	{
@@ -56,7 +61,7 @@ class MyApp implements \ArrayAccess
 	}
 	public function read_cookie_data($conf = array())
 	{
-		if (empty($this->datas['cookies'])):
+		if (!isset($this->datas['cookies'])):
 			$this->datas['ip'] = $this->get_client_ip();
 			$this->datas['cookie_prefix'] = $conf['cookie_prefix'] ?? 'bbs_';
 			$this->datas['cookie_domain'] = $conf['cookie_domain'] ?? '';
@@ -69,7 +74,7 @@ class MyApp implements \ArrayAccess
 			ini_set('session.cookie_secure', 'Off'); // 打开后，只有通过 https 才有效。
 			ini_set('session.cookie_lifetime', 86400);
 			ini_set('session.cookie_httponly', 'On'); // 打开后 js 获取不到 HTTP 设置的 cookie, 有效防止 XSS，这个对于安全很重要，除非有 BUG，否则不要关闭。
-			ini_set('session.gc_maxlifetime', $conf['online_hold_time']);	// 活动时间 $conf['online_hold_time']
+			ini_set('session.gc_maxlifetime', $conf['online_hold_time'] ?? 3600);	// 活动时间 $conf['online_hold_time']
 			ini_set('session.gc_probability', 1); 	// 垃圾回收概率 = gc_probability/gc_divisor
 			ini_set('session.gc_divisor', 500); 	// 垃圾回收时间 5 秒，在线人数 * 10 
 			session_set_save_handler(
@@ -83,14 +88,18 @@ class MyApp implements \ArrayAccess
 			// register_shutdown_function 会丢失当前目录，需要 chdir(APP_PATH)
 			// 这个比须有，否则 ZEND 会提前释放 $db 资源
 			register_shutdown_function('session_write_close');
-			$len = strlen($this->datas['cookie_prefix']);
-			foreach ($_COOKIE as $k => $v):
-				if (str_starts_with($k, $this->datas['cookie_prefix'])):
-					$k = substr($k,$len);
-					$this->datas['cookies'][$k] = $v;
-				endif;
-			endforeach;
+			$this->read_cookies_data();
 		endif;
+	}
+	public function read_cookies_data()
+	{
+		$len = strlen($this->datas['cookie_prefix']);
+		foreach ($_COOKIE as $k => $v):
+			if (str_starts_with($k, $this->datas['cookie_prefix'])):
+				$k = substr($k, $len);
+				$this->datas['cookies'][$k] = $v;
+			endif;
+		endforeach;
 	}
 	/**
 	 * session打开
@@ -309,7 +318,7 @@ class MyApp implements \ArrayAccess
 			$this->datas['cookies'][$name] = $data;
 		endif;
 		return setcookie(
-			$this->datas['cookie_prefix'].$name,
+			$this->datas['cookie_prefix'] . $name,
 			$data,
 			array(
 				'expires' => $time,
@@ -371,7 +380,7 @@ class MyApp implements \ArrayAccess
 	}
 
 
-	public static function conf(string $name,mixed $defalut='')
+	public static function conf(string $name, mixed $defalut = '')
 	{
 		return self::app()->conf[$name] ?? $defalut;
 	}
@@ -729,14 +738,51 @@ class MyApp implements \ArrayAccess
 	/**
 	 * 获取HEADER标记
 	 */
-	public static function head(string $name,mixed $defalut=''):string|int
+	public static function head(string $name, mixed $defalut = ''): string|int
 	{
-		$name = 'HTTP_'.strtoupper(str_replace('-','_',$name));
+		$name = 'HTTP_' . strtoupper(str_replace('-', '_', $name));
 		$value =  $_SERVER[$name] ?? $defalut;
-		if(is_numeric($value)):
+		if (is_numeric($value)):
 			return intval($value);
 		endif;
 		return $value;
+	}
+	/**
+	 * 输出json
+	 */
+	public static function message_json($json)
+	{
+		@ob_clean();
+		header('content-type:application/json;charset='.MyApp::conf('charset', 'utf-8'));
+		echo xn_json_encode($json);
+		exit;
+	}
+	/**
+	 * 输出JSON信息
+	 * 第三参数 array('url'=>'',delay=>'')
+	 */
+	public static function message($code, $message,$extra = array())
+	{
+		@ob_clean();
+		//$header['title'] = self::conf('sitename');
+		if (empty(self::head('ajax-fetch'))):
+			$header = $GLOBALS['header'] ?? array();
+			$url = empty($extra['url']) ? 'javascript:history.back()':$extra['url'];
+			$message = '<a href="'.$url.'">'.$message.'</a>';
+			if(!empty($extra['delay'])):
+				$message .= '<script>setTimeout(function() {'.(empty($extra['url']) ? 'history.back()':'window.location="'.$extra['url'].'";').'}, '.($extra['delay'] * 1000).');</script>';
+			endif;
+			if (defined('MESSAGE_HTM_PATH')):
+				include _include(MESSAGE_HTM_PATH);
+			else:
+				include _include(APP_PATH . "view/htm/message.htm");
+			endif;
+		else:
+			$extra['code'] = $code;
+			$extra['message'] = $message;
+			self::message_json($extra);
+		endif;
+		exit;
 	}
 	/**
 	 * 返回合法URL参数param
@@ -785,7 +831,7 @@ class MyApp implements \ArrayAccess
 		endif;
 		$param = $this->get_url_param($param, $width);
 		#index.php 为引导文件
-		if ($this->datas['rewriteopen']&&$this->datas['rewriteMode']):
+		if ($this->datas['rewriteopen'] && $this->datas['rewriteMode']):
 			#是否支持伪静态重写
 			if (!empty($param)):
 				if (empty($router)):
@@ -794,7 +840,7 @@ class MyApp implements \ArrayAccess
 					$router .= '&' . $param;
 				endif;
 			endif;
-			return $this->datas['rewriteroot']. $router;
+			return $this->datas['rewriteroot'] . $router;
 		endif;
 		if (!empty($param)):
 			if (empty($router)):
@@ -807,7 +853,7 @@ class MyApp implements \ArrayAccess
 			$router = '?' . $router;
 		endif;
 		if ($this->datas['rewriteopen']):
-			return $this->datas['rewriteroot'].$router;
+			return $this->datas['rewriteroot'] . $router;
 		endif;
 		return $_SERVER['PHP_SELF'] . $router;
 	}
@@ -819,44 +865,43 @@ class MyApp implements \ArrayAccess
 	{
 		return self::app()->get_url_href(self::value('module') . '/' . $router, $param, $width);
 	}
-	public static function cookies($name,?string $value=null,int $time=0)
+	public static function cookies($name, ?string $value = null, int $time = 0)
 	{
-		if(isset($value)):
-			self::app()->set_cookies_raw($name,$value,$time);
+		if (isset($value)):
+			self::app()->set_cookies_raw($name, $value, $time);
 		else:
 			return self::app()->datas['cookies'][$name] ?? NULL;
 		endif;
 	}
-	public static function scss(string $link,string $href='')
+	public static function scss(string $link, string $href = '')
 	{
-		if(!str_starts_with($link,APP_PATH)):
-			$link = self::path('view/scss/'.$link);
+		if (!str_starts_with($link, APP_PATH)):
+			$link = self::path('view/scss/' . $link);
 		endif;
-		if(empty($href)):
-			$href = self::path('view/css/'.pathinfo($link,PATHINFO_FILENAME).'.css');
+		if (empty($href)):
+			$href = self::path('view/css/' . pathinfo($link, PATHINFO_FILENAME) . '.css');
 		endif;
-		if(is_file($href)):
-			if(!defined('DEBUG') || !DEBUG):
+		if (is_file($href)):
+			if (!defined('DEBUG') || !DEBUG):
 				return self::convert_site($href);
-			elseif(filemtime($link)<filemtime($href)):
-				return self::convert_site($href); 
+			elseif (filemtime($link) < filemtime($href)):
+				return self::convert_site($href);
 			endif;
 		endif;
-		if(model\tool::scss_write($link,$href)):
+		if (model\tool::scss_write($link, $href)):
 			return self::convert_site($href);
 		endif;
 		return '';
 	}
-	public static function scsslink(string $link,string $href='')
+	public static function scsslink(string $link, string $href = '')
 	{
-		$url = self::scss($link,$href);
-		if(empty($url)):
+		$url = self::scss($link, $href);
+		if (empty($url)):
 			return '';
 		endif;
 		return '<link rel="stylesheet" type="text/css" href="' . $url . '" />';
-
 	}
-	
+
 	/**
 	 * 迭代扫描目录文件
 	 */

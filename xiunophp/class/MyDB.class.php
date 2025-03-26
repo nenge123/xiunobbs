@@ -23,7 +23,6 @@ class MyDB
 	 * @var array
 	 */
 	public $rconf = array(); // 配置，可以支持主从
-	public $sqls = array();
 	public $scheme = '';
 	public $tablepre = '';
 	public $errno = 0;
@@ -31,6 +30,7 @@ class MyDB
 	public $innodb_first; // 优先 InnoDB
 	public array $tables = array();
 	public static $_db;
+	public static array $_tablelist;
 	/**
 	 * 返回最后插入的主键值  
 	 * 即 insert_id
@@ -39,7 +39,7 @@ class MyDB
 	/**
 	 * 返回数据更新的影响行数
 	 */
-	const MODE_ROWS_VALUE  = 0;
+	const MODE_AFFECTED_ROWS  = 0;
 	/**
 	 * 返回带索引字段的多行数据
 	 */
@@ -55,15 +55,15 @@ class MyDB
 	/**
 	 * 返回带字段索引的单行数据
 	 */
-	const MODE_ASSOC = 4;
+	const MODE_SINGLE_ASSOC = 4;
 	/**
 	 * 返回带数字索引的单行数据
 	 */
-	const MODE_NUM = 5;
+	const MODE_SINGLE_NUM = 5;
 	/**
 	 * 返回带混合索引的单行数据
 	 */
-	const MODE_BOTH = 6;
+	const MODE_SINGLE_BOTH = 6;
 	/**
 	 * 返回单行首列数据
 	 */
@@ -85,14 +85,14 @@ class MyDB
 		endif;
 		return self::$_db;
 	}
-	public static function t(string $table, ?string $key = null): MyTable
+	public static function t(string $table, ?string $key = null): \model\table
 	{
 		$db = self::app();
 		if (!isset($db->tables[$table])):
 			$arr = explode('.', $table);
 			$tablename = array_pop($arr);
 			$dbname = array_pop($arr);
-			$db->tables[$table] = new MyTable($dbname ? $tablename : $db->tablepre . $tablename, $key, $dbname);
+			$db->tables[$table] = new \model\table($dbname ? $tablename : $db->tablepre . $tablename, $key, $dbname);
 		endif;
 		return $db->tables[$table];
 	}
@@ -202,7 +202,7 @@ class MyDB
 	{
 		return self::rlink()->executeSQL($query, $param, $mode);
 	}
-	public static function exec($sql, $mode = self::MODE_ROWS_VALUE)
+	public static function exec($sql, $mode = self::MODE_AFFECTED_ROWS)
 	{
 		$sql = trim($sql);
 		$wlink = self::wlink();
@@ -215,13 +215,13 @@ class MyDB
 		if ($pre == 'INSERT ' || $pre == 'REPLACE') {
 			$mode = self::MODE_INSERT_ID;
 		} elseif ($pre == 'UPDATE ' || $pre == 'DELETE ') {
-			$mode = self::MODE_ROWS_VALUE;
+			$mode = self::MODE_AFFECTED_ROWS;
 		}
 		return $wlink->execSQL($sql, $mode);
 	}
 	public function sql_find_one($sql)
 	{
-		return $this->query($sql,self::MODE_ASSOC) ?: false;
+		return $this->query($sql, self::MODE_SINGLE_ASSOC) ?: false;
 	}
 
 	public function sql_find($sql, $key = NULL)
@@ -394,28 +394,46 @@ class MyDB
 		endif;
 		return $s;
 	}
+	/**
+	 * 查询语句开头
+	 */
 	public static function sql_select(string $name, $column = '*')
 	{
 		$column = self::quote($column, true);
 		return 'SELECT ' . $column . ' FROM ' . $name . ' ';
 	}
+	/**
+	 * 删除语句开头
+	 */
 	public static function sql_delete(string $name)
 	{
 		return 'DELETE FROM ' . $name . ' ';
 	}
+	/**
+	 * 更新语句开头
+	 */
 	public static function sql_update(string $name)
 	{
 		return 'UPDATE ' . $name . ' SET ';
 	}
+	/**
+	 * 插入语句开头
+	 */
 	public static function sql_insert(string $name)
 	{
 		return 'INSERT INTO ' . $name . ' ';
 	}
+	/**
+	 * 替换语句开头
+	 */
 	public static function sql_replace(string $name)
 	{
 		return 'REPLACE INTO ' . $name . ' ';
 	}
-	public static function sql_alert(string $name)
+	/**
+	 * 调整字段语句开头
+	 */
+	public static function SQL_ALERT(string $name)
 	{
 		return 'ALTER TABLE ' . $name . ' ';
 	}
@@ -572,36 +590,9 @@ class MyDB
 		return self::quote($key) . ' ' . (strtoupper($order) == 'ASC' ? 'ASC' : 'DESC');
 	}
 	/**
-	 * array<`key` = ?>
-	 */
-	static public function paramSet(array $field): array
-	{
-		return array_map(fn($key) => self::KEY_SET($key), $field);
-	}
-	static public function paramLike(array $field): array
-	{
-		return array_map(fn($key) => self::KEY_LIKE($key), $field);
-	}
-	/**
-	 * array<`key` <> ?>
-	 */
-	static public function paramNotEq(array $field): array
-	{
-		return array_map(fn($key) => self::KEY_NOT($key), $field);
-	}
-	/**
-	 *  ?,?,?
-	 */
-	static public function fill(array|int $value = 1): string
-	{
-		if (is_array($value)):
-			$value = count($value);
-		endif;
-		return substr(str_repeat(',?', $value ?: 1), 1);
-	}
-	/**
 	 * 一维数据AND 链接
 	 * array<$sql,$param,...mixed>
+	 * @return array [标准化语句,参数值,...额外值]
 	 */
 	static public function WHERE_AND(array $where, string $endsql = '', ...$arg): array
 	{
@@ -615,6 +606,7 @@ class MyDB
 	}
 	/**
 	 * 一维数据OR链接
+	 * @return array [标准化语句,参数值,...额外值]
 	 */
 	static public function WHERE_OR(array $where, string $endsql = '', ...$arg): array
 	{
@@ -628,8 +620,9 @@ class MyDB
 	}
 	/**
 	 * 二维数据,用AND链接,一维数据用OR
+	 * @return array [标准化语句,参数值,...额外值]
 	 */
-	static public function WHERE_WITH(array $data, string $endsql = '', ...$arg)
+	static public function WHERE_WITH(array $data, string $endsql = '', ...$arg): array
 	{
 		$sql = [];
 		$param = array();
@@ -650,7 +643,7 @@ class MyDB
 	/**
 	 * 配置WHERE查询 索引可用前缀 !<>% 代码不等于,小于,大于,LIKE
 	 * @param array $data
-	 * @return array<array,array>
+	 * @return array<array,array> [条件语句组,参数值]
 	 */
 	static public function WHERE_VALUE(array $data): array
 	{
@@ -747,13 +740,13 @@ class MyDB
 	}
 	/**
 	 * 配置WHERE查询 索引可用前缀 !<>% 代码不等于,小于,大于,LIKE
-	 * @param array $data
-	 * @return array<string>
+	 * @param array $keys (纯字段)
+	 * @return array<string> 标准化语句
 	 */
-	static public function WHERE_KEY(array $data): array
+	static public function WHERE_KEY(array $keys): array
 	{
 		$where = array();
-		foreach ($data as $key):
+		foreach ($keys as $key):
 			$char = substr($key, 0, 1);
 			if (!ctype_alpha($char)):
 				$key = substr($key, 1);
@@ -783,34 +776,34 @@ class MyDB
 	}
 	/**
 	 * 配置UPDATE 可用前缀 +- 对字段增加,减少
-	 * @param array|string $key
-	 * @return string
+	 * @param array|string $keys (纯字段)
+	 * @return string 标准化语句
 	 */
-	static public function UPDATE_KEY(array|string $key): string
+	static public function UPDATE_KEY(array|string $keys): string
 	{
 
-		if (is_array($key)):
+		if (is_array($keys)):
 			return implode(
 				',',
-				array_map(fn($m) => self::UPDATE_KEY($m), $key)
+				array_map(fn($m) => self::UPDATE_KEY($m), $keys)
 			) . PHP_EOL;
 		endif;
-		$key = trim($key);
-		$char = substr($key, 0, 1);
+		$keys = trim($keys);
+		$char = substr($keys, 0, 1);
 		if (!ctype_alpha($char)):
-			$key = substr($key, 1);
+			$keys = substr($keys, 1);
 			return match ($char) {
-				'+' => self::KEY_ADD($key),
-				'-' => self::KEY_PDD($key),
-				default => self::KEY_SET($key)
+				'+' => self::KEY_ADD($keys),
+				'-' => self::KEY_PDD($keys),
+				default => self::KEY_SET($keys)
 			};
 		endif;
-		return self::KEY_SET($key);
+		return self::KEY_SET($keys);
 	}
 	/**
 	 * 更新语句标准化 更新可用前缀 +-<>对应字段增加减少,减少至为零,每次增加1到指定值
 	 * @param array $data
-	 * @param array $where
+	 * @param array $where [标准化语句,参数值]
 	 */
 	static public function UPDATE_VALUE(array $data, array $where = array()): array
 	{
@@ -875,10 +868,15 @@ class MyDB
 	 */
 	static function INSERT_VALUES(array $field, int $len = 1): string
 	{
-		$value = str_repeat(',(' . self::fill($field) . ')', $len);
+		$value = str_repeat(',(' . substr(str_repeat(',?', count($field)), 1) . ')', $len);
 		return '(' . self::quote($field, true) . ') VALUES ' . substr($value, 1) . PHP_EOL;
 	}
-	static function INSERT_DATA(array $field, int $len = 1): string
+	/**
+	 * 处理插入数据  
+	 * 特殊  
+	 * 字段带@ 表示参数为一个文件
+	 */
+	static function INSERT_DATA(array $field): string
 	{
 		$str1 = [];
 		$str2 = [];
@@ -899,10 +897,18 @@ class MyDB
 		endforeach;
 		return '(' . implode(',', $str1) . ') VALUES (' . $str2 . ')' . PHP_EOL;
 	}
+	/**
+	 * 排序
+	 */
 	static public function ORDER(array|string $order): string
 	{
 		return PHP_EOL . 'ORDER BY ' . self::KEY_ORDER($order);
 	}
+	/**
+	 * 结果分页
+	 * 只有一个参数的时 LIMIT size
+	 * 两个参数时 LIMIT page,size
+	 */
 	static public function LIMIT(int $page, int $limit = 0): string
 	{
 		if (empty($limit)):
@@ -914,15 +920,24 @@ class MyDB
 		$start = ($page - 1) * $limit;
 		return PHP_EOL . 'LIMIT ' . $start . ',' . $limit . ';';
 	}
-
+	/**
+	 * 返回带表前缀的表名
+	 */
 	public static function tablename(string $table): string
 	{
 		return self::app()->tablepre . $table;
 	}
+	/**
+	 * 返回带表前缀的反斜杠表名
+	 */
 	public static function tableqoute(string $table): string
 	{
 		return self::quote(self::tablename($table));
 	}
+	/**
+	 * 获取查询语句历史(基于当前MYSQL进程 需要启用DEBUG)
+	 * [array(0=>次序,1=>耗时,2=>语句)]
+	 */
 	public static function PROFILES(): array
 	{
 		$mydb = self::app();
@@ -935,6 +950,9 @@ class MyDB
 		endif;
 		return array();
 	}
+	/**
+	 * 基于查询操作记录,不是有效查询
+	 */
 	public static function LENGTH(): int
 	{
 
@@ -947,5 +965,26 @@ class MyDB
 			return $length;
 		endif;
 		return 0;
+	}
+	/**
+	 * 获取当前账号所有数据库
+	 */
+	public static function database(): array|bool
+	{
+		return array_column(self::query('SHOW DATABASES', self::MODE_ALL_NUM),0);
+	}
+	/**
+	 * 获取当前数据库所有表
+	 */
+	public static function tablelist(?string $dbname=null,?string $tablepre=null): array
+	{
+		return array_column(self::t('information_schema.TABLES')->where(array('TABLE_SCHEMA' => $dbname?? self::rconf('name'),'%TABLE_NAME' => $tablepre ?? self::rconf('tablepre') . '%'),'',2,array('TABLE_NAME')),0);
+	}
+	/**
+	 * 获取当前数据库所有自定义函数
+	 */
+	public static function functions(?string $dbname=null)
+	{
+		return array_column(self::t('information_schema.routines')->where(array('ROUTINE_TYPE'=>'FUNCTION','ROUTINE_SCHEMA'=>$dbname ?? self::rconf('name')),'',2,['ROUTINE_NAME']),0);
 	}
 }
