@@ -1,0 +1,72 @@
+<!--{template(ADMIN_PATH.'view/htm/new-header.htm')}-->
+<form action="<?= $_SERVER['REQUEST_URI'] ?>" method="post" onpost="true" onmethods="admin_forum_update">
+	<div class="card">
+		<div class="card-header">
+			<h4 class="card-title">{lang admin_forum_edit}:<?= $_forum['name'] ?></h4>
+		</div>
+		<div class="card-body">
+			<div class="form-floating mb-3"><!--{{ \route_admin::input_required_text('name',$_forum['name'],'forum_name') }}--></div>
+			<div class="mb-3">
+				<div class="form-check form-switch mb-3" onmethods="admin_forum_edit"><!--{{  route_admin::input_check('',0,'brief_edit') }}--></div>
+				<div name="brief"><!--{{ $_forum['brief'] }}--></div>
+			</div>
+			<!--{hook admin_forum_update_forum_brief_after.htm}-->
+			<div class="mb-3">
+				<div class="form-check form-switch mb-3" onmethods="admin_forum_edit"><!--{{  route_admin::input_check('',0,'announcement_edit') }}--></div>
+				<div name="announcement"><!--{{ $_forum['announcement'] }}--></div>
+			</div>
+			<!--{hook admin_forum_update_forum_announcement_after.htm}-->
+			<div class="form-floating mb-3">
+				<!--{{ \route_admin::input_text('modnames',$_forum['modnames'],'moderator') }}-->
+				<p class="small text-muted mt-2" id="modnames"><!--{lang forum_moduid_format_tips}--></p>
+			</div>
+			<div class="form-check form-switch mb-3"><!--{{ \route_admin::input_check('accesson',$_forum['accesson'],'user_privilege') }}--></div>
+			<div class="mb-3 text-center">
+				<button type="submit" class="btn btn-primary" id="submit" data-loading-text="<!--{lang submiting}-->..."><!--{lang confirm}--></button>
+				<a role="button" class="btn btn-secondary" href="{{ MyApp::purl('forum/list') }}"><!--{lang back}--></a>
+			</div>
+			<!--{hook admin_forum_update_submit_after.htm}-->
+		</div>
+	</div>
+	<div id="accesslist" class="card mb-3" {{ $_forum['accesson']?'':'hidden' }}>
+		<div class="card-header">
+			<h4 class="card-title">{lang user_privilege}</h4>
+		</div>
+		<div class="card-body">
+			<!--{hook admin_forum_update_privilete_before.htm}-->
+			<table class="table  text-small" style="min-width: 700px;">
+				<thead>
+					<tr align="center">
+						<td width="60"><!--{lang checkall}--></td>
+						<td align="left"><!--{lang user_group}--></td>
+						<td width="80"><!--{lang allow_view}--></td>
+						<td width="60"><!--{lang allow_thread}--></td>
+						<td width="60"><!--{lang allow_post}--></td>
+						<td width="60"><!--{lang allow_upload}--></td>
+						<td width="60"><!--{lang allow_download}--></td>
+						<!--{hook admin_forum_update_access_title_end.htm}-->
+					</tr>
+					<thead>
+					<tbody>
+						<!--{each $accesslist $access}-->
+						<tr align="center">
+							<td><label class="custom-input c-checkbox"><input type="checkbox" /></label></td>
+							<td align="left"><?php echo $access['name']; ?></td>
+							<!--{each $access $a $b}-->
+							<!--{if in_array($a,['allowread','allowthread','allowpost','allowattach','allowdown'])}-->
+							<td>
+								<div class="form-check form-switch"><!--{{ \route_admin::input_check($a.'['.$access['gid'].']',$access[$a],'') }}--></div>
+							</td>
+							<!--{/if}-->
+							<!--{/each}-->
+							<!--{hook admin_forum_update_access_input_end.htm}-->
+						</tr>
+						<!--{/each}-->
+					</tbody>
+			</table>
+			<!--{hook admin_forum_update_privilete_after.htm}-->
+		</div>
+	</div>
+</form>
+<!--{hook admin_forum_update_js.htm}-->
+<!--{template(ADMIN_PATH.'view/htm/new-footer.htm')}-->

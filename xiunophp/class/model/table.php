@@ -1,5 +1,7 @@
 <?php
 namespace model;
+
+use Exception;
 use MyDB;
 /**
  * 数据表操作类
@@ -20,6 +22,17 @@ class table
 		if ($key) $this->key = $key;
 	}
 	// hook model_table_methods.php
+	public function get_primary(string $primary = '')
+	{
+		
+		if(empty($primary)):
+			if(empty($this->key)):
+				throw new Exception(self::class.':未能找到主键');
+			endif;
+			return $this->key;
+		endif;
+		return $primary;
+	}
 	/**
 	 * 给字段生成带表名反引号
 	 */
@@ -374,16 +387,34 @@ class table
 			-1
 		);
 	}
-	public function insert_update($json, string $primary): int
+	/**
+	 * 更新/插入一个带字段索引一维数据
+	 * @param array $json
+	 * @return integer
+	 */
+	public function insert_update(array $json): int
 	{
 		// hook model_table_insert_update.php
-		if (empty($primary) || empty($json[$primary])):
-			return $this->insert_json($json);
-		endif;
-		$sql = MyDB::INSERT_VALUES(array_keys($json), 1);
-		$sql .= ' AS `_new` ON DUPLICATE KEY UPDATE `_new`.' . MyDB::quote($primary) . '=' . MyDB::quote($primary) . ';';
-		$param = array_values($json);
-		return $this->insert($sql, $param);
+		$keys = array_keys($json);
+		$sql = MyDB::INSERT_VALUES($keys,1);
+		$sql .= ' AS `_NEW` ON DUPLICATE KEY UPDATE '.implode(',',array_map(fn($m)=>MyDB::quote($m) . ' = '.MyDB::quote('_NEW.'.$m),$keys));
+		return $this->insert($sql,array_values($json),0);
+	}
+	/**
+	 * 批量更新/插入一个二维数据
+	 * @param array<array> $mapjson 带索引二维数据
+	 * @param string $primary 主键
+	 */
+	public function insert_map_update($mapjson): int
+	{
+		$keys = array_keys($mapjson[array_key_first($mapjson)]);
+		$sql = MyDB::INSERT_VALUES($keys,count($mapjson));
+		$sql .= ' AS `_NEW` ON DUPLICATE KEY UPDATE '.implode(',',array_map(fn($m)=>MyDB::quote($m) . ' = '.MyDB::quote('_NEW.'.$m),$keys));
+		$param = [];
+		foreach($mapjson as $v):
+			array_push($param,...array_values($v));
+		endforeach;
+		return $this->insert($sql, $param,0);
 	}
 	/**
 	 * 根据固定条目 逐条插入数据,遇到错误终止插入 MYISAM不支持事务

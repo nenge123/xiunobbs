@@ -10,215 +10,183 @@ switch ($action):
 		$_fid = MyApp::value(1);;
 		$_forum = forum_read($_fid);
 		empty($_forum) and message(-1, lang('forum_not_exists'));
-
-		// hook admin_forum_update_get_post.php
-
-		if ($_SERVER['REQUEST_METHOD'] == 'GET') {
-
+		if ($_SERVER['REQUEST_METHOD'] == 'GET'):
+			//user_ids_to_names($_forum['moduids'])
 			$header['title']        = lang('forum_edit');
 			$header['mobile_title'] = lang('forum_edit');
-
 			// hook admin_forum_update_get_start.php
-
 			$accesslist = forum_access_find_by_fid($_fid);
-
-			if (empty($accesslist)) {
-				foreach ($grouplist as $group) {
+			if (empty($accesslist)):
+				foreach ($grouplist as $group):
 					$accesslist[$group['gid']] = $group; // 字段名相同，直接覆盖。 / same field, directly overwrite
-				}
-			} else {
-				foreach ($accesslist as &$access) {
+				endforeach;
+			else:
+				foreach ($accesslist as &$access):
 					$access['name'] = $grouplist[$access['gid']]['name']; // 字段名相同，直接覆盖。 / same field, directly overwrite
-				}
-			}
-			//array_htmlspecialchars($_forum);
-
-			$input = array();
-			$input['name'] = form_text('name', $_forum['name']);
-			$input['rank'] = form_text('rank', $_forum['rank']);
-			$input['brief'] = form_textarea('brief', $_forum['brief'], '100%', 80);
-			$input['announcement'] = form_textarea('announcement', $_forum['announcement'], '100%', 80);
-			$input['accesson'] = form_checkbox('accesson', $_forum['accesson']);
-			$input['modnames'] = form_text('modnames', user_ids_to_names($_forum['moduids']));
-
-			// hook admin_forum_update_get_end.php
-
-
-			include _include(ADMIN_PATH . "view/htm/forum_update.htm");
-		} elseif ($_SERVER['REQUEST_METHOD'] == 'POST') {
-			if(!empty(MyApp::head('ajax-fetch'))):
-				new model\adminupload($_fid);
-				message(-1,'非法请求');
+				endforeach;
 			endif;
-			if(count($_POST)==1):
+			if (empty($_forum['modlist'])):
+				$_forum['modnames'] = '';
+			else:
+				$_forum['modnames'] = implode(',', array_column($_forum['modlist'], 'username'));
+			endif;
+			// hook admin_forum_update_get_end.php
+			$importjs[] = route_admin::site('view/js/forum-update.js');
+			include _include(ADMIN_PATH . "view/htm/forum/update.htm");
+			exit;
+		elseif ($_SERVER['REQUEST_METHOD'] == 'POST'):
+			// hook admin_forum_update_post_start.php
+			if (!empty(MyApp::head('ajax-fetch'))):
+				new model\adminupload($_fid);
+			endif;
+			if (count($_POST) == 1):
 				$key = array_keys($_POST)[0];
-				if(isset($_forum[$key])):
-					MyDB::t('forum')->update_by_where($_POST,array('fid'=>$_forum['fid']));
+				if (isset($_forum[$key])):
+					MyDB::t('forum')->update_by_where($_POST, array('fid' => $_forum['fid']));
 					$ajax = 1;
 					$_SERVER['ajax'] = 1;
-					message(0,lang('forum_'.$key).'保存成功!可能缓存原因,效果不会立即在板块显示!');
+					message(0, lang('forum_' . $key) . lang('admin_forum_save_brief'));
 				endif;
 			endif;
-			$name = param('name');
-			$rank = param('rank', 0);
-			$brief = param('brief', '', FALSE);
-			$announcement = param('announcement', '', FALSE);
-			$modnames = param('modnames');
-			$accesson = param('accesson', 0);
-			$moduids = user_names_to_ids($modnames);
-
-			// hook admin_forum_update_post_start.php
-
-			$arr = array(
-				'name' => $name,
-				'rank' => $rank,
-				'brief' => $brief,
-				'announcement' => $announcement,
-				'moduids' => $moduids,
-				'accesson' => $accesson,
-			);
-
+			#获取论坛板块的字段
+			$forumkeys = MyDB::t('forum')->columns();
+			$update = [];
+			$allowlist = [];
+			$rows = 0;
+			foreach ($_POST as $k => $v):
+				if (in_array($k, $forumkeys)):
+					$update[$k] = $v;
+				elseif (str_starts_with($k, 'allow')):
+					foreach ($v as $x => $y):
+						$allowlist[$x][$k] = $y;
+					endforeach;
+				endif;
+			endforeach;
 			// hook admin_forum_update_post_before.php
-
-			forum_update($_fid, $arr);
-
-			if ($accesson) {
-				$allowread = param('allowread', array(0));
-				$allowthread = param('allowthread', array(0));
-				$allowpost = param('allowpost', array(0));
-				$allowattach = param('allowattach', array(0));
-				$allowdown = param('allowdown', array(0));
-				foreach ($grouplist as $_gid => $v) {
-					$access = array(
-						'allowread' => array_value($allowread, $_gid, 0),
-						'allowthread' => array_value($allowthread, $_gid, 0),
-						'allowpost' => array_value($allowpost, $_gid, 0),
-						'allowattach' => array_value($allowattach, $_gid, 0),
-						'allowdown' => array_value($allowdown, $_gid, 0),
-					);
-					forum_access_replace($_fid, $_gid, $access);
-				}
-			} else {
-				forum_access_delete_by_fid($_fid);
-			}
-
-
-
+			if (!empty($update['accesson'])):
+				#更新 插入权限
+				foreach ($allowlist as $k => $v):
+					$allowlist[$k]['fid'] = $_fid;
+					$allowlist[$k]['gid'] = $k;
+					foreach (['allowread', 'allowthread', 'allowpost', 'allowattach', 'allowdown'] as $x):
+						if (empty($v[$x])):
+							$allowlist[$k][$x] = 0;
+						endif;
+					endforeach;
+				endforeach;
+				$rows += MyDB::t('forum_access')->insert_map_update($allowlist);
+			else:
+				#删除板块权限
+				$update['accesson'] = 0;
+				$rows += MyDB::t('forum_access')->delete_by_where(array('fid' => $_fid));
+			endif;
+			if (!empty($_POST['modnames'])):
+				#版主UID
+				#$moduids = user_names_to_ids($_POST['modnames']); 不支持数字 改进他
+				$modnames = explode(',', $_POST['modnames']);
+				$where = [];
+				foreach ($modnames as $v):
+					if (is_numeric($v)):
+						$where['uid'][] = intval($v);
+					else:
+						$where['username'][] = trim($v);
+					endif;
+				endforeach;
+				if (!empty($where)):
+					#目标数据明确 应该减少不必要的字段索引
+					$useruids = array_column(MyDB::t('user')->select(...MyDB::WHERE_OR($where, '', MyDB::MODE_ALL_NUM, array('uid'))), 0);
+					print_r($useruids);
+					if (!empty($useruids)):
+						$update['moduids'] = implode(',', $useruids);
+					endif;
+				endif;
+			endif;
+			$rows += MyDB::t('forum')->insert_update($update);
 			// hook admin_forum_update_post_end.php
-
-			forum_list_cache_delete();
-
-			message(0, lang('edit_sucessfully'));
-		}
+			if (!empty($rows)):
+				forum_list_cache_delete();
+				MyApp::message(0, lang('save_successfully'), array('url' => MyApp::purl('forum/list')));
+			endif;
+			MyApp::message(0, lang('forum_no_update'));
+		endif;
 		break;
 	case 'delete':
-
+		$_fid = MyApp::value(1);;
+		$_forum = forum_read($_fid);
+		empty($_forum) and MyApp::message(-1, lang('forum_not_exists'));
 		if ($_SERVER['REQUEST_METHOD'] == 'GET'):
+			include _include(ADMIN_PATH . "view/htm/forum/delete.htm");
+			exit;
 		elseif ($_SERVER['REQUEST_METHOD'] == 'POST'):
-			$_fid = param(2, 0);
-			$_forum = forum_read($_fid);
-			empty($_forum) and message(-1, lang('forum_not_exists'));
-
-			in_array($_fid, $system_forum) and message(-1, 'Not allowed');;
-
 			// hook admin_forum_delete_start.php
-
-			$threadlist = thread_find_by_fid($_fid, 1, 20);
-			if (!empty($threadlist)) {
-				message(-1, lang('forum_delete_thread_before_delete_forum'));
-			}
-
-			$sublist = forum_find_son_list($forumlist, $_fid);
-			if (!empty($sublist)) {
-				message(-1, lang('forum_please_delete_sub_forum'));
-			}
-
+			if(MyDB::t('thread')->whereCount(array('fid'=>$_fid))):
+				#先删除主题?
+				MyApp::message(-1, lang('forum_delete_thread_before_delete_forum'));
+			endif;
+			if (isset($_forum['fup'])):
+				#不能删除子版块功能
+				foreach ($forumlist as $k => $v):
+					if ($v['fup'] == $_fid):
+						MyApp::message(-1, lang('forum_please_delete_sub_forum'));
+					endif;
+				endforeach;
+			endif;
 			forum_delete($_fid);
-
 			forum_list_cache_delete();
-
 			// hook admin_forum_delete_end.php
-
-			message(0, lang('forum_delete_successfully'));
+			MyApp::message(0, lang('forum_delete_successfully'),array('url'=>MyApp::purl('forum/list')));
 		endif;
 		break;
 	default:
-		// hook admin_forum_list_get_post.php
-		if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+		// hook admin_forum_list.php
+		if ($_SERVER['REQUEST_METHOD'] == 'GET'):
 			// hook admin_forum_list_get_start.php
 			$header['title']        = lang('forum_admin');
 			$header['mobile_title'] = lang('forum_admin');
-			$maxfid = forum_maxid();
+			$importjs[] = route_admin::site('view/js/forum-list.js');
 			// hook admin_forum_list_get_end.php
 			include _include(ADMIN_PATH . "view/htm/forum/list.htm");
-		} elseif ($_SERVER['REQUEST_METHOD'] == 'POST') {
-			$fidarr = param('fid', array(0));
-			$namearr = param('name', array(''));
-			$rankarr = param('rank', array(0));
-			$iconarr = param('icon', array(''));
+			exit;
+		elseif ($_SERVER['REQUEST_METHOD'] == 'POST'):
 			// hook admin_forum_list_post_start.php
-			$arrlist = array();
-			foreach ($fidarr as $k => $v) {
-				$arr = array(
-					'fid' => $k,
-					'name' => array_value($namearr, $k),
-					'rank' => array_value($rankarr, $k)
-				);
-				if (!isset($forumlist[$k])) {
-					// hook admin_forum_list_add_before.php
-					forum_create($arr);
-				} else {
-					// hook admin_forum_list_update_before.php
-					forum_update($k, $arr);
-				}
-				// icon
-				if (!empty($iconarr[$k])) {
-					$s = array_value($iconarr, $k);
-					$data = substr($s, strpos($s, ',') + 1);
-					$data = base64_decode($data);
-					$iconfile = "../upload/forum/$k.png";
-					file_put_contents($iconfile, $data);
-					forum_update($k, array('icon' => $_SERVER['REQUEST_TIME']));
-				}
+			if (!empty(MyApp::head('ajax-fetch'))):
+				if (!empty($_FILES['file']) && empty($_FILES['file']['error'])):
+					// hook admin_forum_list_post_upload.php
+					$imagepath = MyApp::path('upload/forum/' . MyApp::post('fid') . '.png');
+					if (move_upload_file($_FILES['file']['tmp_name'], $imagepath)):
+						MyApp::message_json(
+							array('url' => MyApp::convert_site($imagepath), 'icon' => $_SERVER['REQUEST_TIME'])
+						);
+					else:
+						MyApp::message(-1, '上传失败');
+					endif;
+				endif;
+			endif;
+			if (isset($_POST['fid']) && is_array($_POST['fid'])):
+				$datalist = array();
+				$keys = array_keys($_POST);
+				$forumkeys = MyDB::t('forum')->columns();
+				foreach ($_POST['fid'] as $k => $v):
+					foreach ($keys as $x):
+						if (!in_array($x, $forumkeys)) continue;
+						$datalist[$v][$x] = $_POST[$x][$k];
+					endforeach;
+				endforeach;
 				// hook admin_forum_list_post_loop_end.php
-			}
-			// 删除 / delete
-			$deletearr = array_diff_key($forumlist, $fidarr);
-			foreach ($deletearr as $k => $v) {
-				if (in_array($k, $system_forum)) continue;
-				// hook admin_forum_list_delete_before.php
-				forum_delete($k);
-				// hook admin_forum_list_delete_end.php
-			}
-			forum_list_cache_delete();
+				if (!empty($datalist)):
+					$row = MyDB::t('forum')->insert_map_update($datalist, 'fid');
+					#更新板块缓存
+					if ($row):
+						forum_list_cache_delete();
+						// hook admin_forum_list_post_end.php
+						MyApp::message(0, lang('save_successfully'), array('url' => MyApp::purl('forum/list')));
+					endif;
+				endif;
+			endif;
 			// hook admin_forum_list_post_end.php
-			message(0, lang('save_successfully'));
-		}
+			MyApp::message(0, lang('forum_no_update'));
+		endif;
 		break;
 endswitch;
-
-function user_names_to_ids($names, $sep = ',')
-{
-	$namearr = explode($sep, $names);
-	$r = array();
-	foreach ($namearr as $name) {
-		$user = user_read_by_username($name);
-		if (empty($user)) continue;
-		$r[] = $user ? $user['uid'] : 0;
-	}
-	return implode($sep, $r);
-}
-
-function user_ids_to_names($ids, $sep = ',')
-{
-	$idarr = explode($sep, $ids);
-	$r = array();
-	foreach ($idarr as $id) {
-		$user = user_read($id);
-		if (empty($user)) continue;
-		$r[] = $user ? $user['username'] : '';
-	}
-	return implode($sep, $r);
-}
-
 // hook admin_forum_end.php
+exit;

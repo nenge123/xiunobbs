@@ -1,0 +1,16 @@
+<!--{template(ADMIN_PATH.'view/htm/new-header.htm')}-->
+<form action="<?= $_SERVER['REQUEST_URI'] ?>" method="post" onpost="true" onmethods="admin_forum_update">
+	<div class="card">
+		<div class="card-header">
+			<h4 class="card-title">{lang admin_forum_delete}:<?= $_forum['name'] ?></h4>
+		</div>
+		<div class="card-body">
+			<input type="hidden" name="yes" value="1">
+			<div class="alert alert-danger" role="alert"><!--{lang admin_forum_delete_message}--></div>
+			<div class="text-center">
+				<button type="submit" name="yes" class="btn btn-primary" id="submit" data-loading-text="<!--{lang submiting}-->..."><!--{lang confirm}--></button>
+			</div>
+		</div>
+	</div>
+</form>
+<!--{template(ADMIN_PATH.'view/htm/new-footer.htm')}-->

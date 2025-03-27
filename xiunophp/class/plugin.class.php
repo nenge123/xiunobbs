@@ -264,7 +264,7 @@ class plugin
 			'<?php endforeach;?>',
 			$template
 		);
-		$template = preg_replace('/\s*\?\>[\n\r\s\t]*\<\?php\s+/is', ' ', $template);
+		$template = preg_replace('/\s*\?\>[\n\r\s\t]*\<\?php\s+/is', ';', $template);
 		return $template;
 	}
 	static public function parse_fn_each($param): string
@@ -289,15 +289,12 @@ class plugin
 					#纯数字或字母
 					if (ctype_alnum($param1)):
 						return '<?=MyApp::data(\'' . $param1 . '\')?>';
-					elseif (str_contains($param1, '::')):
+					elseif (str_contains($param1, '::')||str_contains($param1, '->')):
 						return '<?=' . $param1 . '?>';
 					elseif (str_ends_with($param1, ')')):
 						return '<?=MyApp::app()->' . $param1 . '??\'\'?>';
-					elseif (preg_match('/^[\w\d\-\_\.]+$/', $param1)):
-						$arr = explode('.', $param1);
-						$arr = array_map(fn($m) => '[\'' . $m . '\']', $arr);
-						return '<?=$myapp->data' . implode('', $arr) . '??\'\'?>';
 					endif;
+					return '<?=' . $param1 . '?>';
 					break;
 			endswitch;
 		endif;

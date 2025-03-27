@@ -39,6 +39,11 @@ body[data-headerbg=default]{
 		}
 	}
 }
+.lyear-layout-content{
+	.container-fluid{
+		max-width: 1000px;
+	}
+}
 .lyear-layout-sidebar {
 	.sidebar-header>div {
 		width: 100%;

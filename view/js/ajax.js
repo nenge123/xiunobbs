@@ -27,18 +27,20 @@ export default {
 			await import(X.jsroot + 'spark-md5.min.js');
 			const jform = $(this);
 			//发送前提交
-			const postdata = jform.serializeObject();
+			const postdata = await X.callMethod('FormData',this);
 			if (!await X.callAjax('userlogin_await',this,postdata)) {
-				if (!postdata.password) {
+				if (!postdata.has('password')) {
 					$.alert(lang['password_empty']);
 					return jform.disabled(false);
 				}
-				postdata.password = SparkMD5.hash(postdata.password);
+				postdata.set('password',SparkMD5.hash(postdata.get('password')));
 				X.callAjax('formpost',jform,postdata);
 			}
 		});
 	},
-	formpost(jform,data){
+	async formpost(jform,data){
+		const X = this;
+		let processData = false;
 		if (!X.isFrom(jform)){
 			jform = $(jform.from);
 		}else if(!(jform instanceof jQuery)){
@@ -50,16 +52,21 @@ export default {
 		}
 		submitButton.disabled();
 		if(!data){
-			data = jform.serializeObject();
+			data = await X.callMethod('FormData',jform[0]);
+		}else if(!(data instanceof FormData)&&X.isOBJ(data)){
+			processData = true;
+		}else{
+			return $.alert('输入数据不合法!');
 		}
 		$.ajax({
 			type: 'POST',
 			url:jform.attr('action'),
 			data,
 			dataType: 'json',
+			processData,
+			contentType:processData,
 			timeout: 6000000,
 			/**
-			 * 
 			 * @param {XMLHttpRequest} xhr 
 			 */
 			beforeSend(xhr){
@@ -93,5 +100,37 @@ export default {
 			}
 		});
 
+	},
+	/**
+	 * 上传一张图片
+	 */
+	uploadimage(url,success,post,error){
+		const X = this;
+		X.callMethod('upload',async files=>{
+			const data = await X.callMethod('FormData');
+			const file = await X.callMethod('formatImage',files[0]);
+			if(!file) return ;
+			data.append('file',file);
+			if(post){
+				for(const i in post){
+					data.append(i,post[i]);
+				}
+			}
+			$.ajax({
+				type: 'POST',
+				url,
+				data,
+				dataType: 'json',
+				timeout: 6000000,
+                processData: false,
+                contentType: false,
+				beforeSend(xhr){
+					xhr.setRequestHeader('ajax-fetch',1);
+					xhr.setRequestHeader('ajax-image',1);
+				},
+				success,
+				error
+			});
+		},'image/*');
 	}
 }

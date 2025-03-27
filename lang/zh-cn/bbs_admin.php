@@ -107,7 +107,13 @@ return array(
 	'add_new_line'=>'增加一行',
 	'forum_edit_tip'=>'请谨慎编辑版块，一旦确定后不要轻易变动，否则可能会导致数据关联错误，一般在正式运营时就不要再变动。',
 	'forum_cant_delete_system_reserved'=>'不能删除系统保留的版块。',
-	'forum_moduid_format_tips'=>'最多允许10个，逗号隔开，如：Jack,Lisa,Mike',
+	'forum_moduid_format_tips'=>'最多允许10个，逗号隔开，如：Jack,Lisa,Mike,亦可以输入UID',
+	'admin_forum_edit'=>'板块编辑',
+	'admin_forum_delete'=>'删除板块',
+	'admin_forum_delete_message'=>'你确定你没有手滑删除吗?',
+	'announcement_edit'=>'点击编辑板块公告',
+	'admin_forum_save_brief'=>'保存成功!<br>缓存原因,效果不会立即在板块显示!<br>可以手动更新缓存或者在修改板块信息时更新.',
+	'brief_edit'=>'点击编辑板块说明',
 	'user_privilege'=>'用户权限',
 	'allow_view'=>'允许看帖',
 	'allow_thread'=>'发主题',
@@ -117,6 +123,7 @@ return array(
 	'forum_delete_thread_before_delete_forum'=>'请先通过批量主题管理删除版块主题。',
 	'forum_please_delete_sub_forum'=>'请删除子版块。',
 	'forum_delete_successfully'=>'删除成功。',
+	'forum_no_update'=>'数据没有发生变化',
 	
 	// 主题
 	'thread_queue_not_exists'=>'队列不存在',

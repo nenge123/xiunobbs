@@ -16,5 +16,8 @@ var lang = {
 	'http_error_500':'服务器错误!',
 	'http_error_lose':'请检查你的网络!',
 	'submit_loading':'正在提交中...!',
+
+
+	'image_unkonw':'图片类型未知',
 	// hook lang_zh_cn_bbs_js.htm
 };

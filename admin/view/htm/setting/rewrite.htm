@@ -77,7 +77,7 @@ RewriteRule ^(.*)$ index.php?$1 [QSA,NC,NE,L]
 <textarea class="form-control" style="min-height: 200px;width: 100%;">
 RewriteEngine on
 RewriteBase /admin/
-RewriteCond %{REQUEST_FILENAME} \/index\.php$
+RewriteCond %{REQUEST_FILENAME} (?!index\.php).*\.php$
 RewriteRule ^(.*)$ index.php?$1 [QSA,NC,NE,L]
 </textarea>
 	</div>

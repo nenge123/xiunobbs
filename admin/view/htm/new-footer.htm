@@ -15,6 +15,7 @@
 	/*/额外js{if !empty($importjs)}{each $importjs $js} */
 	import "{{ $js }}";
 	/*{/each}{/if}*/
+	X.admin_jsroot = "{{ route_admin::site('view/js/') }}";
 	X.toEvent(new CustomEvent('ready'));
 	console.log($);
 </script>
