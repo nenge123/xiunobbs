@@ -5,11 +5,10 @@ self.X.methods.set('admin_forum_list',
 	 */
 	function (elm) {
 		const X = this;
-		const trs = elm.querySelectorAll('tr');
-		var maxfid = parseInt(trs[trs.length - 1].querySelector('[type=number]').value);
-		var jarrlist = $(elm);
+		const jarrlist = $(elm);
 		// 增加
-		var jadd = $('a.row_add');
+		const jadd = $('a.row_add');
+		let maxfid = parseInt(jadd.attr('max-id'));
 		jarrlist.on('click','.uploadimage',function(event){
 			console.log(this);
 			const next = $(this).next();

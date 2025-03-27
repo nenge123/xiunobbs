@@ -123,6 +123,7 @@ return array(
 	'forum_delete_thread_before_delete_forum'=>'请先通过批量主题管理删除版块主题。',
 	'forum_please_delete_sub_forum'=>'请删除子版块。',
 	'forum_delete_successfully'=>'删除成功。',
+	'forum_delete_error'=>'删除失败。',
 	'forum_no_update'=>'数据没有发生变化',
 	
 	// 主题

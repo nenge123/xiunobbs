@@ -21,18 +21,53 @@
 	<div class="card-body">
 		<h4>前台重写 <b>web.config</b></h4>
 		<textarea class="form-control" style="min-height: 400px;width: 100%;">
-&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
-&lt;configuration xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:noNamespaceSchemaLocation=&quot;web.xsd&quot;&gt;
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;configuration&gt;
 	&lt;system.webServer&gt;
 		&lt;rewrite&gt;
 			&lt;rules&gt;
-				&lt;rule name=&quot;WEB重写&quot; enabled=&quot;true&quot;&gt;
-					&lt;match url=&quot;.*&quot; /&gt;
-					&lt;conditions logicalGrouping=&quot;MatchAny&quot;&gt;
-						&lt;add input=&quot;{REQUEST_FILENAME}&quot; matchType=&quot;IsFile&quot; negate=&quot;true&quot; /&gt;
-						&lt;add input=&quot;{URL}&quot; pattern=&quot;^(tmp|upload|plugin|route||log|lang|view|mode|xiunophp)\/.*\.(htm|html|php)$&quot; /&gt;
+				&lt;!-- 排除根目录下的PHP、HTML、HTM文件 --&gt;
+				&lt;rule name="ExcludeRootFiles" stopProcessing="true"&gt;
+					&lt;match url="^([^/]+\.(php|html|htm))$" ignoreCase="true" /&gt;
+					&lt;action type="None" /&gt;
+				&lt;/rule&gt;
+
+				&lt;!-- 排除admin目录下的所有文件 --&gt;
+				&lt;rule name="ExcludeAdmin" stopProcessing="true"&gt;
+					&lt;match url="^admin/.*" ignoreCase="true" /&gt;
+					&lt;action type="None" /&gt;
+				&lt;/rule&gt;
+
+				&lt;!-- 排除install目录下的所有文件 --&gt;
+				&lt;rule name="ExcludeInstall" stopProcessing="true"&gt;
+					&lt;match url="^install/.*" ignoreCase="true" /&gt;
+					&lt;action type="None" /&gt;
+				&lt;/rule&gt;
+
+				&lt;!-- 重写其他目录的PHP、HTML、HTM文件到index.php --&gt;
+				&lt;rule name="RewriteFilesToIndex" stopProcessing="true"&gt;
+					&lt;match url="^(?:.*\/)?(.*\.(php|html|htm))$" ignoreCase="true" /&gt;
+					&lt;conditions&gt;
+						&lt;!-- 确保请求不是根目录下的文件 --&gt;
+						&lt;add input="{REQUEST_URI}" pattern="^/[^/]+\.php$" negate="true" ignoreCase="true" /&gt;
+						&lt;add input="{REQUEST_URI}" pattern="^/[^/]+\.html$" negate="true" ignoreCase="true" /&gt;
+						&lt;add input="{REQUEST_URI}" pattern="^/[^/]+\.htm$" negate="true" ignoreCase="true" /&gt;
+						&lt;!-- 排除admin和install目录 --&gt;
+						&lt;add input="{REQUEST_URI}" pattern="^/(admin|install)/" negate="true" ignoreCase="true" /&gt;
 					&lt;/conditions&gt;
-					&lt;action type=&quot;Rewrite&quot; url=&quot;index.php?{R:0}&quot; /&gt;
+					&lt;action type="Rewrite" url="/index.php" /&gt;
+				&lt;/rule&gt;
+
+				&lt;!-- 重写不存在的文件到index.php --&gt;
+				&lt;rule name="RewriteNonExistentFiles" stopProcessing="true"&gt;
+					&lt;match url=".*" ignoreCase="true" /&gt;
+					&lt;conditions&gt;
+						&lt;!-- 检查文件是否不存在 --&gt;
+						&lt;add input="{REQUEST_FILENAME}" matchType="IsFile" negate="true" /&gt;
+						&lt;!-- 排除admin和install目录 --&gt;
+						&lt;add input="{REQUEST_URI}" pattern="^/(admin|install)/" negate="true" ignoreCase="true" /&gt;
+					&lt;/conditions&gt;
+					&lt;action type="Rewrite" url="/index.php" /&gt;
 				&lt;/rule&gt;
 			&lt;/rules&gt;
 		&lt;/rewrite&gt;
@@ -67,11 +102,27 @@
 	<div class="card-body">
 <h4>WEB前台重写<b>.htaccess</b></h4>
 <textarea class="form-control" style="min-height: 200px;width: 100%;">
-RewriteEngine on
+# 启用重写引擎
+RewriteEngine On
+
+# 设置基名称为index.php
 RewriteBase /
-RewriteCond %{REQUEST_URI}  ^\/(tmp|upload|plugin|route||log|lang|view|mode|xiunophp|assets)\/.+(\.htm|\.html|\.php|\/)$ [OR]
+
+# 排除根目录下的PHP、HTML、HTM文件
+RewriteRule ^([^/]+\.(php|html|htm))$ - [L]
+
+# 排除admin目录
+RewriteRule ^admin/ - [L]
+
+# 排除install目录
+RewriteRule ^install/ - [L]
+
+# 重写其他目录的PHP、HTML、HTM文件到index.php
+RewriteRule ^(.*\/)*(.*\.(php|html|htm))$ index.php [L]
+
+# 重写不存在的文件到index.php
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^(.*)$ index.php?$1 [QSA,NC,NE,L]
+RewriteRule . index.php [L]	
 </textarea>
 <h4>ADMIN重写<b>.htaccess</b></h4>
 <textarea class="form-control" style="min-height: 200px;width: 100%;">

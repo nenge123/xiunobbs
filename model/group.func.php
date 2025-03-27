@@ -78,7 +78,8 @@ function group_delete($gid) {
 function group_find($cond = array(), $orderby = array('gid'=>1), $page = 1, $pagesize = 1000) {
 	// hook model_group_find_start.php
 	#$grouplist = group__find($cond, $orderby, $page, $pagesize);
-	$grouplist = MyDB::t('group')->selectAll(MyDB::ORDER(['gid'=>'desc']));
+	$grouplist = MyDB::t('group')->selectAll(MyDB::ORDER(['gid'=>'asc']));
+	$grouplist = array_column($grouplist,null,'gid');
 	if($grouplist) foreach ($grouplist as &$group) group_format($group);
 	// hook model_group_find_end.php
 	return $grouplist;

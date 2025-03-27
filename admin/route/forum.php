@@ -1,34 +1,36 @@
 <?php
 !defined('APP_PATH') and exit('Access Denied.');
 $action = MyApp::value(0);
-
-// 不允许删除的版块 / system keeped forum
-$system_forum = array(1);
 // hook admin_forum_start.php
 switch ($action):
 	case 'update':
 		$_fid = MyApp::value(1);;
-		$_forum = forum_read($_fid);
+		$_forum = MyDB::t('forum')->whereFirst(['fid' => $_fid]);
 		empty($_forum) and message(-1, lang('forum_not_exists'));
 		if ($_SERVER['REQUEST_METHOD'] == 'GET'):
 			//user_ids_to_names($_forum['moduids'])
 			$header['title']        = lang('forum_edit');
 			$header['mobile_title'] = lang('forum_edit');
 			// hook admin_forum_update_get_start.php
-			$accesslist = forum_access_find_by_fid($_fid);
+			$accesslist = MyDB::t('forum_access')->whereAll(array('fid' => $_fid), MyDB::ORDER(['gid' => 'asc']));
 			if (empty($accesslist)):
-				foreach ($grouplist as $group):
-					$accesslist[$group['gid']] = $group; // 字段名相同，直接覆盖。 / same field, directly overwrite
+				foreach ($grouplist as $k => $v):
+					$accesslist[$k] = $v; // 字段名相同，直接覆盖。 / same field, directly overwrite
 				endforeach;
 			else:
-				foreach ($accesslist as &$access):
-					$access['name'] = $grouplist[$access['gid']]['name']; // 字段名相同，直接覆盖。 / same field, directly overwrite
+				$accesslist = array_column($accesslist, null, 'gid');
+				foreach ($grouplist as $k => $v):
+					$accesslist[$k] = array_merge($grouplist[$k], $v);
 				endforeach;
 			endif;
-			if (empty($_forum['modlist'])):
+			if (isset($accesslist[7])):
+				#禁用对禁止用户设置
+				unset($accesslist[7]);
+			endif;
+			if (empty($_forum['moduids'])):
 				$_forum['modnames'] = '';
 			else:
-				$_forum['modnames'] = implode(',', array_column($_forum['modlist'], 'username'));
+				$_forum['modnames'] = implode(',', array_column(MyDB::t('user')->where(['uid' => explode(',', $_forum['moduids'])], MyDB::ORDER(['uid' => 'asc']), 2, array('username')), 0));
 			endif;
 			// hook admin_forum_update_get_end.php
 			$importjs[] = route_admin::site('view/js/forum-update.js');
@@ -36,21 +38,23 @@ switch ($action):
 			exit;
 		elseif ($_SERVER['REQUEST_METHOD'] == 'POST'):
 			// hook admin_forum_update_post_start.php
+			#获取论坛板块的字段
+			$forumkeys = MyDB::t('forum')->columns();
 			if (!empty(MyApp::head('ajax-fetch'))):
 				new model\adminupload($_fid);
 			endif;
 			if (count($_POST) == 1):
+				#单独更新一个字段
 				$key = array_keys($_POST)[0];
-				if (isset($_forum[$key])):
+				if (in_array($key, $forumkeys)):
+					// hook admin_forum_update_post_a_key.php
 					MyDB::t('forum')->update_by_where($_POST, array('fid' => $_forum['fid']));
 					$ajax = 1;
 					$_SERVER['ajax'] = 1;
 					message(0, lang('forum_' . $key) . lang('admin_forum_save_brief'));
 				endif;
 			endif;
-			#获取论坛板块的字段
-			$forumkeys = MyDB::t('forum')->columns();
-			$update = [];
+			$update = array('fid'=>$_fid);
 			$allowlist = [];
 			$rows = 0;
 			foreach ($_POST as $k => $v):
@@ -111,18 +115,22 @@ switch ($action):
 		endif;
 		break;
 	case 'delete':
-		$_fid = MyApp::value(1);;
-		$_forum = forum_read($_fid);
+		$_fid = intval(MyApp::value(1));
+		$_forum = MyDB::t('forum')->whereFirst(['fid' => $_fid], '', array('name'));
+		if (MyDB::t('forum')->selectCount() == 1):
+			#只有一个板块不允许删除
+			MyApp::message(-1, lang('forum_cant_delete_system_reserved'));
+		endif;
 		empty($_forum) and MyApp::message(-1, lang('forum_not_exists'));
 		if ($_SERVER['REQUEST_METHOD'] == 'GET'):
 			include _include(ADMIN_PATH . "view/htm/forum/delete.htm");
 			exit;
 		elseif ($_SERVER['REQUEST_METHOD'] == 'POST'):
 			// hook admin_forum_delete_start.php
-			if(MyDB::t('thread')->whereCount(array('fid'=>$_fid))):
-				#先删除主题?
-				MyApp::message(-1, lang('forum_delete_thread_before_delete_forum'));
-			endif;
+			#if (MyDB::t('thread')->whereCount(array('fid' => $_fid))):
+			#先删除主题?
+			#	MyApp::message(-1, lang('forum_delete_thread_before_delete_forum'));
+			#endif;
 			if (isset($_forum['fup'])):
 				#不能删除子版块功能
 				foreach ($forumlist as $k => $v):
@@ -131,10 +139,20 @@ switch ($action):
 					endif;
 				endforeach;
 			endif;
+			$threadlist = thread_find_by_fid($_fid, 1, 20);
+			if(!empty($threadlist)) {
+				message(-1, lang('forum_delete_thread_before_delete_forum'));
+			}
 			forum_delete($_fid);
 			forum_list_cache_delete();
 			// hook admin_forum_delete_end.php
-			MyApp::message(0, lang('forum_delete_successfully'),array('url'=>MyApp::purl('forum/list')));
+			MyApp::message(0, lang('forum_delete_successfully'), array('url' => MyApp::purl('forum/list')));
+			#if (route_admin::forum_delete($_fid)):
+				#forum_list_cache_delete();
+				// hook admin_forum_delete_end.php
+			#	MyApp::message(0, lang('forum_delete_successfully'), array('url' => MyApp::purl('forum/list')));
+			#endif;
+			#MyApp::message(0, lang('forum_delete_error'), array('url' => MyApp::purl('forum/list')));
 		endif;
 		break;
 	default:
@@ -143,6 +161,7 @@ switch ($action):
 			// hook admin_forum_list_get_start.php
 			$header['title']        = lang('forum_admin');
 			$header['mobile_title'] = lang('forum_admin');
+			$newforumlist = MyDB::t('forum')->whereAll([], MyDB::ORDER(['rank' => 'desc', 'fid' => 'asc']), array('name', 'icon', 'rank', 'fid'));
 			$importjs[] = route_admin::site('view/js/forum-list.js');
 			// hook admin_forum_list_get_end.php
 			include _include(ADMIN_PATH . "view/htm/forum/list.htm");

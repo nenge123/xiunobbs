@@ -19,13 +19,13 @@
 						</tr>
 						<thead>
 						<tbody>
-							<!--{each $forumlist $_fid $_forum}-->
+							<!--{each $newforumlist $_fid $_forum}-->
 							<tr align="center" rowid="{{ $_fid }}">
 								<td class="50">
 									<div class="form-floating mb-3"><!--{{ \route_admin::input_required_number('fid['.$_fid.']',$_forum['fid'],'forum_id') }}--></div>
 								</td>
 								<td align="left">
-									<img  class="uploadimage" src="{{ MyApp::site($_forum['icon_url']) }}" base-url="{{ MyApp::site('view/img/forum.png') }}" class="forum" width="48" id="img_{{ $_fid }}" />
+									<img  class="uploadimage" src="{{ $_forum['icon']?MyApp::site('upload/forum/'.$_forum['fid'].'.png'):MyApp::site('view/img/forum.png') }}" base-url="{{ MyApp::site('view/img/forum.png') }}" class="forum" width="48" id="img_{{ $_fid }}" />
 									<input type="hidden" name="icon[{{ $_fid }}]" value="{{ $_forum['icon'] }}">
 								</td>
 								<td>
@@ -41,7 +41,7 @@
 						</tbody>
 				</table>
 			</div>
-			<p><a role="button" class="btn row_add">[+]<!--{lang add_new_line}--></a></p>
+			<p><a role="button" class="btn row_add" max-id="{{ \max(...array_column($newforumlist,'fid')) }}">[+]<!--{lang add_new_line}--></a></p>
 			<p class="text-center">
 				<button type="submit" class="btn btn-primary" id="submit" data-loading-text="<!--{lang submiting}-->..." style="width: 10rem;"><!--{lang confirm}--></button>
 			</p>

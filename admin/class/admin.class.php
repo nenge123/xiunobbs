@@ -190,4 +190,39 @@ class route_admin
 			)
 		));
 	}
+	/**
+	 * 删除板块
+	 */
+	public static function forum_delete(int $_fid):bool
+	{
+		
+		#先删除主题 不知道10万以上数据会不会崩 求告知!!!
+
+		#不管如何先开打开事务
+		set_time_limit(0);
+		MyDB::wlink()->commitStart();
+		$list = MyDB::t('thread')->where(['fid'=>$_fid],MyDB::ORDER(['tid'=>'asc']),10,array('tid','uid'));
+		$userupdate = [];
+		foreach($list as $v):
+			if(!isset($userupdate['uid']['-threads'])):
+				$userupdate[$v['uid']]['-threads'] = 0;
+			endif;
+			$userupdate[$v['uid']]['-threads'] +=1;
+			foreach(MyDB::t('post')->where(['tid'=>$v['tid']],MyDB::ORDER(['tid'=>'asc']),10,array('uid')) as $x):
+				if(!isset($userupdate[$x['uid']]['-posts'])):
+					$userupdate[$x['uid']]['-posts'] = 0;
+				endif;
+				$userupdate[$x['uid']]['-posts'] +=1;
+			endforeach;
+			MyDB::t('post')->delete_by_where(['tid'=>$v['tid']]);
+		endforeach;
+		foreach($userupdate as $u=>$d):
+			MyDB::t('user')->update_by_where($d,['uid'=>$u]);
+		endforeach;
+		MyDB::t('thread')->delete_by_where(['fid'=>$_fid]);
+		MyDB::t('forum')->delete_by_where(['fid'=>$_fid]);
+		MyDB::t('forum_access')->delete_by_where(['fid'=>$_fid]);
+		MyDB::wlink()->commitEnd();
+		return true;
+	}
 }
