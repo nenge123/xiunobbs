@@ -10,15 +10,13 @@ self.X.methods.set('admin_forum_list',
 		const jadd = $('a.row_add');
 		let maxfid = parseInt(jadd.attr('max-id'));
 		jarrlist.on('click','.uploadimage',function(event){
-			console.log(this);
 			const next = $(this).next();
 			const fid = next.attr('name').match(/\d+/)[0];
 			X.callAjax('uploadimage',jarrlist.attr('action'),json=>{
 				if (json.message) return $.alert(json.message);
-				this.src = json.url;
+				this.src = json.url+'?'+Date.now();
 				next.val(json.icon);
 			},{fid});
-			console.log(this,event);
 		});
 		jadd.on('click', function () {
 			var jclone = jarrlist.find('tr').last().clone(true);

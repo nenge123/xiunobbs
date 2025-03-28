@@ -61,7 +61,7 @@ export default {
 		}
 		$.ajax({
 			type: 'POST',
-			url:jform.action,
+			url:jform.getAttribute('action'),
 			data,
 			dataType: 'json',
 			processData,
@@ -144,7 +144,7 @@ export default {
 			$(E).disabled();
 			const scroll = E.getAttribute('data-scroll');
 			E.style.cssText = 'white-space: pre;';
-			X.callMethod('createEventSource',E.action,{
+			X.callMethod('createEventSource',E.getAttribute('action'),{
 				open(event){
 					console.log(event);
 					if(event.data){

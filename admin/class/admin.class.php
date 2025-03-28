@@ -208,6 +208,90 @@ class route_admin
 	 */
 	public static function forum_delete(mixed $_forum, $size = 100): bool
 	{
+		self::eventStart();
+		// hook model_forum_delete_start.php
+		$id = 1;
+		flush(); #兼容,一般可忽略
+		if (empty($_forum)):
+			self::eventMessage('close',$id,array('message'=>lang('forum_not_exists'),'url'=>MyApp::purl('forum/list')));
+			exit;
+		endif;
+		if (MyDB::t('forum')->selectCount() == 1):
+			#只有一个板块不允许删除
+			self::eventMessage('close',$id,array('message'=>lang('forum_cant_delete_system_reserved'),'url'=>MyApp::purl('forum/list')));
+			exit;
+		endif;
+		$_fid = $_forum['fid'];
+		if (isset($_forum['fup'])):
+			#不能删除子版块功能
+			foreach ($GLOBALS['forumlist'] as $k => $v):
+				if ($v['fup'] == $_fid):
+					self::eventMessage('close',$id,array('message'=>lang('forum_please_delete_sub_forum'),'url'=>MyApp::purl('forum/list')));
+					exit;
+				endif;
+			endforeach;
+		endif;
+		self::eventMessage('open',$id,array('message'=>lang('forum_event_stream_start')));
+		$id++;
+		sleep(1);
+		$threadlist = MyDB::t('thread')->where(['fid' => $_fid], MyDB::LIMIT($size), MyDB::MODE_ITERATOR, array('uid', 'tid', 'subject'));
+		if ($threadlist->valid()):
+			self::eventMessage('progress',$id,array('message'=>sprintf(lang('forum_event_stream_progress'), $size)));
+			$id++;
+			sleep(1);
+			#存在主题 先删除主题
+			foreach ($threadlist as $thread):
+				self::eventMessage('progress',$id,array('message'=>sprintf(lang('forum_event_stream_progress_subject'), $thread['subject'])));
+				$id++;
+				thread_delete($thread['tid']);
+			endforeach;
+			self::eventMessage('progress',$id,array('message'=>sprintf(lang('forum_event_stream_progress_success'), $size)));
+			$id++;
+			sleep(1);
+			exit;
+		endif;
+		MyDB::t('forum')->delete_by_where(['fid' => $_fid]);
+		MyDB::t('forum_access')->delete_by_where(['fid' => $_fid]);
+		self::eventMessage('close',$id,array('message'=>lang('forum_event_stream_close')));
+		sleep(1);
+		forum_list_cache_delete();
+		// hook model_forum_delete_end.php
+		exit;
+	}
+	public static function thread_delete_list()
+	{
+		
+		self::eventStart();
+		$tids = MyApp::param('tids');
+		$id = 1;
+		if (empty($tids)):
+			self::eventMessage('close',$id,array('message'=>'没有勾选主题!!','url'=>MyApp::purl('forum/list')));
+			exit;
+		endif;
+		$tids = explode(',',$tids);
+		$threadlist = MyDB::t('thread')->where(['tid'=>$tids],'',MyDB::MODE_ITERATOR,array('uid', 'tid', 'subject'));
+		if ($threadlist->valid()):
+			self::eventMessage('progress',$id,array('message'=>sprintf(lang('forum_event_stream_progress'),count($tids))));
+			$id++;
+			sleep(1);
+			#存在主题 先删除主题
+			foreach ($threadlist as $thread):
+				self::eventMessage('progress',$id,array('message'=>sprintf(lang('forum_event_stream_progress_subject'), $thread['subject'])));
+				$id++;
+				thread_delete($thread['tid']);
+				self::eventMessage('progress',$id,array('tid'=>$thread['tid']));
+				$id++;
+			endforeach;
+			self::eventMessage('progress',$id,array('message'=>sprintf('本次删除%s条主题成功!',count($tids))));
+			$id++;
+			sleep(1);
+		endif;
+		self::eventMessage('close',$id,array('message'=>'勾选的主题删除完毕!!!'));
+		//,"url":"' . MyApp::purl('forum/list') . '"
+		exit;
+	}
+	public static function eventStart()
+	{
 		@ob_clean();
 		set_time_limit(0); #脚本没超时限制
 		ignore_user_abort(true); #不好说
@@ -217,81 +301,15 @@ class route_admin
 		header("X-Accel-Buffering: no");
 		header("Content-Type: text/event-stream"); #非常重要
 		echo PHP_EOL . PHP_EOL; #重点 每条消息末端必须用两个\r\n隔开
-		// hook model_forum_delete_start.php
-		$id = 1;
 		flush(); #兼容,一般可忽略
-		if (empty($_forum)):
-			echo 'event:close' . PHP_EOL; #相当于响应side事件
-			echo 'id:' . $id . PHP_EOL; #相当于响应id
-			echo 'data:{"message":"' . lang('forum_not_exists') . '","url":"' . MyApp::purl('forum/list') . '"}' . PHP_EOL; #相当于事件里的event.data
-			echo PHP_EOL . PHP_EOL; #重点 每条消息末端必须用两个\r\n隔开
-			exit;
-		endif;
-		if (MyDB::t('forum')->selectCount() == 1):
-			#只有一个板块不允许删除
-			echo 'event:close' . PHP_EOL; #相当于响应side事件
-			echo 'id:' . $id . PHP_EOL; #相当于响应id
-			echo 'data:{"message":"' . lang('forum_cant_delete_system_reserved') . '","url":"' . MyApp::purl('forum/list') . '"}' . PHP_EOL; #相当于事件里的event.data
-			echo PHP_EOL . PHP_EOL; #重点 每条消息末端必须用两个\r\n隔开
-			exit;
-		endif;
-		$_fid = $_forum['fid'];
-		if (isset($_forum['fup'])):
-			#不能删除子版块功能
-			foreach ($GLOBALS['forumlist'] as $k => $v):
-				if ($v['fup'] == $_fid):
-					echo 'event:close' . PHP_EOL; #相当于响应side事件
-					echo 'id:' . $id . PHP_EOL; #相当于响应id
-					echo 'data:{"message":"' . lang('forum_please_delete_sub_forum') . '","url":"' . MyApp::purl('forum/list') . '"}' . PHP_EOL; #相当于事件里的event.data
-					echo PHP_EOL . PHP_EOL; #重点 每条消息末端必须用两个\r\n隔开
-					exit;
-				endif;
-			endforeach;
-		endif;
-		echo 'event:open' . PHP_EOL; #相当于响应side事件
+		
+	}
+	public static function eventMessage($type,$id,$json)
+	{
+		echo 'event:'.$type . PHP_EOL; #相当于响应side事件
 		echo 'id:' . $id . PHP_EOL; #相当于响应id
-		echo 'data:{"message":"' . lang('forum_event_stream_start') . '"}' . PHP_EOL; #相当于事件里的event.data
+		echo 'data:'.json_encode($json,). PHP_EOL; #相当于事件里的event.data
 		echo PHP_EOL . PHP_EOL; #重点 每条消息末端必须用两个\r\n隔开
 		flush(); #兼容,一般可忽略
-		$id++;
-		sleep(1);
-		$threadlist = MyDB::t('thread')->where(['fid' => $_fid], MyDB::LIMIT($size), MyDB::MODE_ITERATOR, array('uid', 'tid', 'subject'));
-		if ($threadlist->valid()):
-			echo 'event:progress' . PHP_EOL; #相当于响应side事件
-			echo 'id:' . $id . PHP_EOL; #相当于响应id
-			echo 'data:{"message":"' . sprintf(lang('forum_event_stream_progress'), $size) . '"}' . PHP_EOL; #相当于事件里的event.data
-			echo PHP_EOL . PHP_EOL; #重点 每条消息末端必须用两个\r\n隔开
-			flush(); #兼容,一般可忽略
-			$id++;
-			sleep(1);
-			#存在主题 先删除主题
-			foreach ($threadlist as $thread):
-				echo 'event:progress' . PHP_EOL; #相当于响应side事件
-				echo 'id:' . $id . PHP_EOL; #相当于响应id
-				echo 'data:{"message":"' . sprintf(lang('forum_event_stream_progress_subject'), $thread['subject']) . '"}' . PHP_EOL; #相当于事件里的event.data
-				echo PHP_EOL . PHP_EOL; #重点 每条消息末端必须用两个\r\n隔开
-				flush(); #兼容,一般可忽略
-				$id++;
-				thread_delete($thread['tid']);
-			endforeach;
-			echo 'event:progress' . PHP_EOL; #相当于响应side事件
-			echo 'id:' . $id . PHP_EOL; #相当于响应id
-			echo 'data:{"message":"' . sprintf(lang('forum_event_stream_progress_success'), $size) . '"}' . PHP_EOL; #相当于事件里的event.data
-			echo PHP_EOL . PHP_EOL; #重点 每条消息末端必须用两个\r\n隔开
-			flush(); #兼容,一般可忽略
-			$id++;
-			sleep(1);
-			exit;
-		endif;
-		MyDB::t('forum')->delete_by_where(['fid' => $_fid]);
-		MyDB::t('forum_access')->delete_by_where(['fid' => $_fid]);
-		echo 'event:close' . PHP_EOL; #相当于响应side事件
-		echo 'id:' . $id . PHP_EOL; #相当于响应id
-		echo 'data:{"message":"' . lang('forum_event_stream_close') . '","url":"' . MyApp::purl('forum/list') . '"}' . PHP_EOL; #相当于事件里的event.data
-		echo PHP_EOL . PHP_EOL; #重点 每条消息末端必须用两个\r\n隔开
-		sleep(1);
-		forum_list_cache_delete();
-		// hook model_forum_delete_end.php
-		exit;
 	}
 }

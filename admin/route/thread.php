@@ -4,139 +4,79 @@ $action = MyApp::value(0);
 // hook admin_thread_start.php
 $pagesize = 100;
 switch ($action):
-	case 'scan':
-
-		$queueid = _SESSION('thread_find_queueid');
-		empty($queueid) and message(-1, lang('thread_queue_not_exists'));
-
-		$fid = param('fid', 0);
-		$cond = array();
-		$cond['fid'] = $fid;
-		$cond['create_date_start'] = strtotime(param('create_date_start'));
-		$cond['create_date_end'] = strtotime(param('create_date_end'));
-		$cond['uid'] = param('uid', 0);
-		$userip = param('userip');
-		$cond['userip'] = $userip ? ip2long($userip) : 0;
-		$cond['keyword'] = param('keyword');
-		$cond['page'] = param('page', 1);
-
-		$page = $cond['page'];
-		$threads = $cond['fid'] ? $forumlist[$fid]['threads'] : $runtime['threads'];
-		$totalpage = ceil($threads / $pagesize);
-
-		// hook admin_thread_scan_start.php
-		$threadlist = thread_find_by_fid($fid, $page, $pagesize);
-
-		if ($page == 1) $queueid and queue_destory($queueid);
-
-		$tids = array();
-		// 查找到的数据存到 cache，并且返回
-		foreach ($threadlist as $thread) {
-
-			if ($cond['fid'] && $thread['fid'] != $cond['fid']) continue;
-			if ($cond['create_date_start'] && $thread['create_date'] < $cond['create_date_start']) continue;
-			if ($cond['create_date_end'] && $thread['create_date'] > $cond['create_date_end']) continue;
-			if ($cond['uid'] && $thread['uid'] != $cond['uid']) continue;
-			if ($cond['userip'] && $thread['userip'] != $cond['userip']) continue;
-			//if($cond['views_start'] && $thread['views'] > $cond['views_start']) continue; 
-			//if($cond['views_end'] && $thread['views'] > $cond['views_end']) continue; 
-			//if($cond['posts_start'] && $thread['posts'] > $cond['posts_start']) continue; 
-			//if($cond['posts_end'] && $thread['posts'] > $cond['posts_end']) continue; 
-			if ($cond['keyword'] && stripos($thread['subject'], $cond['keyword']) === FALSE) continue;
-
-			// hook admin_thread_scan_for.php
-
-			$tids[] = $thread['tid'];
-			queue_push($queueid, $thread['tid'], 86400);
-		}
-
-		// hook admin_thread_scan_end.php
-		message(0, $tids);
-		break;
-	case 'operation':
-
-		$queueid = _SESSION('thread_find_queueid');
-		empty($queueid) and message(-1, lang('thread_queue_not_exists'));
-
-		$op = param(2);
-		$tids = array();
-		// hook admin_thread_operation_start.php
-		for ($i = 0; $i <= $pagesize; $i++) {
-			$tid = queue_pop($queueid);
-			if (!$tid) {
-				//queue_destory($queueid);
-				//unset($_SESSION['thread_find_queueid']);
-				break;
-				//message(0, '删除全部完成');
-			}
-			if ($op == 'delete') {
-				thread_delete($tid);
-			} elseif ($op == 'close') {
-				thread_update($tid, array('closed' => 1));
-			} elseif ($op == 'open') {
-				thread_update($tid, array('closed' => 0));
-			}
-			// hook admin_thread_operation_for.php
-			$tids[] = $tid;
-		}
-		// hook admin_thread_operation_end.php
-		message(0, $tids);
-		break;
-	case 'found':
-		$queueid = _SESSION('thread_find_queueid');
-		empty($queueid) and message(-1, lang('thread_queue_not_exists'));
-
-		$page = param(2, 1);
-		$total = queue_count($queueid);
-		$pagination = pagination(url('thread-found-{page}'), $total, $page, $pagesize);
-		// hook admin_thread_found_start.php
-		$tids = queue_find($queueid, $page, $pagesize);
-		$threadlist = thread_find_by_tids($tids);
-
-		// hook admin_thread_found_end.php
-		include _include(ADMIN_PATH . "view/htm/thread/found.htm");
+	case 'delete':
+		$_tid = intval(MyApp::value(1));
+		$_thread = MyDB::t('thread')->whereFirst(['tid' => $_tid], '', array('tid', 'subject', 'closed'));
+		if ($_SERVER['REQUEST_METHOD'] == 'POST'):
+			switch (MyApp::post('action')):
+				case '1':
+					// hook admin_thread_delete_close.php
+					if (empty($_thread['closed']) && MyDB::t('thread')->update_by_where(['closed' => 1], ['tid' => $_tid]) > 0):
+						MyApp::message(0, '主题关闭成功,主题不可回复了');
+					elseif (!empty($_thread['closed']) && MyDB::t('thread')->update_by_where(['closed' => 0], ['tid' => $_tid]) > 0):
+						MyApp::message(0, '主题重新打开成功,主题可回复了');
+					endif;
+					break;
+				case '2':
+					// hook admin_thread_delete_block.php
+					MyApp::message(-1, '你安装封禁主题,回收站功能插件!');
+					break;
+				case '3':
+					// hook admin_thread_delete_remove.php
+					if (thread_delete($_tid)):
+						MyApp::message(0, '删除成功!!', ['url' => MyApp::purl('list')]);
+					endif;
+					break;
+			endswitch;
+			MyApp::message(-1, '没变化');
+		endif;
+		include _include(ADMIN_PATH . "view/htm/thread/delete.htm");
 		break;
 	default:
+		if (MyApp::head('accept') == 'text/event-stream'):
+			#每次删除100条主题
+			route_admin::thread_delete_list();
+		endif;
 		$header['title'] = lang('thread_admin');
 		$header['mobile_title'] = lang('thread_admin');
-		if(empty($_SESSION['thread_find_queueid'])):
-			$_SESSION['thread_find_queueid'] = $_SERVER['REQUEST_TIME'];
-		endif;
+		$threadlist = array();
+		$maxlength = 0;
 		// hook admin_thread_list_start.php
-		// ajax 扫描全表
-		$threads = $runtime['threads'];
-		$page = 1; // 从第一页开始
-		$totalpage = ceil($threads / $pagesize);
-
-		$queueid = _SESSION('thread_find_queueid');
-		$queueid and queue_destory($queueid);
-		$queueid = $_SERVER['REQUEST_TIME'];
-		$_SESSION['thread_find_queueid'] = $queueid;
-		$forumlist_simple = array();
-		foreach ($forumlist as $k => $v) {
-			$forumlist_simple[$k] = array(
-				'name' => $v['name'],
-				'threads' => $v['threads'],
-			);
-		}
-
-		//$queue_count = queue_count($queueid);
-
+		if ($_SERVER['REQUEST_METHOD'] == 'POST'):
+			$where = array();
+			$limit = 30;
+			$fid = intval(MyApp::post('fid'));
+			$page = intval(MyApp::post('page', 1));
+			$keyword = MyApp::post('keyword');
+			$create_date_start = MyApp::post('create_date_start');
+			$create_date_end = MyApp::post('create_date_end');
+			$userip = MyApp::post('userip');
+			$uid = intval(MyApp::post('uid'));
+			if (!empty($create_date_start)):
+				$where['>create_date'] = strtotime($create_date_start);
+			endif;
+			if (!empty($create_date_end)):
+				$where['<create_date'] = strtotime($create_date_end);
+			endif;
+			if (!empty($fid)):
+				$where['fid'] = $fid;
+			endif;
+			if (!empty($keyword)):
+				$where['%subject'] = $keyword;
+			endif;
+			if (!empty($userip)):
+				$where['%'] = strtotime($userip);
+			endif;
+			if (!empty($uid)):
+				$where['uid'] = $uid;
+			endif;
+			$maxlength = MyDB::t('thread')->whereCount($where);
+			$threadlist = MyDB::t('thread')->where($where, MyDB::ORDER(['tid' => 'asc']) . MyDB::LIMIT($page, $limit), MyDB::MODE_ITERATOR, array('tid', 'subject'));
+			$maxpage = ceil($maxlength / $limit);
+			$pagination = MyApp::pagination($maxpage, $page);
+		endif;
 		// hook admin_thread_list_end.php
-
 		include _include(ADMIN_PATH . "view/htm/thread/list.htm");
-
-		// 全表扫描，每次扫描 1000 条记录
-		/*
-		搜索条件，并且关系：
-		create_date (start, end) 
-		last_date (start, end) 
-		fid = 
-		uid =
-		userip =
-		views (start, end)
-		subject like '%keyword%'
-	*/
 		break;
 endswitch;
 // hook admin_thread_end.php

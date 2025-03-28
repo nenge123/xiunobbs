@@ -997,10 +997,7 @@ class MyApp implements \ArrayAccess
 		if (!empty($router)):
 			$router = '?' . $router;
 		endif;
-		if ($this->datas['rewriteopen']):
-			return $this->datas['rewriteroot'] . $router;
-		endif;
-		return $_SERVER['PHP_SELF'] . $router;
+		return $this->datas['rewriteroot'] . $router;
 	}
 	public static function url(string|array $router = 'index', string|array $param = array(), bool $width = false): string
 	{
@@ -1074,5 +1071,42 @@ class MyApp implements \ArrayAccess
 			endforeach;
 		endif;
 		return $files;
+	}
+	/**
+	 * 分页列表
+	 * @param integer $total
+	 * @param integer $page
+	 * @param integer $limit
+	 * @param integer $maxnum
+	 * @return array
+	 */
+	public static function pagination(int|float $maxpage, int $page = 1, int $maxnum = 8): array
+	{
+		$maxpage = floor($maxpage);
+		if ($page >= $maxpage) $page = $maxpage;
+		$result = array($page);
+		$j = 1;
+		while(true):
+			if($page+$j<=$maxpage):
+				$result[] = $page+$j;
+			endif;
+			if($page-$j>0):
+				array_unshift($result,$page-$j);
+			endif;
+			$j+=1;
+			if($page+$j>$maxpage&&$page-$j<0):
+			break;
+			endif;
+			if(count($result)>=$maxnum):
+				break;
+			endif;
+		endwhile;
+		if($result[count($result)-1]):
+			$result[count($result)-1] = $maxpage;
+		endif;
+		if($result[0]):
+			$result[0] = 1;
+		endif;
+		return $result;
 	}
 }

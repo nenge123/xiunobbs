@@ -1,0 +1,26 @@
+<!--{template(ADMIN_PATH.'view/htm/new-header.htm')}-->
+<form action="{{ $_SERVER['REQUEST_URI'] }}" method="post" class="mb-3" onpost="true" data-scroll="#end-{{ $_SERVER['REQUEST_TIME'] }}">
+	<div class="card">
+		<div class="card-header">
+			<h4 class="card-title"><!--{lang admin_thread_delete}-->:<!--{{ $_thread['subject'] }}--></h4>
+		</div>
+		<div class="card-body">
+			<input type="hidden" name="yes" value="1">
+			<div class="alert alert-danger" role="alert"><!--{lang admin_thread_delete_message}--></div>
+			<div class="form-floating mb-3">
+				<select class="form-control" name="action" id="action">
+					<option value="0">无操作</option>
+					<option value="1">关闭/打开</option>
+					<option value="2">封禁</option>
+					<option value="3">删除</option>
+				</select>
+				<label for="action">主题操作</label>
+			</div>
+			<div class="text-center">
+				<button type="submit" class="btn btn-primary" id="submit" data-loading-text="<!--{lang submiting}-->..."><!--{lang confirm}--></button>
+			</div>
+		</div>
+	</div>
+</form>
+<div class="mb-3" id="end-{{ $_SERVER['REQUEST_TIME'] }}"></div>
+<!--{template(ADMIN_PATH.'view/htm/new-footer.htm')}-->

@@ -136,7 +136,10 @@ return array(
 	'operator_complete'=>'操作完成',
 	'click_to_view'=>'点击查看',
 	'thread_userip'=>'发帖 IP',
+	'thread_delete'=>'删除',
 	'thread_search_result'=>'结果：{n} 条',
+	'admin_thread_delete'=>'主题删除',
+	'admin_thread_delete_message'=>'此操作不可恢复!!',
 	
 	// 用户
 	'please_check_delete_user'=>'请勾选您要删除的用户',
@@ -212,6 +215,8 @@ return array(
 	'forum_event_stream_progress_subject'=>'正在删除主题: %s  ...',
 	'forum_event_stream_progress_success'=>'删除%s条主题成功!稍后继续尝试删除板块!',
 	'forum_event_stream_close'=>'板块已删除!正在返回...',
+	'page_index'=>'首页',
+	'page_last'=>'末页',
 	// hook lang_zh_cn_bbs_admin.php
 	
 );
