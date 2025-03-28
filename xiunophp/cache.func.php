@@ -22,7 +22,7 @@ function cache_new($cacheconf)
 
 function cache_get($k, $c = NULL)
 {
-	$cache = $_SERVER['cache'];
+	$cache = MyApp::data('cacheobj');
 	$c = $c ? $c : $cache;
 	if (!$c) return FALSE;
 
@@ -35,7 +35,7 @@ function cache_get($k, $c = NULL)
 
 function cache_set($k, $v, $life = 0, $c = NULL)
 {
-	$cache = $_SERVER['cache'];
+	$cache = $GLOBALS['cache'];
 	$c = $c ? $c : $cache;
 	if (!$c) return FALSE;
 
@@ -48,7 +48,7 @@ function cache_set($k, $v, $life = 0, $c = NULL)
 
 function cache_delete($k, $c = NULL)
 {
-	$cache = $_SERVER['cache'];
+	$cache = MyApp::data('cacheobj');
 	$c = $c ? $c : $cache;
 	if (!$c) return FALSE;
 
@@ -62,7 +62,7 @@ function cache_delete($k, $c = NULL)
 // 尽量避免调用此方法，不会清理保存在 kv 中的数据，逐条 cache_delete() 比较保险
 function cache_truncate($c = NULL)
 {
-	$cache = $_SERVER['cache'];
+	$cache = MyApp::data('cacheobj');
 	$c = $c ? $c : $cache;
 	if (!$c) return FALSE;
 

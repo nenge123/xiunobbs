@@ -7,7 +7,7 @@ define('SKIP_ROUTE', TRUE);
 
 include '../index.php';
 
-$fid = 4;	// 版块 id
+$fid = 2;	// 版块 id
 $uid = 1;	// 用户 id
 $gid = 1;	// 用户组 id; 1: 管理员; 101:普通用户
 for($i=1; $i<100; $i++) {

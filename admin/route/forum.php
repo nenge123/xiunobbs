@@ -54,7 +54,7 @@ switch ($action):
 					message(0, lang('forum_' . $key) . lang('admin_forum_save_brief'));
 				endif;
 			endif;
-			$update = array('fid'=>$_fid);
+			$update = array('fid' => $_fid);
 			$allowlist = [];
 			$rows = 0;
 			foreach ($_POST as $k => $v):
@@ -116,43 +116,18 @@ switch ($action):
 		break;
 	case 'delete':
 		$_fid = intval(MyApp::value(1));
-		$_forum = MyDB::t('forum')->whereFirst(['fid' => $_fid], '', array('name'));
-		if (MyDB::t('forum')->selectCount() == 1):
-			#只有一个板块不允许删除
-			MyApp::message(-1, lang('forum_cant_delete_system_reserved'));
+		$_forum = MyDB::t('forum')->whereFirst(['fid' => $_fid], '', array('name','fid'));
+		if (MyApp::head('accept') == 'text/event-stream'):
+			#每次删除100条主题
+			route_admin::forum_delete($_forum,100);
+		else:
+			empty($_forum) and MyApp::message(-1, lang('forum_not_exists'));
 		endif;
-		empty($_forum) and MyApp::message(-1, lang('forum_not_exists'));
 		if ($_SERVER['REQUEST_METHOD'] == 'GET'):
 			include _include(ADMIN_PATH . "view/htm/forum/delete.htm");
 			exit;
 		elseif ($_SERVER['REQUEST_METHOD'] == 'POST'):
-			// hook admin_forum_delete_start.php
-			#if (MyDB::t('thread')->whereCount(array('fid' => $_fid))):
-			#先删除主题?
-			#	MyApp::message(-1, lang('forum_delete_thread_before_delete_forum'));
-			#endif;
-			if (isset($_forum['fup'])):
-				#不能删除子版块功能
-				foreach ($forumlist as $k => $v):
-					if ($v['fup'] == $_fid):
-						MyApp::message(-1, lang('forum_please_delete_sub_forum'));
-					endif;
-				endforeach;
-			endif;
-			$threadlist = thread_find_by_fid($_fid, 1, 20);
-			if(!empty($threadlist)) {
-				message(-1, lang('forum_delete_thread_before_delete_forum'));
-			}
-			forum_delete($_fid);
-			forum_list_cache_delete();
-			// hook admin_forum_delete_end.php
-			MyApp::message(0, lang('forum_delete_successfully'), array('url' => MyApp::purl('forum/list')));
-			#if (route_admin::forum_delete($_fid)):
-				#forum_list_cache_delete();
-				// hook admin_forum_delete_end.php
-			#	MyApp::message(0, lang('forum_delete_successfully'), array('url' => MyApp::purl('forum/list')));
-			#endif;
-			#MyApp::message(0, lang('forum_delete_error'), array('url' => MyApp::purl('forum/list')));
+			MyApp::message(-1, lang('error_request'));
 		endif;
 		break;
 	default:
@@ -162,6 +137,7 @@ switch ($action):
 			$header['title']        = lang('forum_admin');
 			$header['mobile_title'] = lang('forum_admin');
 			$newforumlist = MyDB::t('forum')->whereAll([], MyDB::ORDER(['rank' => 'desc', 'fid' => 'asc']), array('name', 'icon', 'rank', 'fid'));
+			$newforumlist = array_column($newforumlist, null, 'fid');
 			$importjs[] = route_admin::site('view/js/forum-list.js');
 			// hook admin_forum_list_get_end.php
 			include _include(ADMIN_PATH . "view/htm/forum/list.htm");
@@ -171,7 +147,7 @@ switch ($action):
 			if (!empty(MyApp::head('ajax-fetch'))):
 				if (!empty($_FILES['file']) && empty($_FILES['file']['error'])):
 					// hook admin_forum_list_post_upload.php
-					$imagepath = MyApp::path('upload/forum/' . MyApp::post('fid') . '.png');
+					$imagepath = MyApp::upload_path('forum/' . MyApp::post('fid') . '.png');
 					if (move_upload_file($_FILES['file']['tmp_name'], $imagepath)):
 						MyApp::message_json(
 							array('url' => MyApp::convert_site($imagepath), 'icon' => $_SERVER['REQUEST_TIME'])
@@ -181,24 +157,29 @@ switch ($action):
 					endif;
 				endif;
 			endif;
-			if (isset($_POST['fid']) && is_array($_POST['fid'])):
+			if (isset($_POST['name']) && is_array($_POST['name'])):
 				$datalist = array();
 				$keys = array_keys($_POST);
 				$forumkeys = MyDB::t('forum')->columns();
-				foreach ($_POST['fid'] as $k => $v):
+				foreach ($_POST['name'] as $k => $v):
+					$datalist[$k]['fid'] = intval($k);
 					foreach ($keys as $x):
 						if (!in_array($x, $forumkeys)) continue;
-						$datalist[$v][$x] = $_POST[$x][$k];
+						$y = $_POST[$x][$k] ?: 0;
+						if (is_numeric($y) || !$y):
+							$y = intval($y);
+						endif;
+						$datalist[$k][$x] = $_POST[$x][$k];
 					endforeach;
 				endforeach;
 				// hook admin_forum_list_post_loop_end.php
 				if (!empty($datalist)):
-					$row = MyDB::t('forum')->insert_map_update($datalist, 'fid');
+					$row = MyDB::t('forum')->insert_map_update($datalist);
 					#更新板块缓存
-					if ($row):
+					if ($row > 0):
 						forum_list_cache_delete();
 						// hook admin_forum_list_post_end.php
-						MyApp::message(0, lang('save_successfully'), array('url' => MyApp::purl('forum/list')));
+						MyApp::message(0,lang('save_successfully'), array('url' => MyApp::purl('forum/list')));
 					endif;
 				endif;
 			endif;

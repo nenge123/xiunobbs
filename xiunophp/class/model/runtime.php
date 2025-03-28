@@ -3,6 +3,7 @@
 namespace model;
 
 use MyApp;
+use mysqli;
 
 class runtime
 {
@@ -30,7 +31,7 @@ class runtime
 			cache_set('runtime', self::$runtime);
 		}
 		// hook model_runtime_init_end.php
-		register_shutdown_function('\model\runtime::save');
+		MyApp::shutdown(array(self::class,'save'),'runtime');
 		return self::$runtime;
 	}
 	/**
@@ -77,9 +78,6 @@ class runtime
 	public static function save()
 	{
 		// hook model_runtime_save_start.php
-
-		function_exists('chdir') and chdir(APP_PATH);
-
 		$r = cache_set('runtime', self::$runtime);
 
 		// hook model_runtime_save_end.php

@@ -72,6 +72,12 @@ class xiuno extends EventTarget {
 	isOBJ(o) {
 		return o && o.constructor instanceof Object
 	}
+	isPOST(o){
+		return o instanceof FormData;
+	}
+	isJQ(o){
+		return o instanceof self.jQuery
+	}
 };
 $.fn.extend({
 	/**

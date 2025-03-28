@@ -5,16 +5,15 @@
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
-  <title><?= $header['title'] ?></title>
-  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title><!--{{ $header['title'] }}--></title>
   <meta name="apple-touch-fullscreen" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <link rel="stylesheet" type="text/css" href="https://cdn.bootcdn.net/ajax/libs/MaterialDesign-Webfont/7.4.47/css/materialdesignicons.min.css">
   <!--{hook admin_header_bootstrap_before.htm}-->
   <link rel="stylesheet" type="text/css" href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.3/css/bootstrap.min.css" />
   <!--{hook admin_header_admin_css_before.htm}-->
-  <link rel="stylesheet" type="text/css" href="<?= route_admin::site('view/css/style.min.css') ?>" />
-  <?= MyApp::scsslink(route_admin::path('view/scss/admin.scss'), route_admin::path('view/css/admin.css')) ?>
+  <link rel="stylesheet" type="text/css" href="{{ \route_admin::site('view/css/style.min.css') }}" />
+  <!--{{ \route_admin::scss('admin') }}-->
   <!--{hook admin_header_admin_css_after.htm}-->
   <!--{hook admin_header_css_after.htm}-->
   <!-- jQuery提前加载JQ -->
@@ -29,37 +28,37 @@
         <!-- logo -->
         <div class="sidebar-header">
           <div>
-            <span><?= lang('admin_index_page') ?></span>
+            <span><!--{lang admin_index_page}--></span>
           </div>
         </div>
         <div class="lyear-layout-sidebar-info lyear-scroll">
           <nav class="sidebar-main">
             <ul class="nav-drawer">
               <li class="nav-item">
-                <a href="<?=MyApp::url('index')?>">
+                <a href="{{ \MyApp::url('index') }}">
                   <i class="mdi mdi-home-analytics"></i>
-                  <span><?=lang('admin_index_page')?></span>
+                  <span><!--{lang admin_index_page}--></span>
                 </a>
               </li>
               <!-- 统计 -->
               <!--{each MyApp::data('menus') $k $v}-->
-                <li class="nav-item nav-item-has-subnav<?= MyApp::value('module') == $k ? ' active open' : '' ?>">
+                <li class="nav-item nav-item-has-subnav{if MyApp::value('module') == $k} active open{/if}">
                   <!--{if !empty($v['tab'])}-->
                   <a href="#">
-                    <i class="<?= empty($v['icon']) ? 'mdi mdi-card-account-details' : $v['icon'] ?>"></i>
-                    <span><?= $v['text'] ?></span>
+                    <i class="{if empty($v['icon'])}mdi mdi-card-account-details{else}{{ $v['icon'] }}{/if}"></i>
+                    <span><!--{{ $v['text'] }}--></span>
                   </a>
                     <ul class="nav nav-subnav">
                       <!--{each $v['tab'] $x $y}-->
-                        <li class="<?= MyApp::value(0) == $x ? 'active' : '' ?>">
-                          <a href="<?= $y['url'] ?>" class="icon-<?= $k ?>-<?= $x ?>"><?= $y['text'] ?></a>
+                        <li class="{if MyApp::value(0) == $x}active{/if}">
+                          <a href="{{ $y['url'] }}" class="icon-{{  $k }}-{{ $x }}"><!--{{ $y['text'] }}--></a>
                         </li>
                       <!--{/each}-->
                     </ul>
                   <!--{else}-->
-                  <a href="<?=$v['url']?>">
-                    <i class="<?= empty($v['icon']) ? 'mdi mdi-card-account-details' : $v['icon'] ?>"></i>
-                    <span><?= $v['text'] ?></span>
+                  <a href="{{ $v['url'] }}">
+                    <i class="{if empty($v['icon'])}mdi mdi-card-account-details{else}{{ $v['icon'] }}{/if}"></i>
+                    <span><!--{{ $v['text'] }}--></span>
                   </a>
                   <!--{/if}-->
                 </li>
@@ -70,7 +69,7 @@
             <p class="copyright text-center">
               <span>模板来源</span>
               <a target="_blank" href="http://www.bixiaguangnian.com">笔下光年</a>
-              <img src="<?= route_admin::site('view/img/qqgroup.webp') ?>" width="100%">
+              <img src="{{ \route_admin::site('view/img/qqgroup.webp') }}" width="100%">
             </p>
           </div>
         </div>
@@ -79,12 +78,17 @@
       <!--头部信息-->
       <header class="lyear-layout-header">
         <nav class="navbar">
-          <div class="navbar-left">
-            <div class="lyear-aside-toggler">
+          <div class="nav align-items-center navbar-left">
+            <div class="nav-item lyear-aside-toggler">
               <span class="lyear-toggler-bar"></span>
               <span class="lyear-toggler-bar"></span>
               <span class="lyear-toggler-bar"></span>
             </div>
+            <ul class="nav align-items-center nav-item">
+              <li class="nav-item">
+                <a href="{{ \MyApp::url('other/cache') }}"><!--{lang admin_other_cache}--></a>
+              </li>
+            </ul>
           </div>
           <ul class="navbar-right d-flex align-items-center">
             <!--切换主题配色-->
@@ -246,22 +250,22 @@
             <!--End 切换主题配色-->
             <!--{if !empty($user)}-->
             <li class="dropdown">
-              <a href="<?=MyApp::site('?my')?>">
-                <img class="avatar-md rounded-circle" src="<?=MyApp::site($user['avatar_url'])?>">
-                <span><?=$user['username']??'游客'?></span>
+              <a href="{{ \MyApp::site('?my') }}">
+                <img class="avatar-sm rounded-circle" src="{{ $user['avatar_url'] }}">
+                <span><!--{{ $user['username'] }}--></span>
               </a>
             </li>
             <!--{/if}-->
             <li>
-              <a href="<?= MyApp::url('index/logout'); ?>">
+              <a href="{{ \MyApp::url('index/logout') }}">
                 <i class="mdi-logout-variant"></i>
-                <span><?= lang('logout') ?></span>
+                <span><!--{lang logout}--></span>
               </a>
             </li>
             <li>
-              <a href="<?= MyApp::site() ?>">
+              <a href="{{ \MyApp::site() }}">
                 <i class="mdi-home"></i>
-                <span><?= lang('front_index_page') ?></span>
+                <span><!--{lang front_index_page}--></span>
               </a>
             </li>
           </ul>

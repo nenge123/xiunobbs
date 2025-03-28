@@ -67,7 +67,7 @@ function attach_delete($aid) {
 	// hook model_attach_delete_start.php
 	global $conf;
 	$attach = attach_read($aid);
-	$path = $conf['upload_path'].'attach/'.$attach['filename'];
+	$path = MyApp::app()->datas['path']['upload'].'attach/'.$attach['filename'];
 	file_exists($path) AND unlink($path);
 	
 	$r = attach__delete($aid);
@@ -80,7 +80,7 @@ function attach_delete_by_pid($pid) {
 	list($attachlist, $imagelist, $filelist) = attach_find_by_pid($pid);
 	// hook model_attach_delete_by_pid_start.php
 	foreach($attachlist as $attach) {
-		$path = $conf['upload_path'].'attach/'.$attach['filename'];
+		$path = MyApp::app()->datas['path']['upload'].'attach/'.$attach['filename'];
 		file_exists($path) AND unlink($path);
 		attach__delete($attach['aid']);
 	}
@@ -93,7 +93,7 @@ function attach_delete_by_uid($uid) {
 	// hook model_attach_delete_by_uid_start.php
 	$attachlist = db_find('attach', array('uid'=>$uid), array(), 1, 9000);
 	foreach ($attachlist as $attach) {
-		$path = $conf['upload_path'].'attach/'.$attach['filename'];
+		$path = MyApp::app()->datas['path']['upload'].'attach/'.$attach['filename'];
 		file_exists($path) AND unlink($path);
 		attach__delete($attach['aid']);
 	}
@@ -126,11 +126,10 @@ function attach_find_by_pid($pid) {
 // ------------> 其他方法
 
 function attach_format(&$attach) {
-	global $conf;
 	if(empty($attach)) return;
 	// hook model_attach_format_start.php
 	$attach['create_date_fmt'] = date('Y-n-j', $attach['create_date']);
-	$attach['url'] = $conf['upload_url'].'attach/'.$attach['filename'];
+	$attach['url'] = MyApp::upload_site('attach/'.$attach['filename']);
 	// hook model_attach_format_end.php
 }
 
@@ -158,7 +157,7 @@ function attach_type($name, $types) {
 function attach_gc() {
 	global $conf;
 	// hook model_attach_gc_start.php
-	$tmpfiles = glob($conf['upload_path'].'tmp/*.*');
+	$tmpfiles = glob(MyApp::app()->datas['path']['upload'].'tmp/*.*');
 	if(is_array($tmpfiles)) {
 		foreach($tmpfiles as $file) {
 			// 清理超过一天还没处理的临时文件
@@ -201,8 +200,8 @@ function attach_assoc_post($pid) {
 			$filename = file_name($file['url']);
 			
 			$day = date($attach_dir_save_rule, $_SERVER['REQUEST_TIME']);
-			$path = $conf['upload_path'].'attach/'.$day;
-			$url = $conf['upload_url'].'attach/'.$day;
+			$path = MyApp::app()->datas['path']['upload'].'attach/'.$day;
+			$url =MyApp::upload_site('attach/'.$day);
 			!is_dir($path) AND mkdir($path, 0777, TRUE);
 			
 			$destfile = $path.'/'.$filename;
@@ -245,7 +244,7 @@ function attach_assoc_post($pid) {
 	/*
 	list($attachlist, $imagelist, $filelist) = attach_find_by_pid($pid);
 	foreach($imagelist as $k=>$attach) {
-		$url = $conf['upload_url'].'attach/'.$attach['filename'];
+		$url = MyApp::upload_site('attach/'.$attach['filename']);
 		if(strpos($post['message_fmt'], $url) === FALSE) {
 			unset($imagelist[$k]);
 			attach_delete($attach['aid']);

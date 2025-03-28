@@ -206,7 +206,12 @@ return array(
 	'plugin_wechat_qrcode_pay'=>'微信扫码支付。',
 	'plugin_service_qq'=>'客服 QQ',
 	
-	
+	'error_request'=>'异常请求',
+	'forum_event_stream_start'=>'正在为你删除板块',
+	'forum_event_stream_progress'=>'存在主题,正在删除%s条主题',
+	'forum_event_stream_progress_subject'=>'正在删除主题: %s  ...',
+	'forum_event_stream_progress_success'=>'删除%s条主题成功!稍后继续尝试删除板块!',
+	'forum_event_stream_close'=>'板块已删除!正在返回...',
 	// hook lang_zh_cn_bbs_admin.php
 	
 );

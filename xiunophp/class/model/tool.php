@@ -38,14 +38,14 @@ class tool
 		/**
 		 * 初始化scss变量
 		 */
-		$Variables = array(
+		$Variables = array_merge(MyApp::app()->datas['site'],array(
 			'lg-size' => '992px',
 			'md-size' => '768px',
 			'sm-size' => '576px',
 			'root' => APP_SITE,
-			'imgroot' => APP_SITE . 'view/img/',
-			'fontroot' => APP_SITE . 'view/font/'
-		);
+			'imgroot' =>MyApp::app()->datas['site']['img'],
+			'fontroot' => MyApp::app()->datas['site']['font']
+		));
 		foreach ($Variables as $k => $v):
 			$Variables[$k] =  self::scss_format($v);
 		endforeach;
@@ -83,8 +83,8 @@ class tool
 					return $path;
 				endif;
 			endif;
-			if (is_file(MyApp::path('view/scss/' . $scss))):
-				return MyApp::path('view/scss/' . $scss);
+			if (is_file(MyApp::app()->datas['path']['scss'].$scss)):
+				return MyApp::app()->datas['path']['scss'].$scss;
 			endif;
 		endif;
 		return null;

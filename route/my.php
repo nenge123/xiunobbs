@@ -105,8 +105,8 @@ if(empty($action)) {
 		
 		$filename = "$uid.png";
 		$dir = substr(sprintf("%09d", $uid), 0, 3).'/';
-		$path = $conf['upload_path'].'avatar/'.$dir;
-		$url = $conf['upload_url'].'avatar/'.$dir.$filename;
+		$path = MyApp::app()->datas['path']['upload'].'avatar/'.$dir;
+		$url = MyApp::upload_site('avatar/'.$dir.$filename);
 		!is_dir($path) AND (mkdir($path, 0777, TRUE) OR message(-2, lang('directory_create_failed')));
 		
 		// hook my_avatar_post_save_before.php

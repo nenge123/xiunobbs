@@ -31,11 +31,11 @@ $forumarr = arrlist_key_values($forumlist_show, 'fid', 'name');
 
 // 头部 header.inc.htm 
 $header = array(
-	'title' => $conf['sitename'],
+	'title' => MyApp::conf('sitename'),
 	'mobile_title' => '',
 	'mobile_link' => './',
 	'keywords' => '', // 搜索引擎自行分析 keywords, 自己指定没用 / Search engine automatic analysis of key words, so keep it empty.
-	'description' => strip_tags($conf['sitebrief']),
+	'description' => strip_tags(MyApp::conf('sitebrief')),
 	'navs' => array(),
 );
 

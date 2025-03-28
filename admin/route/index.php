@@ -33,8 +33,6 @@ switch ($action):
 		break;
 	case 'phpinfo':
 		unset($_SERVER['conf']);
-		unset($_SERVER['db']);
-		unset($_SERVER['cache']);
 		ob_start();
 		phpinfo();
 		$data = ob_get_clean();

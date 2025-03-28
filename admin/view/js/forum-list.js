@@ -23,20 +23,12 @@ self.X.methods.set('admin_forum_list',
 		jadd.on('click', function () {
 			var jclone = jarrlist.find('tr').last().clone(true);
 			jclone.insertAfter(jarrlist.find('tr').last());
-			var jfid = jclone.find('input[name^="fid"]');
 			//var rowid = xn.intval(jfid.val()) + 1;
 			var rowid = ++maxfid;
-			Array.from(jclone.find('[name]'),e=>{
-				const el = $(e);
-				if(el.attr('type')=='number')el.val(0);
-				else el.val('');
-				el.removeAttr('id');
-				el.attr('name',el.attr('name').replace(/\d+/,rowid));
-				if(el.next()[0]){
-					el.next().attr('for',el.next().attr('for').replace(/\d+/,rowid));
-				}
-			});
-			jfid.val(rowid);
+			jclone.find('input[name^="rank"]').val('0');
+			jclone.find('input[name^="icon"]').val('0');
+			jclone.find('input[name^="fid"]').val(rowid);
+			jclone.find('input[name^="name"]').val(rowid);
 			jclone.attr('rowid', rowid);
 			// 清空值
 			// 修改 [] 中的值为 rowid

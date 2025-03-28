@@ -37,8 +37,8 @@ if(empty($action) || $action == 'create') {
 	!in_array($ext, $filetypes['all']) AND $ext = '_'.$ext;
 	
 	$tmpanme = $uid.'_'.xn_rand(15).'.'.$ext;
-	$tmpfile = $conf['upload_path'].'tmp/'.$tmpanme;
-	$tmpurl = $conf['upload_url'].'tmp/'.$tmpanme;
+	$tmpfile = MyApp::app()->datas['path']['upload'].'tmp/'.$tmpanme;
+	$tmpurl = MyApp::upload_site('tmp/'.$tmpanme);
 	
 	$filetype = attach_type($name, $filetypes);
 	
@@ -128,8 +128,8 @@ if(empty($action) || $action == 'create') {
 	$allowdown = forum_access_user($fid, $gid, 'allowdown');
 	empty($allowdown) AND message(-1, lang('insufficient_privilege_to_download'));	
 	
-	$attachpath = $conf['upload_path'].'attach/'.$attach['filename'];
-	$attachurl = $conf['upload_url'].'attach/'.$attach['filename'];
+	$attachpath = MyApp::app()->datas['path']['upload'].'attach/'.$attach['filename'];
+	$attachurl = MyApp::upload_site('attach/'.$attach['filename']);
 	!is_file($attachpath)AND message(-1, lang('attach_not_exists'));
 	
 	$type = 'php';

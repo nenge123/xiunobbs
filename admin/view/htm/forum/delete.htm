@@ -1,8 +1,8 @@
 <!--{template(ADMIN_PATH.'view/htm/new-header.htm')}-->
-<form action="<?= $_SERVER['REQUEST_URI'] ?>" method="post" onpost="true" onmethods="admin_forum_update">
+<form action="{{ $_SERVER['REQUEST_URI'] }}" method="post" class="mb-3" onget="eventsourcemessage" data-scroll="#end-{{ $_SERVER['REQUEST_TIME'] }}">
 	<div class="card">
 		<div class="card-header">
-			<h4 class="card-title">{lang admin_forum_delete}:<?= $_forum['name'] ?></h4>
+			<h4 class="card-title"><!--{lang admin_forum_delete}-->:<!--{{ $_forum['name'] }}--></h4>
 		</div>
 		<div class="card-body">
 			<input type="hidden" name="yes" value="1">
@@ -13,4 +13,5 @@
 		</div>
 	</div>
 </form>
+<div class="mb-3" id="end-{{ $_SERVER['REQUEST_TIME'] }}"></div>
 <!--{template(ADMIN_PATH.'view/htm/new-footer.htm')}-->

@@ -102,21 +102,7 @@ function forum_find($cond = array(), $orderby = array('rank'=>-1), $page = 1, $p
 // ------------> 其他方法
 
 function forum_format(&$forum) {
-	global $conf;
-	if(empty($forum)) return;
-	
-	// hook model_forum_format_start.php
-	
-	$forum['create_date_fmt'] = date('Y-n-j', $forum['create_date']);
-	$forum['icon_url'] = $forum['icon'] ? $conf['upload_url']."forum/$forum[fid].png" : 'view/img/forum.png';
-	$forum['accesslist'] = $forum['accesson'] ? forum_access_find_by_fid($forum['fid']) : array();
-	$forum['modlist'] = array();
-	if($forum['moduids']) {
-		$modlist = user_find_by_uids($forum['moduids']);
-		foreach($modlist as &$mod) $mod = user_safe_info($mod);
-		$forum['modlist'] = $modlist;
-	}
-	// hook model_forum_format_end.php
+	return \model\forum::format($forum);
 }
 
 function forum_count($cond = array()) {

@@ -6,7 +6,7 @@
 <?php $forumarr = G('forumarr');?>
 <?php $fid = G('fid');?>
 <?php $conf = G('conf');?>
-<?php $static_version = $conf['static_version'];?>
+<?php $static_version = MyApp::conf('static_version');?>
 
 			<?php echo xn_debug_info();?>
 		</div>
@@ -19,7 +19,7 @@
 			<div class="row">
 				<div class="col">
 					<!--{hook footer_footer_left_start.htm}-->
-					Powered by <b>Xiuno BBS <span><?php echo $conf['version'];?></span></b>
+					Powered by <b>Xiuno BBS <span><?php echo MyApp::conf('version');?></span></b>
 					<!--{hook footer_footer_left_end.htm}-->
 				</div>
 				<div class="col text-right">
@@ -39,7 +39,7 @@
 	
 	<!--{hook admin_footer_js_before.htm}-->
 	
-	<script src="../lang/<?php echo $conf['lang'];?>/bbs.js<?php echo $static_version;?>"></script>
+	<script src="../lang/<?php echo \MyApp::conf('lang');?>/bbs.js<?php echo $static_version;?>"></script>
 	<script src="../view/js/jquery-3.1.0.js<?php echo $static_version;?>"></script>
 	<script src="../view/js/popper.js<?php echo $static_version;?>"></script>
 	<script src="../view/js/bootstrap.js<?php echo $static_version;?>"></script>
@@ -49,7 +49,7 @@
 	<script src="../view/js/form.js<?php echo $static_version;?>"></script>
 	<script>
 	var debug = DEBUG = <?php echo DEBUG; ?>;
-	var url_rewrite_on = <?php echo $conf['url_rewrite_on'];?>;
+	var url_rewrite_on = <?php echo \MyApp::conf('url_rewrite_on');?>;
 	var fid = <?php echo $fid;?>;
 	</script>
 	<script src="../view/js/bbs.js<?php echo $static_version;?>"></script>

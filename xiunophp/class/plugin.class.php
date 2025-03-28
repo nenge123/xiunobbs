@@ -27,18 +27,19 @@ class plugin
 		$ext = '';
 		if (empty($tmpfile)):
 			$file_arr = array();
-			#if (str_starts_with($srcfile, 'phar://')):
-			#	$temppath = preg_replace('/^.+?\.phar\//is', '', $srcfile);
-			#	$pathinfo = pathinfo($temppath);
-			#	$ext = $pathinfo['extension'];
-			#	$file_arr = explode('/', $pathinfo['dirname']);
-			#else:
-			$len = strlen(APP_PATH);
-			$temppath = substr($srcfile, $len);
+			$isphar = false;
+			if (str_starts_with($srcfile, 'phar://')):
+				$isphar = true;
+				$temppath = preg_replace('/^.+?[\\\\\/]([\-\w]+)\.phar/is', '\\1', $srcfile);
+			else:
+				$len = strlen(APP_PATH);
+				$temppath = substr($srcfile, $len);
+			endif;
+			$temppath = MyApp::convert_site($temppath);
 			$pathinfo = pathinfo($temppath);
 			$ext = $pathinfo['extension'];
 			if ($pathinfo['dirname'] != '.'):
-				$file_arr = explode(DIRECTORY_SEPARATOR, $pathinfo['dirname']);
+				$file_arr = explode('/', $pathinfo['dirname']);
 			endif;
 			#endif;
 			$file_arr[] = $pathinfo['filename'] . '.php';
@@ -46,8 +47,12 @@ class plugin
 				$tmpfile = MyApp::tmp_path($file_arr[0] . '/' . implode('_', array_slice($file_arr, 1)));
 			elseif ($file_arr[0] == 'xiunophp'):
 				$tmpfile = MyApp::tmp_path(implode(DIRECTORY_SEPARATOR, $file_arr));
-			elseif ($file_arr[0] == 'plugin'):
-				$tmpfile = MyApp::tmp_path($file_arr[0] . '/' . $file_arr[1] . '/' . implode('_', array_slice($file_arr, 2)));
+			elseif ($file_arr[0] == 'plugin' || $isphar):
+				if($isphar):
+					$tmpfile = MyApp::tmp_path('plugin/phar/'.implode(DIRECTORY_SEPARATOR, $file_arr));
+				else:
+					$tmpfile = MyApp::tmp_path('plugin/' . $file_arr[1] . '/' . implode('_', array_slice($file_arr, 2)));
+				endif;
 			else:
 				$tmpfile = MyApp::tmp_path(implode('_', $file_arr));
 			endif;
@@ -95,9 +100,10 @@ class plugin
 	 */
 	public static function parseJS(string $srcfile, ?string $name = null)
 	{
-		$tmpfile = MyApp::path('view/js/hook/' . ($name ?? basename($srcfile)));
+		$path = 'js/hook/' . ($name ?? basename($srcfile));
+		$tmpfile = MyApp::view_path($path);
 		self::parseFile($srcfile, $tmpfile);
-		return MyApp::convert_site($tmpfile);
+		return MyApp::view_site($path);
 	}
 	/**
 	 * 读取准备注入文件的内容

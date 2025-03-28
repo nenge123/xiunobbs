@@ -1,3 +1,6 @@
+/**
+ * @var  X xiuno
+ */
 export default {
 	onajax(elm, type, domId) {
 		const X = this;
@@ -7,7 +10,7 @@ export default {
 			return X.callAjax(value, elm, domId);
 		}
 		if(type=='onpost'){
-			if (!X.isFrom(elm)) elm = elm.from;
+			elm = X.callMethod('get_form_elm',elm);
 			$(elm).on('submit', async function (event) {
 				event.preventDefault();
 				return X.callAjax('formpost',this);
@@ -21,7 +24,7 @@ export default {
 	 */
 	userlogin(elm, domId) {
 		const X = this;
-		if (!X.isFrom(elm)) elm = elm.from;
+		elm = X.callMethod('get_form_elm',elm);
 		$(elm).on('submit', async function (event) {
 			event.preventDefault();
 			await import(X.jsroot + 'spark-md5.min.js');
@@ -41,26 +44,24 @@ export default {
 	async formpost(jform,data){
 		const X = this;
 		let processData = false;
-		if (!X.isFrom(jform)){
-			jform = $(jform.from);
-		}else if(!(jform instanceof jQuery)){
-			jform = $(jform);
-		}
-		const submitButton = jform.find('[type=submit]');
+		jform = X.callMethod('get_form_elm',jform);
+		const submitButton = $(jform).find('[type=submit]');
 		if(submitButton.prop('disabled')){
 			return $.alert(submitButton.attr('loading-text') || lang('submit_loading'));;
 		}
 		submitButton.disabled();
-		if(!data){
-			data = await X.callMethod('FormData',jform[0]);
-		}else if(!(data instanceof FormData)&&X.isOBJ(data)){
-			processData = true;
-		}else{
-			return $.alert('输入数据不合法!');
+		if(!X.isPOST(data)){
+			if(!data){
+				data = await X.callMethod('FormData',jform);
+			}else if(X.isOBJ(data)){
+				processData = true;
+			}else{
+				return $.alert('输入数据不合法!')
+			}
 		}
 		$.ajax({
 			type: 'POST',
-			url:jform.attr('action'),
+			url:jform.action,
 			data,
 			dataType: 'json',
 			processData,
@@ -77,7 +78,7 @@ export default {
 				if (X.isOBJ(r)) {
 					if(!isNaN(r.code))r.code = parseInt(r.code);
 					if (typeof r.code == 'string') {
-						return jform.find('[name=' + r.code + ']').val('');
+						return $(jform).find('[name=' + r.code + ']').val('');
 					} else if (r.code == 0) {
 						if(r.delay||r.url){
 							const deply = r.delay || 2;
@@ -132,5 +133,47 @@ export default {
 				error
 			});
 		},'image/*');
+	},
+	eventsourcemessage(elm){
+		const X = this;
+		console.log(elm);
+		elm.once('submit',function(event){
+			event.preventDefault();
+			const E =this;
+			E.innerHTML = '';
+			$(E).disabled();
+			const scroll = E.getAttribute('data-scroll');
+			E.style.cssText = 'white-space: pre;';
+			X.callMethod('createEventSource',E.action,{
+				open(event){
+					console.log(event);
+					if(event.data){
+						let p = JSON.parse(event.data);
+						p&&E.append(p.message+"\n");
+					}
+				},
+				progress(event){
+					console.log(event);
+					if(event.data){
+						let p = JSON.parse(event.data);
+						p&&E.append(p.message+"\n");
+						X.callMethod('scrollView',scroll)
+					}
+				},
+				close(event){
+					if(event.data){
+						let p = JSON.parse(event.data);
+						if(p){
+							E.append(p.message+"\n");
+							if(p.url){
+								$(E).delay(1000).location(p.url);
+							}
+						}
+	
+					}
+					this.close();
+				}
+			});
+		})
 	}
 }

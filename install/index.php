@@ -157,7 +157,7 @@ if (empty($action)) {
 		$db->conf['master']['engine'] = $engine;
 		
 		$conf['cache']['mysql']['db'] = $db; // 这里直接传 $db，复用 $db；如果传配置文件，会产生新链接。
-		$_SERVER['cache'] = $cache = !empty($conf['cache']) ? cache_new($conf['cache']) : NULL;
+		MyApp::app()->datas['cacheobj'] = $cache = !empty($conf['cache']) ? cache_new($conf['cache']) : NULL;
 
 
 		// 连接成功以后，开始建表，导数据。

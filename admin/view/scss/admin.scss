@@ -93,7 +93,7 @@ body[data-headerbg=default]{
 		}
 		.nav-subnav,
 		.nav-item-has-subnav > a:after {
-			display: none;
+			display: none !important;
 		}
 		.copyright {
 			display: none;
@@ -107,8 +107,13 @@ body[data-headerbg=default]{
 	}
 }
 @media screen and (max-width: 600px) {
+	.navbar-left{
+		>.nav{
+			display: none;
+		}
+	}
 	.container-fluid {
-		padding: 0px !important;
+		padding: 5px !important;
 	}
 }
 .table-responsive {

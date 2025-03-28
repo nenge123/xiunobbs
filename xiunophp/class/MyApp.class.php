@@ -7,6 +7,9 @@ class MyApp implements \ArrayAccess
 	public function __construct($conf = array())
 	{
 		self::$_app = $this;
+		#锁定主目录
+		function_exists('chdir') and chdir(APP_PATH);
+		set_include_path(APP_PATH);
 		$this->datas = array(
 			'extension' => 'html',
 			'https' => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on',
@@ -17,25 +20,26 @@ class MyApp implements \ArrayAccess
 			'session' => array(),
 			'g_session_invalid' => FALSE,
 		);
-		$this->routerExport();
 		define('APP_SITE', $this->convert_site(APP_PATH));
+		$this->routerExport();
 		$this->setConf($conf);
+		set_exception_handler(function ($exception) {
+			include __DIR__ . DIRECTORY_SEPARATOR . 'exception.php';
+			exit;
+		});
+		spl_autoload_register(fn($m) => $this->autoload_register($m));
+		register_shutdown_function(fn(...$arg) => $this->register_shutdown($arg));
 		if ($this->datas['gzip'] && !empty($this->conf['gizp'])):
 			#客户端支持gzip压缩
 			ob_start('ob_gzhandler');
 		else:
 			ob_start();
 		endif;
-		set_exception_handler(function ($exception) {
-			include __DIR__ . DIRECTORY_SEPARATOR . 'exception.php';
-			exit;
-		});
-		spl_autoload_register(fn($m) => $this->autoload_register($m));
 	}
 	public function autoload_register($class)
 	{
 		$arr = explode('\\', $class);
-		$path = $this->convert_path(XIUNOPHP_PATH . 'class/' . implode(DIRECTORY_SEPARATOR, $arr) . '.php');
+		$path = $this->datas['path']['appclass']. implode(DIRECTORY_SEPARATOR, $arr) . '.php';
 		switch ($arr[0]):
 			case 'model':
 				return require(\plugin::parseFile($path));
@@ -47,49 +51,137 @@ class MyApp implements \ArrayAccess
 		endswitch;
 		return false;
 	}
+	public function register_shutdown($arg)
+	{
+		if (!empty($this->datas['register_shutdown'])):
+			foreach ($this->datas['register_shutdown']  as $v):
+				if (is_callable($v)):
+					call_user_func_array($v, $arg);
+				endif;
+			endforeach;
+		endif;
+	}
+	public static function shutdown(callable $callable, ?string $name = null)
+	{
+		if (empty($name)):
+			self::app()->datas['register_shutdown'][] = $callable;
+		else:
+			self::app()->datas['register_shutdown'][$name] = $callable;
+		endif;
+	}
+	/**
+	 * 初始化目录路径 cookies
+	 */
+	private function setRoot($conf)
+	{
+		#缓存目录
+		$this->set_basepath('tmp', $conf['tmp_path'] ?? null);
+		#log目录
+		$this->set_basepath('log', $conf['log_path'] ?? null);
+		#上传目录
+		$this->set_basepath('upload', $conf['upload_path'] ?? null);
+		#资源目录
+		$this->set_basepath('view', $conf['view_path'] ?? null);
+		#模板目录
+		$this->set_basepath('view/htm', $conf['htm_path'] ?? null);
+		#view资源目录WEB访问地址
+		if (isset($conf['view_url']) && str_contains($conf['view_url'], '://')):
+			$this->datas['site']['view'] = $conf['view_url'];
+		else:
+			$this->datas['site']['view'] = self::convert_site($this->datas['path']['view']);
+		endif;
+		#upload目录WEB访问地址
+		if (isset($conf['upload_url']) && str_contains($conf['upload_url'], '://')):
+			$this->datas['site']['upload'] = $conf['upload_url'];
+		else:
+			$this->datas['site']['upload'] = self::convert_site($this->datas['path']['upload']);
+		endif;
+		$this->datas['site'] += array(
+			'js' => $this->datas['site']['view'] . 'js/',
+			'css' => $this->datas['site']['view'] . 'css/',
+			'font' => $this->datas['site']['view'] . 'font/',
+			'fonts' => $this->datas['site']['view'] . 'fonts/',
+			'img' => $this->datas['site']['view'] . 'img/',
+			'images' => $this->datas['site']['view'] . 'images/',
+			'attach' => $this->datas['site']['upload'] . 'attach/',
+			'uploadtmp' => $this->datas['site']['upload'] . 'tmp/',
+			'forum' => $this->datas['site']['upload'] . 'forum/',
+			'avatar' => $this->datas['site']['upload'] . 'avatar/',
+		);
+		$this->datas['path'] += array(
+			'app' => XIUNOPHP_PATH,
+			'appclass' => XIUNOPHP_PATH.'class'.DIRECTORY_SEPARATOR,
+			'js' => $this->datas['path']['view'] . 'js' . DIRECTORY_SEPARATOR,
+			'css' => $this->datas['path']['view'] . 'css' . DIRECTORY_SEPARATOR,
+			'scss' => $this->datas['path']['view'] . 'scss' . DIRECTORY_SEPARATOR,
+			'font' => $this->datas['path']['view'] . 'font' . DIRECTORY_SEPARATOR,
+			'fonts' => $this->datas['path']['view'] . 'fonts' . DIRECTORY_SEPARATOR,
+			'img' => $this->datas['path']['view'] . 'img' . DIRECTORY_SEPARATOR,
+			'images' => $this->datas['path']['view'] . 'images' . DIRECTORY_SEPARATOR,
+			'attach' => $this->datas['path']['upload'] . 'attach' . DIRECTORY_SEPARATOR,
+			'uploadtmp' => $this->datas['path']['upload'] . 'tmp' . DIRECTORY_SEPARATOR,
+			'forum' => $this->datas['path']['upload'] . 'forum' . DIRECTORY_SEPARATOR,
+			'avatar' => $this->datas['path']['upload'] . 'avatar' . DIRECTORY_SEPARATOR,
+		);
+		$this->read_cookie_data($conf);
+	}
 	public function setConf(array $conf)
 	{
+		$this->setRoot($conf);
 		$this->conf = $conf;
-		if (!empty($conf['tmp_path'])):
-			if (str_starts_with($conf['tmp_path'], APP_PATH)):
-				$this->datas['tmp_path'] = realpath($conf['tmp_path']) . DIRECTORY_SEPARATOR;
-			else:
-				$this->datas['tmp_path'] = realpath(APP_PATH . $conf['tmp_path']) . DIRECTORY_SEPARATOR;
+	}
+	public function get_realpath($path): ?string
+	{
+		if (realpath($path)):
+			return realpath($path) . DIRECTORY_SEPARATOR;
+		else:
+			$path = realpath(APP_PATH . $path);
+			if ($path):
+				return $path . DIRECTORY_SEPARATOR;
 			endif;
 		endif;
-		$this->read_cookie_data($conf);
+		return null;
+	}
+	private function set_basepath(string $pathname, ?string $basepath = null)
+	{
+
+		if (!empty($basepath)):
+			$this->datas['path'][$pathname] = realpath($basepath) . DIRECTORY_SEPARATOR;
+		endif;
+		if (empty($this->datas['path'][$pathname])):
+			$this->datas['path'][$pathname] = $this->get_realpath($pathname);
+		endif;
 	}
 	public function read_cookie_data($conf = array())
 	{
-		if (!isset($this->datas['cookies'])):
-			$this->datas['ip'] = $this->get_client_ip();
-			$this->datas['cookie_prefix'] = $conf['cookie_prefix'] ?? 'bbs_';
-			$this->datas['cookie_domain'] = $conf['cookie_domain'] ?? '';
-			$this->datas['cookie_path'] = APP_SITE;
-			ini_set('session.name', $this->datas['cookie_prefix'] . 'sid');
-			ini_set('session.use_cookies', 'On');
-			ini_set('session.use_only_cookies', 'On');
-			ini_set('session.cookie_domain', '');
-			ini_set('session.cookie_path', '');	// 为空则表示当前目录和子目录
-			ini_set('session.cookie_secure', 'Off'); // 打开后，只有通过 https 才有效。
-			ini_set('session.cookie_lifetime', 86400);
-			ini_set('session.cookie_httponly', 'On'); // 打开后 js 获取不到 HTTP 设置的 cookie, 有效防止 XSS，这个对于安全很重要，除非有 BUG，否则不要关闭。
-			ini_set('session.gc_maxlifetime', $conf['online_hold_time'] ?? 3600);	// 活动时间 $conf['online_hold_time']
-			ini_set('session.gc_probability', 1); 	// 垃圾回收概率 = gc_probability/gc_divisor
-			ini_set('session.gc_divisor', 500); 	// 垃圾回收时间 5 秒，在线人数 * 10 
-			session_set_save_handler(
-				[$this, 'sess_open'],
-				[$this, 'sess_close'],
-				[$this, 'sess_read'],
-				[$this, 'sess_write'],
-				[$this, 'sess_destroy'],
-				[$this, 'sess_gc']
-			);
-			// register_shutdown_function 会丢失当前目录，需要 chdir(APP_PATH)
-			// 这个比须有，否则 ZEND 会提前释放 $db 资源
-			register_shutdown_function('session_write_close');
-			$this->read_cookies_data();
-		endif;
+		$this->datas['ip'] = $this->get_client_ip();
+		$this->datas['cookie_prefix'] = $conf['cookie_prefix'] ?? 'bbs_';
+		$this->datas['cookie_domain'] = $conf['cookie_domain'] ?? '';
+		$this->datas['online_hold_time'] = $conf['online_hold_time'] ?? 3600;
+		$this->datas['cookie_path'] = APP_SITE;
+		ini_set('session.name', $this->datas['cookie_prefix'] . 'sid');
+		ini_set('session.use_cookies', 'On');
+		ini_set('session.use_only_cookies', 'On');
+		ini_set('session.cookie_domain', $this->datas['cookie_domain']);
+		ini_set('session.cookie_path', APP_SITE);	// 为空则表示当前目录和子目录
+		ini_set('session.cookie_secure', 'Off'); // 打开后，只有通过 https 才有效。
+		ini_set('session.cookie_lifetime', 86400);
+		ini_set('session.cookie_httponly', 'On'); // 打开后 js 获取不到 HTTP 设置的 cookie, 有效防止 XSS，这个对于安全很重要，除非有 BUG，否则不要关闭。
+		ini_set('session.gc_maxlifetime', $this->datas['online_hold_time']);	// 活动时间 $conf['online_hold_time']
+		ini_set('session.gc_probability', 1); 	// 垃圾回收概率 = gc_probability/gc_divisor
+		ini_set('session.gc_divisor', 500); 	// 垃圾回收时间 5 秒，在线人数 * 10 
+		session_set_save_handler(
+			[$this, 'sess_open'],
+			[$this, 'sess_close'],
+			[$this, 'sess_read'],
+			[$this, 'sess_write'],
+			[$this, 'sess_destroy'],
+			[$this, 'sess_gc']
+		);
+		// register_shutdown_function 会丢失当前目录，需要 chdir(APP_PATH)
+		// 这个比须有，否则 ZEND 会提前释放 $db 资源
+		self::shutdown('session_write_close', 'session');
+		$this->read_cookies_data();
 	}
 	public function read_cookies_data()
 	{
@@ -127,13 +219,13 @@ class MyApp implements \ArrayAccess
 			$this->sess_new($sid);
 			return '';
 		}
-		$arr = MyDB::t('session')->whereFirst(['sid' => $sid]);
+		$arr = MyDB::t('session')->whereFirst(array('sid' => $sid));
 		if (empty($arr)) {
 			$this->sess_new($sid);
 			return '';
 		}
 		if ($arr['bigdata'] == 1) {
-			$arr2 = MyDB::t('session_data')->whereFirst(['sid' => $sid]);
+			$arr2 = MyDB::t('session_data')->whereFirst(array('sid' => $sid));
 			$arr['data'] = $arr2['data'];
 		}
 		$this->datas['session'] = $arr;
@@ -228,14 +320,13 @@ class MyApp implements \ArrayAccess
 	}
 	function sess_new($sid)
 	{
-
 		$agent = $_SERVER['HTTP_USER_AGENT'];
 		$longip = ip2long($this->datas['ip']);
 
 		/**
 		 * 未知作用
 		 */
-		$cookie_test = _COOKIE('cookie_test');
+		$cookie_test = self::cookies('cookie_test');
 		if ($cookie_test) {
 			$cookie_test_decode = xn_decrypt($cookie_test, $this->conf['auth_key']);
 			$this->datas['g_session_invalid'] = ($cookie_test_decode != md5($agent . $longip));
@@ -246,7 +337,6 @@ class MyApp implements \ArrayAccess
 			$this->datas['g_session_invalid'] = FALSE;
 			return;
 		}
-
 		// 可能会暴涨
 		$url = $_SERVER['REQUEST_URI_NO_PATH'] ?? '';
 		if (strlen($url) > 32):
@@ -264,7 +354,7 @@ class MyApp implements \ArrayAccess
 			'bigdata' => 0,
 		);
 		$this->datas['session'] = $arr;
-		$where = ['sid' => $sid];
+		$where = array('sid' => $sid);
 		if (empty(MyDB::t('session')->whereCount($where))):
 			MyDB::t('session')->insert_json($arr);
 		else:
@@ -384,17 +474,61 @@ class MyApp implements \ArrayAccess
 	{
 		return self::app()->conf[$name] ?? $defalut;
 	}
+	/**
+	 * 返回网站目录下的文件绝对物理路径
+	 */
 	public static function path(string $name = ''): string
 	{
 		return self::convert_path(APP_PATH . $name);
 	}
+	/**
+	 * 返回网站目录下的文件绝对WEB地址
+	 */
 	public static function site(string $name = ''): string
 	{
 		return APP_SITE . $name;
 	}
+	/**
+	 * 返回缓存目录下的文件绝对物理路径
+	 */
 	public static function tmp_path(string $name = '')
 	{
-		return self::convert_path(self::$_app['tmp_path'] . $name);
+		return self::convert_path(self::app()->datas['path']['tmp'] . $name);
+	}
+	/**
+	 * 返回资源目录下的文件绝对物理路径
+	 */
+	public static function view_path(string $name = '')
+	{
+		return self::convert_path(self::app()->datas['path']['view'] . $name);
+	}
+	/**
+	 * 返回上传目录下的文件绝对物理路径
+	 */
+	public static function upload_path(string $name = '')
+	{
+		return self::convert_path(self::app()->datas['path']['upload'] . $name);
+	}
+	/**
+	 * 返回资源目录下WEB地址
+	 */
+	public static function view_site(string $name = '')
+	{
+		return self::app()->datas['site']['view'] . $name;
+	}
+	/**
+	 * 返回上传目录下WEB地址
+	 */
+	public static function upload_site(string $name = '')
+	{
+		return self::app()->datas['site']['upload'] . $name;
+	}
+	/**
+	 * 返回默认模板目录下的文件绝对物理路径
+	 */
+	public static function htm_path(string $name = '')
+	{
+		return self::convert_path(self::app()->datas['path']['htm'] . $name);
 	}
 	public static function app()
 	{
@@ -419,14 +553,14 @@ class MyApp implements \ArrayAccess
 		unset($this->datas[$offset]);
 	}
 	/**
-	 * 格式化地址为标准绝对地址
+	 * 格式化地址为标准物理地址
 	 */
 	public static function convert_path(string|array $path = ''): string
 	{
-		if (is_array($path)) return implode(DIRECTORY_SEPARATOR, $path);
 		if (empty($path)):
 			return '';
 		else:
+			if (is_array($path)) return implode(DIRECTORY_SEPARATOR, $path);
 			if (str_starts_with($path, 'phar://')):
 				return str_replace('\\', '/', $path);
 			endif;
@@ -438,8 +572,19 @@ class MyApp implements \ArrayAccess
 	 */
 	public static function convert_site(string $path): string
 	{
+		$myapp = self::app();
 		if (str_starts_with($path, APP_PATH)):
-			$path = str_replace($_SERVER['DOCUMENT_ROOT'], '', $path);
+			if (isset($myapp->datas['site']['upload'])):
+				if (str_starts_with($path, $myapp->datas['path']['view'])):
+					$path = str_replace($myapp->datas['path']['view'], $myapp->datas['site']['view'], $path);
+				elseif (str_starts_with($path, $myapp->datas['path']['upload'])):
+					$path = str_replace($myapp->datas['path']['upload'], $myapp->datas['site']['upload'], $path);
+				else:
+					$path = str_replace($_SERVER['DOCUMENT_ROOT'], '', $path);
+				endif;
+			else:
+				$path = str_replace($_SERVER['DOCUMENT_ROOT'], '', $path);
+			endif;
 		endif;
 		$path = str_replace('\\', '/', $path);
 		return $path;
@@ -753,7 +898,7 @@ class MyApp implements \ArrayAccess
 	public static function message_json($json)
 	{
 		@ob_clean();
-		header('content-type:application/json;charset='.MyApp::conf('charset', 'utf-8'));
+		header('content-type:application/json;charset=' . MyApp::conf('charset', 'utf-8'));
 		echo xn_json_encode($json);
 		exit;
 	}
@@ -761,16 +906,16 @@ class MyApp implements \ArrayAccess
 	 * 输出JSON信息
 	 * 第三参数 array('url'=>'',delay=>'')
 	 */
-	public static function message($code, $message,$extra = array())
+	public static function message($code, $message, $extra = array())
 	{
 		@ob_clean();
 		//$header['title'] = self::conf('sitename');
 		if (empty(self::head('ajax-fetch'))):
 			$header = $GLOBALS['header'] ?? array();
-			$url = empty($extra['url']) ? 'javascript:history.back()':$extra['url'];
-			$message = '<a href="'.$url.'">'.$message.'</a>';
-			if(!empty($extra['delay'])):
-				$message .= '<script>setTimeout(function() {'.(empty($extra['url']) ? 'history.back()':'window.location="'.$extra['url'].'";').'}, '.($extra['delay'] * 1000).');</script>';
+			$url = empty($extra['url']) ? 'javascript:history.back()' : $extra['url'];
+			$message = '<a href="' . $url . '">' . $message . '</a>';
+			if (!empty($extra['delay'])):
+				$message .= '<script>setTimeout(function() {' . (empty($extra['url']) ? 'history.back()' : 'window.location="' . $extra['url'] . '";') . '}, ' . ($extra['delay'] * 1000) . ');</script>';
 			endif;
 			if (defined('MESSAGE_HTM_PATH')):
 				include _include(MESSAGE_HTM_PATH);
@@ -876,10 +1021,10 @@ class MyApp implements \ArrayAccess
 	public static function scss(string $link, string $href = '')
 	{
 		if (!str_starts_with($link, APP_PATH)):
-			$link = self::path('view/scss/' . $link);
+			$link = self::app()->datas['path']['scss'] . $link;
 		endif;
 		if (empty($href)):
-			$href = self::path('view/css/' . pathinfo($link, PATHINFO_FILENAME) . '.css');
+			$href = self::app()->datas['site']['css'] . pathinfo($link, PATHINFO_FILENAME) . '.css';
 		endif;
 		if (is_file($href)):
 			if (!defined('DEBUG') || !DEBUG):

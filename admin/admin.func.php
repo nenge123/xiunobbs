@@ -12,7 +12,7 @@ function admin_token_check() {
 	global $longip, $conf;
 	$useragent_md5 = md5($_SERVER['HTTP_USER_AGENT']);
 	
-	//$key = md5($longip.$useragent_md5.$conf['auth_key']); // 有些环境是动态 IP
+	//$key = md5($longip.$useragent_md5.MyApp::conf('auth_key')); // 有些环境是动态 IP
 	$key = md5((XN_ADMIN_BIND_IP ? $longip : '').$useragent_md5.xn_key());
 	
 	// hook admin_token_check_start.php
@@ -50,7 +50,7 @@ function admin_token_check() {
 function admin_token_set() {
 	global $longip, $conf;
 	$useragent_md5 = md5($_SERVER['HTTP_USER_AGENT']);
-	//$key = md5($longip.$useragent_md5.$conf['auth_key']);
+	//$key = md5($longip.$useragent_md5.MyApp::conf('auth_key'));
 	$key = md5((XN_ADMIN_BIND_IP ? $longip : '').$useragent_md5.xn_key());
 	
 	// hook admin_token_set_start.php

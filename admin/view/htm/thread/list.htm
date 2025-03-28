@@ -1,0 +1,186 @@
+<!--{template(ADMIN_PATH.'view/htm/new-header.htm')}-->
+
+<!--{hook admin_thread_list_start.htm}-->
+
+<div class="row">
+	<div class="col-12">
+		<div class="btn-group mb-3" role="group">
+
+		</div>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-12">
+		<form action="{{ \MyApp::purl('scan') }}" method="post" id="form">
+			<div class="card card-body">
+				<h4 class="card-title"><!--{lang search_condition}--></h4>
+				<div class="row">
+					<div class="col-md-6">
+						<div class="form-floating mb-3">
+							<select class="form-control" name="fid" id="fid">
+								<option value="0"><!--{lang none}--></option>
+								<?php foreach ($forumlist as $forum) { ?>
+									<option value="<?php echo $forum['fid']; ?>"><?php echo $forum['name']; ?></option>
+								<?php } ?>
+							</select>
+
+							<label for="fid"><!--{lang forum}-->：</label>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-floating mb-3"><!--{{ \route_admin::input_text('keyword',MyApp::post('keyword'),'keyword') }}--></div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-6">
+						<div class="form-floating mb-3"><!--{{ \route_admin::input_date_text('create_date_start',MyApp::post('create_date_start',date('Y-m-d',mktime(-24,0,0,))),'start_date',' max="'.date('Y-m-d').'"') }}--></div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-floating mb-3"><!--{{ \route_admin::input_date_text('create_date_end',MyApp::post('create_date_end',date('Y-m-d',mktime(24,0,0,))),'end_date',' max="'.date('Y-m-d',mktime(24,0,0,)).'"') }}--></div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-6">
+						<fieldset class="form-group">
+							<label for="create_date_end"><!--{lang thread_userip}-->：</label>
+							<input class="form-control" type="text" id="userip" name="userip" placeholder="<!--{lang thread_userip}-->" value="" />
+						</fieldset>
+					</div>
+					<div class="col-md-6">
+						<fieldset class="form-group">
+							<label for="create_date_end"><!--{lang user}--> ID：</label>
+							<input class="form-control" type="text" id="uid" name="uid" placeholder="<!--{lang uid}-->" value="" />
+						</fieldset>
+					</div>
+				</div>
+				<!--{hook admin_thread_list_search_before.htm}-->
+				<div class="row">
+					<div class="col-md-6">
+						<button type="button" id="search" class="btn btn-primary" data-loading-text="<!--{lang searching}-->... "><!--{lang search}--></button>
+					</div>
+				</div>
+			</div>
+		</form>
+
+		<div class="card">
+			<div class="card-body" id="search_result">
+				<div class="progress mt-4">
+					<div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 0%" id="progress"></div>
+				</div>
+
+				<?php echo lang('thread_search_result', array('n' => '<b id="threads">0</b>')); ?>, <a href="{{ MyApp::purl('found') }}" target="_blank"><b><!--{lang click_to_view}--></b></a>
+				<p id="operation" class="hidden mt-4">
+					<button type="button" id="close" class="btn btn-primary" data-loading-text="<!--{lang operating}-->... "><i class="icon-lock"></i> <!--{lang close}--></button>
+					<button type="button" id="open" class="btn btn-primary" data-loading-text="<!--{lang operating}-->... "><i class="icon-unlock"></i> <!--{lang open}--></button>
+					<button type="button" id="delete" class="btn btn-danger" data-loading-text="<!--{lang operating}-->... "><i class="icon-remove"></i> <!--{lang delete}--></button>
+					<!--{hook admin_thread_list_delete_after.htm}-->
+				</p>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!--{hook admin_thread_list_end.htm}-->
+
+<!--{template(ADMIN_PATH.'view/htm/new-footer.htm')}-->
+
+<script>
+	var jform = $('#form');
+	var jsubmit = $('#search');
+	var jopsubmit = $('#operation').find('button');
+	var jsearch_result = $('#search_result');
+	var jprogress = $('#progress');
+	var jthreads = $('#threads');
+	var joperation = $('#operation');
+	var jfid = $('#fid');
+	var threads = 0; // 符合的条数
+	var page = 1;
+	var pagesize = <?php echo $pagesize; ?>;
+	var totalpage = <?php echo $totalpage; ?>;
+	var totalpage_back = totalpage;
+	var pagearr = [];
+	for (var i = 1; i <= totalpage; i++) pagearr.push(i);
+	var forumlist = <?php echo xn_json_encode($forumlist_simple); ?>;
+
+	jfid.on('change', function() {
+		var fid = $(this).val();
+		if (fid == 0) {
+			totalpage = Math.max(1, totalpage_back);
+		} else {
+			var n = forumlist[fid]['threads'];
+			totalpage = Math.max(1, Math.ceil(n / pagesize));
+		}
+		pagearr = [];
+		for (var i = 1; i <= totalpage; i++) pagearr.push(i);
+	});
+
+	jsubmit.on('click', async function() {
+		jsubmit.button('loading');
+		var postdata = jform.serializeObject();
+		var url = jform.attr('action');
+		threads = 0;
+		jprogress.width(0);
+		jsearch_result.show();
+		await Promise.all(Array.from(pagearr, function(i) {
+			postdata.page = pagearr[i];
+			$.xpost(url, postdata, function(code, message) {
+				if (code == 0) {
+					var tids = message;
+					threads += tids.length;
+					jthreads.html(threads);
+					var percent = (postdata.page / totalpage) * 100;
+					jprogress.width(percent + '%');
+					if (postdata.page == totalpage) {
+						jsubmit.button('reset');
+						jopsubmit.button('reset');
+						joperation.show();
+					}
+				} else {
+					//alert(message);
+				}
+			});
+		}));
+		return false;
+	});
+	$('#nav li.nav-item-thread').addClass('active');
+
+
+	jopsubmit.on('click', async function() {
+		var jthis = $(this);
+		var op = jthis.attr('id');
+		var url = "{{ MyApp::purl('operation') }}?" + op;
+		var totalpage = Math.max(1, Math.ceil(threads / pagesize));
+		var jsubmit = jthis;
+		jsubmit.button('loading');
+		var postdata = {};
+		jprogress.val(0);
+		var operation_threads = 0;
+		jsearch_result.show();
+		await Promise.all(Array.from(pagearr, function(i) {
+			postdata.page = pagearr[i];
+			$.xpost(url, postdata, function(code, message) {
+				if (code == 1) {
+					alert(message);
+				}
+				if (code == 0) {
+					var tids = message;
+					operation_threads += tids.length;
+					jthreads.html(operation_threads);
+					jprogress.val((postdata.page / totalpage) * 100);
+					if (postdata.page == totalpage) {
+						jsubmit.button('<!--{lang operator_complete}-->');
+						jopsubmit.button('disabled');
+						joperation.show();
+					}
+				} else {
+					//alert(message);
+				}
+			});
+		}));
+		return false;
+
+	});
+</script>
+
+<!--{hook admin_thread_list_js.htm}-->

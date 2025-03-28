@@ -20,9 +20,6 @@ class cache_mysql {
 	public $errno = 0;
 	public $errstr = '';
         public function __construct($dbconf = array()) {
-        	if(!empty($_SERVER['db'])):
-                        $this->db = $_SERVER['db'];
-                endif;
 		$this->cachepre = isset($dbconf['cachepre']) ? $dbconf['cachepre'] : 'pre_';
         }
         public function connect() {
@@ -35,46 +32,26 @@ class cache_mysql {
                 	'v'=>xn_json_encode($v),
                 	'expiry'=>$expiry,
                 );
-                $r = db_replace($this->table, $arr, $this->db);
-                if($r === FALSE) {
-                	$this->errno = $this->db->errno;
-                	$this->errstr = $this->db->errstr;
-                	return FALSE;
-                }
+                $r = db_replace($this->table, $arr);
                 return $r !== FALSE;
         }
         public function get($k) {
                 $time = time();
-                $arr = db_find_one($this->table, array('k'=>$k), array(), array(), $this->db);
+                $arr = db_find_one($this->table, array('k'=>$k), array(), array());
                 // 如果表不存在，则建立表 pre_cache
-                if($arr === FALSE) {
-                	$this->errno = $this->db->errno;
-                	$this->errstr = $this->db->errstr;
-                	return FALSE;
-                }
-                if(!$arr) return NULL;
+                if(empty($arr)) return NULL;
                 if($arr['expiry'] && $time > $arr['expiry']) {
-                	db_delete($this->table, array('k'=>$k), $this->db);
+                	db_delete($this->table, array('k'=>$k));
                         return NULL;
                 }
                 return xn_json_decode($arr['v'], 1);
         }
         public function delete($k) {
-        	$r = db_delete($this->table, array('k'=>$k), $this->db);
-        	if($r === FALSE) {
-                	$this->errno = $this->db->errno;
-                	$this->errstr = $this->db->errstr;
-                	return FALSE;
-                }
+        	$r = db_delete($this->table, array('k'=>$k));
                 return empty($r) ? FALSE : TRUE;
         }
         public function truncate() {
-        	$r = db_truncate($this->table, $this->db);
-        	if($r === FALSE) {
-                	$this->errno = $this->db->errno;
-                	$this->errstr = $this->db->errstr;
-                	return FALSE;
-                }
+        	$r = db_truncate($this->table);
                 return TRUE;
         }
         public function error($errno, $errstr) {

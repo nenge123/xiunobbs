@@ -161,5 +161,35 @@ export default {
 			//E.name = $(elm).next().attr('name');
 			E.form = this.form;
 		});
+	},
+	get_form_elm(elm){
+		const X = this;
+		if(X.isJQ(elm)){
+			if(X.isFrom(elm[0])){
+				return elm[0];
+			}
+			elm = elm[0];
+		}else if(X.isFrom(elm)){
+			return elm;
+		}
+		if(elm.from&&X.isFrom(elm.from)){
+			return elm.from;
+		}
+		return false;
+	},
+	scrollView(id){
+		const elm = document.querySelector(id);
+		if(elm instanceof HTMLElement){
+			elm.scrollIntoView();
+		}
+	},
+	createEventSource(url,opt){
+		const link = new EventSource(url);
+		if(opt){
+			for(const e in opt){
+				link.on(e,opt[e]);
+			}
+		}
+		return link;
 	}
 }
