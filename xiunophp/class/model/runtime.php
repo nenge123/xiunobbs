@@ -1,10 +1,7 @@
 <?php
 
 namespace model;
-
 use MyApp;
-use mysqli;
-
 class runtime
 {
 	public static array $runtime;

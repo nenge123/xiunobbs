@@ -53,6 +53,7 @@ switch ($action):
 			include _include(ADMIN_PATH . 'view/htm/setting/time.htm');
 		elseif ($_SERVER['REQUEST_METHOD'] == 'POST'):
 			// hook admin_setting_time_post_start.php
+			route_admin::format_post();
 			file_replace_var(APP_PATH . 'conf/conf.php', $_POST);
 			// hook admin_setting_time_post_end.php
 			message(0, lang('modify_successfully'));
@@ -67,6 +68,10 @@ switch ($action):
 			include _include(ADMIN_PATH . 'view/htm/setting/rewrite.htm');
 		elseif ($_SERVER['REQUEST_METHOD'] == 'POST'):
 			// hook admin_setting_rewrite_post.php
+			$_POST['url_rewrite_on'] = MyApp::post('url_rewrite_on',0);
+			$_POST['url_rewrite_style'] = MyApp::post('url_rewrite_style',0);
+			$_POST['cdn_on'] = MyApp::post('cdn_on',0);
+			route_admin::format_post();
 			file_replace_var(APP_PATH . 'conf/conf.php', $_POST);
 			message(0, lang('modify_successfully'));
 		endif;
@@ -81,6 +86,12 @@ switch ($action):
 			include _include(ADMIN_PATH . 'view/htm/setting/base.htm');
 		elseif ($_SERVER['REQUEST_METHOD'] == 'POST'):
 			// hook admin_setting_base_post_start.php
+			#防止checkbox空值问题
+			$_POST['user_create_on'] = MyApp::post('user_create_on',0);
+			$_POST['user_create_email_on'] = MyApp::post('user_create_email_on',0);
+			$_POST['user_resetpw_on'] = MyApp::post('user_resetpw_on',0);
+			$_POST['runlevel'] = MyApp::post('runlevel',0);
+			route_admin::format_post();
 			file_replace_var(APP_PATH . 'conf/conf.php', $_POST);
 			// hook admin_setting_base_post_end.php
 			message(0, lang('modify_successfully'));

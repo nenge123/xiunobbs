@@ -33,18 +33,16 @@
 	
 	<!--{hook header_link_before.htm}-->
 	
-	<link rel="shortcut icon" href="<?php echo $conf['view_url'];?>img/favicon.ico" />
-	<link rel="icon" sizes="32x32" href="<?php echo $conf['view_url'];?>img/favicon.ico">
-	<link rel="Bookmark" href="<?php echo $conf['view_url'];?>img/favicon.ico" />
+	<link rel="shortcut icon" href="{{ \MyApp::view_site('img/favicon.ico') }}" />
+	<link rel="icon" sizes="32x32" href="{{ \MyApp::view_site('img/favicon.ico') }}">
+	<link rel="Bookmark" href="{{ \MyApp::view_site('img/favicon.ico') }}" />
 	
 	<!--{hook header_bootstrap_before.htm}-->
-	<?php $bootstrap_css = !empty($bootstrap_css) ? $bootstrap_css : $conf['view_url']."css/bootstrap.css".$static_version; ?>
-	<link rel="stylesheet" href="<?php echo $bootstrap_css;?>">
+	<link rel="stylesheet" href="{{ \MyApp::view_site('css/bootstrap.css'.MyApp::conf('static_version')) }}">
 	<!--{hook header_bootstrap_after.htm}-->
 	
 	<!--{hook header_bootstrap_bbs_before.htm}-->
-	<?php $bootstrap_bbs_css = !empty($bootstrap_bbs_css) ? $bootstrap_bbs_css : $conf['view_url']."css/bootstrap-bbs.css".$static_version; ?>
-	<link rel="stylesheet" href="<?php echo $bootstrap_bbs_css;?>">
+	<link rel="stylesheet" href="{{ \MyApp::view_site('css/bootstrap-bbs.css'.MyApp::conf('static_version')) }}">
 	<!--{hook header_bootstrap_bbs_after.htm}-->
 	
 	<!--{hook header_link_after.htm}-->
@@ -55,7 +53,7 @@
 	
 	<!--{hook header_body_start.htm}-->
 	
-	<?php include _include(APP_PATH.'view/htm/header_nav.inc.htm');?>
+	<!--{template(MyApp::htm_path('header_nav.inc.htm'))}-->
 
 	<main id="body">
 		<div class="container">

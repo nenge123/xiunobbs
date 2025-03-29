@@ -69,6 +69,13 @@ function xn_error($no, $str, $return = FALSE) {
 //define('base64', '__base64__');
 //define('json', '__base64__');
 function param($key, $defval = '', $htmlspecialchars = TRUE, $addslashes = FALSE) {
+	if(is_numeric($key)):
+		$key = intval($key); 
+		if($key==0):
+			return MyApp::value('module',$defval);
+		endif;
+		return MyApp::value($key-1,$defval);
+	endif;
 	if(!isset($_REQUEST[$key]) || ($key === 0 && empty($_REQUEST[$key]))) {
 		if(is_array($defval)) {
 			return array();
@@ -562,7 +569,7 @@ function xn_log($s, $file = 'error') {
 	$uid = intval(G('uid')); // xiunophp 未定义 $uid
 	$day = date('Ym',$_SERVER['REQUEST_TIME']); // 按照月存放，否则 Ymd 目录太多。
 	$mtime = date('Y-m-d H:i:s'); // 默认值为 time()
-	$url = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
+	$url = MyApp::data('querydata')['url'];
 
 	$s = preg_replace('/[\n\r\t]+/',' ', $s);
 	$s = '<?php exit;?>	'.$mtime.'	'.$ip.'	'.$url.'	'.$uid.'	'.$s.PHP_EOL;

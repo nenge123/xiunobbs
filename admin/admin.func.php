@@ -17,7 +17,7 @@ function admin_token_check() {
 	
 	// hook admin_token_check_start.php
 	
-	$admin_token = param('bbs_admin_token');
+	$admin_token = MyApp::cookies('admin_token');
 	if(empty($admin_token)) {
 		$_REQUEST[0] = 'index';
 		$_REQUEST[1] = 'login';
@@ -55,7 +55,7 @@ function admin_token_set() {
 	
 	// hook admin_token_set_start.php
 	
-	$admin_token = param('bbs_admin_token');
+	$admin_token = MyApp::cookies('admin_token');
 	$s = $longip.'	'.$_SERVER['REQUEST_TIME'];
 	
 	$admin_token = xn_encrypt($s, $key);

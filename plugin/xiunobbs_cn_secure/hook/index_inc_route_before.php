@@ -7,7 +7,7 @@
  * @author 浅唱兔君
  */
 	
-	$token = param('bbs_token', '');
+	$token = MyApp::cookies('token');
 	$action = param(0);
 	if(isset($user['secure_token'])){ 
 	    if(strrpos($user['secure_token'],$token) !== false){

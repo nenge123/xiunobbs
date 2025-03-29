@@ -11,13 +11,14 @@
 <script type="text/javascript" src="<?=MyApp::view_site('js/bootstrap-plugin.js'.MyApp::conf('static_version'))?>"></script>
 <!--{hook admin_footer_js_after.htm}-->
 <script type="module">
-	import X from "<?=MyApp::view_site('js/common.js')?>?rewrite=<?=$conf['url_rewrite_on']?>&version=<?=MyApp::conf('static_version')?>";
-	/*/额外js{if !empty($importjs)}{each $importjs $js} */
+	import X from "{{ MyApp::view_site('js/common.js') }}{{ MyApp::conf('static_version') }}";
+	/** 额外js{if !empty($importjs)}{each $importjs $js} **/
 	import "{{ $js }}";
-	/*{/each}{/if}*/
+	/** {/each}{/if} **/
+	X.rewrite = "{{ MyApp::conf('url_rewrite_on') }}";
 	X.admin_jsroot = "{{ route_admin::site('view/js/') }}";
+	X.webroot = "{{ APP_SITE }}";
 	X.toEvent(new CustomEvent('ready'));
-	console.log($);
 </script>
 </body>
 </html>

@@ -2,34 +2,28 @@
 
 <!--{hook admin_user_list_start.htm}-->
 
-<div class="row">
-	<div class="col-12">
-		<div class="btn-group mb-3" role="group">
-
+<form action="{{ MyApp::value('url') }}" method="post">
+	<details class="card" open>
+		<summary class="card-header"><!--{lang search_condition}--></summary>
+		<div class="card-body">
+			<div class="form-floating mb-3">
+				<select class="form-control" name="fid" id="fid">
+					<option value="uid"><?php echo lang('uid');?>：</option>
+					<option value="username" selected><?php echo lang('username');?>：</option>
+					<option value="email"><?php echo lang('email');?>：</option>
+					<option value="gid"><?php echo lang('user_group');?>：</option>
+					<option value="create_ip"><?php echo lang('create_ip');?>：</option>
+					<!--{hook admin_user_list_option_create_ip_after.htm}-->
+				</select>
+				<label for="fid"><!--{lang search_type}-->：</label>
+			</div>
+			<div class="form-floating mb-3"><!--{{ \route_admin::input_text('keyword',MyApp::post('keyword'),'keyword') }}--></div>
+			<div class="mb-3">
+				<button id="search" class="form-control btn btn-primary"><?php echo lang('search');?></button>
+			</div>
 		</div>
-	</div>
-</div>
-
-<div class="row">
-	<div class="col-md-2 mb-3">
-		<select id="srchtype" value="<?php echo $srchtype; ?>" class="form-control">
-			<option value=""><?php echo lang('search_type');?></option>
-			<option value="uid"><?php echo lang('uid');?>：</option>
-			<option value="username" selected><?php echo lang('username');?>：</option>
-			<option value="email"><?php echo lang('email');?>：</option>
-			<option value="gid"><?php echo lang('user_group');?>：</option>
-			<option value="create_ip"><?php echo lang('create_ip');?>：</option>
-			<!--{hook admin_user_list_option_create_ip_after.htm}-->
-		</select>
-	</div>
-	<div class="col-md-3 mb-3">
-		<input type="text" id="keyword" placeholder="<?php echo lang('keyword');?>" value="<?php echo $keyword; ?>"  class="form-control" />
-	</div>
-	<div class="col-md-2 mb-3">
-		<button id="search" class="form-control btn btn-primary"><?php echo lang('search');?></button>
-	</div>
-</div>
-
+	</details>
+</form>
 <div class="row">
 	<div class="col-lg-12">
 		<div class="card">

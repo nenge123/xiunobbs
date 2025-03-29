@@ -1,5 +1,5 @@
 <!--{template(ADMIN_PATH.'view/htm/new-header.htm')}-->
-<form action="{{ $_SERVER['REQUEST_URI'] }}" method="post" onpost="true" onmethods="admin_forum_update">
+<form action="{{ MyApp::value('url') }}" method="post" onpost="true" onmethods="admin_forum_update">
 	<div class="card">
 		<div class="card-header">
 			<h4 class="card-title">{lang admin_forum_edit}:<?= $_forum['name'] ?></h4>

@@ -312,4 +312,14 @@ class route_admin
 		echo PHP_EOL . PHP_EOL; #重点 每条消息末端必须用两个\r\n隔开
 		flush(); #兼容,一般可忽略
 	}
+	public static function format_post()
+	{
+		foreach($_POST as $k=>$v):
+			if(is_numeric($v)):
+				$_POST[$k] = intval($v);
+			elseif(is_string($v)):
+				$_POST[$k] = trim($v);
+			endif;
+		endforeach;
+	}
 }

@@ -5,10 +5,19 @@
 		<h4 class="card-title"><!--{lang admin_setting_rewrite}--></h4>
 	</div>
 	<div class="card-body">
-		<form action="{{ $_SERVER['REQUEST_URI'] }}" method="post" onpost="true">
+		<form action="{{ MyApp::value('url') }}" method="post" onpost="true">
 			<!--{hook admin_setting_rewrite_before.htm}-->
 			<div class="form-check form-switch mb-3"><!--{{ \route_admin::input_check('url_rewrite_on') }}--></div>
+			<div class="form-check form-switch mb-3"><!--{{ \route_admin::input_check('url_rewrite_style') }}--></div>
+			<div class="alert alert-danger"><!--{lang url_rewrite_style_msg}--></div>
 			<div class="form-check form-switch mb-3"><!--{{ \route_admin::input_check('cdn_on') }}--></div>
+			<div class="form-floating mb-3"><!--{{ \route_admin::input_required_text('view_url',null,'conf_view_url','') }}--></div>
+			<div class="form-floating mb-3"><!--{{ \route_admin::input_required_text('upload_url',null,'conf_upload_url','') }}--></div>
+			<div class="alert alert-danger"><!--{lang conf_upload_url_msg}--></div>
+			<div class="form-floating mb-3"><!--{{ \route_admin::input_required_text('view_path',MyApp::conf('conf_view_path','view/'),'conf_view_path') }}--></div>
+			<div class="form-floating mb-3"><!--{{ \route_admin::input_required_text('upload_path',MyApp::conf('conf_upload_path','upload/'),'conf_upload_path') }}--></div>
+			<div class="form-floating mb-3"><!--{{ \route_admin::input_required_text('htm_path',MyApp::conf('conf_htm_path','view/htm/'),'conf_htm_path') }}--></div>
+			<div class="alert alert-danger"><!--{lang conf_htm_path_msg}--></div>
 			<!--{hook admin_setting_rewrite_after.htm}-->
 			<div class="mb-3 text-center">
 				<button type="submit" class="btn btn-primary btn-block" data-loading-text="<!--{lang submiting}-->..."><!--{lang confirm}--></button>

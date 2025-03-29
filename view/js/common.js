@@ -2,11 +2,8 @@ import methods from './methods.js';
 import ajaxs from './ajax.js';
 const url = import.meta.url;
 const jsroot = url.split('/').slice(0, -1).join('/') + '/';
-const webroot = url.split('/').slice(0, -3).join('/') + '/';
-console.log(webroot);
 class xiuno extends EventTarget {
 	jsroot = jsroot;
-	webroot = webroot;
 	cdn_unpkg_path = 'https://lf6-unpkg.zstaticcdn.com/';
 	webp_wasm_path = this.cdn_unpkg_path + 'wasm-webp@0.0.2/dist/esm/';
 	zip_js = this.cdn_unpkg_path + '@zip.js/zip.js@2.7.53/dist/zip.min.js';
@@ -15,17 +12,6 @@ class xiuno extends EventTarget {
 	ajaxs = new Map;
 	constructor() {
 		super();
-		const sw = navigator.serviceWorker;
-		if (sw) {
-			sw.addEventListener('message', e => this.callMethod('sw', e.data, e.source, e.type));
-			if(sw.ready){
-				this.sw = sw.ready.then(s=>s.active);
-				sw.addEventListener('controllerchange',event=>this.sw = event.target.ready.then(s=>s.active));
-			}else{
-				this.sw = new Promise(back=>sw.register(webroot + 'sw.js').then(s=>back(s.active)));
-			}
-			this.methods.set('sw', function (event) { console.log(event); });
-		}
 		Object.entries(methods).forEach(v => this.methods.set(v[0], v[1]));
 		Object.entries(ajaxs).forEach(v => this.ajaxs.set(v[0], v[1]));
 		this.once('ready', this.ready);
@@ -48,6 +34,17 @@ class xiuno extends EventTarget {
 	}
 	ready() {
 		console.log('ready');
+		const sw = navigator.serviceWorker;
+		if (sw) {
+			sw.addEventListener('message', e => this.callMethod('sw', e.data, e.source, e.type));
+			if(sw.ready){
+				this.sw = sw.ready.then(s=>s.active);
+				sw.addEventListener('controllerchange',event=>this.sw = event.target.ready.then(s=>s.active));
+			}else{
+				this.sw = new Promise(back=>sw.register(this.webroot + 'sw.js').then(s=>back(s.active)));
+			}
+			this.methods.set('sw', function (event) { console.log(event); });
+		}
 		this.parse();
 	}
 	parse(dom) {

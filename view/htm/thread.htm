@@ -1,4 +1,4 @@
-<?php include _include(APP_PATH.'view/htm/header.inc.htm');?>
+<!--{template(MyApp::htm_path('header.inc.htm'))}-->
 
 <!--{hook thread_start.htm}-->
 
@@ -149,7 +149,7 @@
 		<!--{hook thread_postlist_after.htm}-->
 		
 		<div class="d-none threadlist"><input type="checkbox" name="modtid" value="<?php echo $thread['tid']; ?>" checked /></div>
-		<?php include _include(APP_PATH.'view/htm/thread_list_mod.inc.htm');?>
+		<!--{template(MyApp::htm_path('thread_list_mod.inc.htm'))}-->
 		
 		<?php if($pagination) { ?>
 		<nav><ul class="pagination my-4 justify-content-center flex-wrap"><?php echo $pagination; ?></ul></nav>
@@ -202,7 +202,7 @@
 
 <!--{hook thread_end.htm}-->
 
-<?php include _include(APP_PATH.'view/htm/footer.inc.htm');?>
+<!--{template(MyApp::htm_path('footer.inc.htm'))}-->
 
 <script>
 var jform = $('#quick_reply_form');

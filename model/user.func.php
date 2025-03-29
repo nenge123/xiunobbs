@@ -297,7 +297,7 @@ function user_token_get() {
 	// hook model_user_token_get_start.php
 	
 	if(!$_uid) {
-		setcookie('bbs_token', '', $_SERVER['REQUEST_TIME'] - 86400, '');
+		MyApp::cookies('token', '');
 	}
 	
 	// hook model_user_token_get_end.php
@@ -308,7 +308,7 @@ function user_token_get() {
 // 用户
 function user_token_get_do() {
 	global $ip, $conf;
-	$token = param('bbs_token');
+	$token = MyApp::cookies('token');
 	
 	// hook model_user_token_get_do_start.php
 	
@@ -332,14 +332,14 @@ function user_token_set($uid) {
 	global $conf;
 	if(empty($uid)) return;
 	$token = user_token_gen($uid);
-	setcookie('bbs_token', $token, $_SERVER['REQUEST_TIME'] + 8640000, $conf['cookie_path']);
+	MyApp::cookies('token', $token, $_SERVER['REQUEST_TIME'] + 8640000);
 	
 	// hook model_user_token_set_end.php
 }
 
 function user_token_clear() {
 	global $conf;
-	setcookie('bbs_token', '', $_SERVER['REQUEST_TIME'] - 8640000, $conf['cookie_path']);
+	MyApp::cookies('token', '', $_SERVER['REQUEST_TIME'] - 8640000);
 	
 	// hook model_user_token_clear_end.php
 }

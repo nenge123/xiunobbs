@@ -20,7 +20,7 @@ switch ($action):
 			else:
 				$accesslist = array_column($accesslist, null, 'gid');
 				foreach ($grouplist as $k => $v):
-					$accesslist[$k] = array_merge($grouplist[$k], $v);
+					$accesslist[$k] = array_merge($grouplist[$k],$accesslist[$k] ?? array());
 				endforeach;
 			endif;
 			if (isset($accesslist[7])):
@@ -57,28 +57,31 @@ switch ($action):
 			$update = array('fid' => $_fid);
 			$allowlist = [];
 			$rows = 0;
+			$_POST['accesson'] = MyApp::post('accesson',0);
 			foreach ($_POST as $k => $v):
 				if (in_array($k, $forumkeys)):
 					$update[$k] = $v;
 				elseif (str_starts_with($k, 'allow')):
 					foreach ($v as $x => $y):
-						$allowlist[$x][$k] = $y;
+						$allowlist[$x][$k] = intval($y);
 					endforeach;
 				endif;
 			endforeach;
 			// hook admin_forum_update_post_before.php
 			if (!empty($update['accesson'])):
 				#更新 插入权限
-				foreach ($allowlist as $k => $v):
-					$allowlist[$k]['fid'] = $_fid;
-					$allowlist[$k]['gid'] = $k;
+				$newarr = [];
+				foreach($grouplist as $_group):
+					if($_group['gid']==7):
+						continue;
+					endif;
+					$newarr[$_group['gid']]['fid'] = $_fid;
+					$newarr[$_group['gid']]['gid'] = $_group['gid'];
 					foreach (['allowread', 'allowthread', 'allowpost', 'allowattach', 'allowdown'] as $x):
-						if (empty($v[$x])):
-							$allowlist[$k][$x] = 0;
-						endif;
+						$newarr[$_group['gid']][$x] = empty($allowlist[$_group['gid']][$x])?0:1;
 					endforeach;
 				endforeach;
-				$rows += MyDB::t('forum_access')->insert_map_update($allowlist);
+				$rows += MyDB::t('forum_access')->insert_map_update($newarr);
 			else:
 				#删除板块权限
 				$update['accesson'] = 0;

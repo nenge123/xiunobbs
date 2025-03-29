@@ -25,9 +25,9 @@
 			<!--{hook header_nav_logo_after.htm}-->
 			
 			<?php if(empty($uid)) { ?>
-				<a class="navbar-brand hidden-lg" href="<?php echo url('user-login');?>" aria-label="<?php echo lang('login');?>"> <i class="icon-user icon"></i></a>
+				<a class="navbar-brand hidden-lg" href="<?php echo MyApp::url('user-login');?>" aria-label="<?php echo lang('login');?>"> <i class="icon-user icon"></i></a>
 			<?php } else { ?>
-				<a class="navbar-brand hidden-lg" href="<?php echo url("thread-create-$fid");?>" aria-label="<?php echo lang('thread_create');?>"><i class="icon-edit icon"></i></a>
+				<a class="navbar-brand hidden-lg" href="<?php echo MyApp::url("thread-create-$fid");?>" aria-label="<?php echo lang('thread_create');?>"><i class="icon-edit icon"></i></a>
 			<?php } ?>
 			
 			<!--{hook header_nav_user_icon_after.htm}-->
@@ -41,7 +41,7 @@
 					<?php foreach($forumlist_show as $_forum) { ?>
 					<!--{hook header_nav_forumlist_loop_start.htm}-->
 					<li class="nav-item" fid="<?php echo $_forum['fid'];?>" data-active="fid-<?php echo $_forum['fid'];?>">
-						<a class="nav-link" href="<?php echo url("forum-$_forum[fid]");?>"><i class="icon-circle-o d-md-none"></i> <?php echo $_forum['name'];?></a>
+						<a class="nav-link" href="<?php echo MyApp::url("forum-$_forum[fid]");?>"><i class="icon-circle-o d-md-none"></i> <?php echo $_forum['name'];?></a>
 					</li>
 					<!--{hook header_nav_forumlist_loop_end.htm}-->
 					<?php } ?>
@@ -51,16 +51,16 @@
 				<ul class="navbar-nav">
 					<!--{hook header_nav_user_start.htm}-->
 				<?php if(empty($uid)) { ?>
-					<li class="nav-item"><a class="nav-link" href="<?php echo url('user-login');?>"><i class="icon-user"></i> <?php echo lang('login');?></a></li>
-					<!--<li class="nav-item"><a class="nav-link" href="<?php echo url('user-create');?>"><?php echo lang('register');?></a></li>-->
+					<li class="nav-item"><a class="nav-link" href="<?php echo MyApp::url('user-login');?>"><i class="icon-user"></i> <?php echo lang('login');?></a></li>
+					<!--<li class="nav-item"><a class="nav-link" href="<?php echo MyApp::url('user-create');?>"><?php echo lang('register');?></a></li>-->
 				<?php } else { ?>
-					<li class="nav-item username"><a class="nav-link" href="<?php echo url('my');?>"><img class="avatar-1" src="<?php echo $user['avatar_url'];?>"> <?php echo $user['username'];?></a></li>
+					<li class="nav-item username"><a class="nav-link" href="<?php echo MyApp::url('my');?>"><img class="avatar-1" src="<?php echo $user['avatar_url'];?>"> <?php echo $user['username'];?></a></li>
 					<!-- 管理员 -->
 					<?php if($gid == 1) { ?>
-					<li class="nav-item"><a class="nav-link" href="admin/"><i class="icon-home"></i> <?php echo lang('admin_page');?></a></li>
+					<li class="nav-item"><a class="nav-link" href="{{ MyApp::url('admin/index') }}"><i class="icon-home"></i> <?php echo lang('admin_page');?></a></li>
 					<?php } ?>
 					<!--{hook header_nav_admin_page_after.htm}-->
-					<li class="nav-item"><a class="nav-link" href="<?php echo url('user-logout');?>"><i class="icon-sign-out"></i> <?php echo lang('logout');?></a></li>
+					<li class="nav-item"><a class="nav-link" href="<?php echo MyApp::url('user-logout');?>"><i class="icon-sign-out"></i> <?php echo lang('logout');?></a></li>
 				<?php } ?>
 					<!--{hook header_nav_user_end.htm}-->
 				</ul>

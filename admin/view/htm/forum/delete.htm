@@ -1,5 +1,5 @@
 <!--{template(ADMIN_PATH.'view/htm/new-header.htm')}-->
-<form action="{{ $_SERVER['REQUEST_URI'] }}" method="post" class="mb-3" onget="eventsourcemessage" data-scroll="#end-{{ $_SERVER['REQUEST_TIME'] }}">
+<form action="{{ MyApp::value('url') }}" method="post" class="mb-3" onget="eventsourcemessage" data-scroll="#end-{{ $_SERVER['REQUEST_TIME'] }}">
 	<div class="card">
 		<div class="card-header">
 			<h4 class="card-title"><!--{lang admin_forum_delete}-->:<!--{{ $_forum['name'] }}--></h4>

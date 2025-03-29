@@ -1,4 +1,4 @@
-<?php include _include(APP_PATH.'view/htm/header.inc.htm');?>
+<!--{template(MyApp::htm_path('header.inc.htm'))}-->
 
 <!--{hook user_create_start.htm}-->
 
@@ -90,9 +90,9 @@
 
 <!--{hook user_create_end.htm}-->
 
-<?php include _include(APP_PATH.'view/htm/footer.inc.htm');?>
+<!--{template(MyApp::htm_path('footer.inc.htm'))}-->
 
-<script src="<?php echo $conf['view_url'];?>js/md5.js"></script>
+<script src="{{ \MyApp::view_site('js/md5.js') }}"></script>
 
 <script>
 var jform = $('#form');

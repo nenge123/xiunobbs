@@ -38,10 +38,14 @@ class plugin
 			$temppath = MyApp::convert_site($temppath);
 			$pathinfo = pathinfo($temppath);
 			$ext = $pathinfo['extension'];
-			if ($pathinfo['dirname'] != '.'):
+			if (!empty($pathinfo['dirname'])&&$pathinfo['dirname'] != '.'):
 				$file_arr = explode('/', $pathinfo['dirname']);
 			endif;
 			#endif;
+			if(empty($pathinfo['filename'])):
+				xn_log($srcfile,'error');
+				echo $srcfile;exit;
+			endif;
 			$file_arr[] = $pathinfo['filename'] . '.php';
 			if (in_array($file_arr[0], ['route', 'model', 'view', 'admin'])):
 				$tmpfile = MyApp::tmp_path($file_arr[0] . '/' . implode('_', array_slice($file_arr, 1)));
@@ -100,7 +104,7 @@ class plugin
 	 */
 	public static function parseJS(string $srcfile, ?string $name = null)
 	{
-		$path = 'js/hook/' . ($name ?? basename($srcfile));
+		$path = 'js/hook/' . ($name ?? pathinfo($srcfile,PATHINFO_FILENAME)).'.js';
 		$tmpfile = MyApp::view_path($path);
 		self::parseFile($srcfile, $tmpfile);
 		return MyApp::view_site($path);

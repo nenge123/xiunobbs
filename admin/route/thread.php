@@ -2,49 +2,61 @@
 !defined('APP_PATH') and exit('Access Denied.');
 $action = MyApp::value(0);
 // hook admin_thread_start.php
-$pagesize = 100;
 switch ($action):
 	case 'delete':
-		$_tid = intval(MyApp::value(1));
-		$_thread = MyDB::t('thread')->whereFirst(['tid' => $_tid], '', array('tid', 'subject', 'closed'));
-		if ($_SERVER['REQUEST_METHOD'] == 'POST'):
-			switch (MyApp::post('action')):
-				case '1':
-					// hook admin_thread_delete_close.php
-					if (empty($_thread['closed']) && MyDB::t('thread')->update_by_where(['closed' => 1], ['tid' => $_tid]) > 0):
-						MyApp::message(0, '主题关闭成功,主题不可回复了');
-					elseif (!empty($_thread['closed']) && MyDB::t('thread')->update_by_where(['closed' => 0], ['tid' => $_tid]) > 0):
-						MyApp::message(0, '主题重新打开成功,主题可回复了');
-					endif;
-					break;
-				case '2':
-					// hook admin_thread_delete_block.php
-					MyApp::message(-1, '你安装封禁主题,回收站功能插件!');
-					break;
-				case '3':
-					// hook admin_thread_delete_remove.php
-					if (thread_delete($_tid)):
-						MyApp::message(0, '删除成功!!', ['url' => MyApp::purl('list')]);
-					endif;
-					break;
-			endswitch;
-			MyApp::message(-1, '没变化');
-		endif;
-		include _include(ADMIN_PATH . "view/htm/thread/delete.htm");
-		break;
-	default:
 		if (MyApp::head('accept') == 'text/event-stream'):
-			#每次删除100条主题
 			route_admin::thread_delete_list();
 		endif;
+		break;
+	case 'closed':
+		$tids = MyApp::post('tids');
+		if (!empty($tids)):
+			// hook admin_thread_closed.php
+			$rows = MyDB::t('thread')->update_by_where(['closed' => 1], ['tid' => $tids]);
+			if ($rows):
+				MyApp::message(0, '你已关闭了' . $rows . '条主题');
+			endif;
+		endif;
+		MyApp::message(-1, '没变化');
+		break;
+	case 'open':
+		$tids = MyApp::post('tids');
+		if (!empty($tids)):
+			// hook admin_thread_open.php
+			$rows = MyDB::t('thread')->update_by_where(['closed' => 0], ['tid' => $tids]);
+			if ($rows):
+				MyApp::message(0, '你已重新打开了' . $rows . '条主题');
+			endif;
+		endif;
+		MyApp::message(-1, '没变化');
+		break;
+	case 'block':
+		$tids = MyApp::post('tids');
+		if (!empty($tids)):
+			// hook admin_thread_block.php
+			MyApp::message(-1, '你没安装封禁主题,回收站功能插件!');
+		endif;
+		MyApp::message(-1, '没变化');
+		break;
+	case 'unblock':
+		$tids = MyApp::post('tids');
+		if (!empty($tids)):
+			// hook admin_thread_unblock.php
+			MyApp::message(-1, '你没安装封禁主题,回收站功能插件!');
+		endif;
+		MyApp::message(-1, '没变化');
+		break;
+	default:
+		// hook admin_thread_end.php
 		$header['title'] = lang('thread_admin');
 		$header['mobile_title'] = lang('thread_admin');
 		$threadlist = array();
 		$maxlength = 0;
+		$limit = 30;
 		// hook admin_thread_list_start.php
 		if ($_SERVER['REQUEST_METHOD'] == 'POST'):
+			// hook admin_thread_list_post_start.php
 			$where = array();
-			$limit = 30;
 			$fid = intval(MyApp::post('fid'));
 			$page = intval(MyApp::post('page', 1));
 			$keyword = MyApp::post('keyword');
@@ -71,12 +83,14 @@ switch ($action):
 				$where['uid'] = $uid;
 			endif;
 			$maxlength = MyDB::t('thread')->whereCount($where);
-			$threadlist = MyDB::t('thread')->where($where, MyDB::ORDER(['tid' => 'asc']) . MyDB::LIMIT($page, $limit), MyDB::MODE_ITERATOR, array('tid', 'subject'));
+			$columns = array('tid', 'subject', 'closed');
+			// hook admin_thread_list_query.php
+			$threadlist = MyDB::t('thread')->where($where, MyDB::ORDER(['tid' => 'asc']) . MyDB::LIMIT($page, $limit), MyDB::MODE_ITERATOR, $columns);
 			$maxpage = ceil($maxlength / $limit);
 			$pagination = MyApp::pagination($maxpage, $page);
 		endif;
 		// hook admin_thread_list_end.php
+		$importjs[] = route_admin::site('view/js/thread-list.js');
 		include _include(ADMIN_PATH . "view/htm/thread/list.htm");
 		break;
 endswitch;
-// hook admin_thread_end.php

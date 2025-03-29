@@ -11,17 +11,15 @@ class MyApp implements \ArrayAccess
 		function_exists('chdir') and chdir(APP_PATH);
 		set_include_path(APP_PATH);
 		$this->datas = array(
+			'charset' => 'utf-8',
 			'extension' => 'html',
 			'https' => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on',
-			'rewriteopen' => str_ends_with($_SERVER['PHP_SELF'], 'index.php'),
-			'rewriteroot' => dirname($_SERVER['PHP_SELF']) . '/',
-			'rewriteMode' => false,
+			'rewrite_open' => false,
 			'gzip' => str_contains($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip'),
 			'session' => array(),
 			'g_session_invalid' => FALSE,
 		);
 		define('APP_SITE', $this->convert_site(APP_PATH));
-		$this->routerExport();
 		$this->setConf($conf);
 		set_exception_handler(function ($exception) {
 			include __DIR__ . DIRECTORY_SEPARATOR . 'exception.php';
@@ -35,11 +33,12 @@ class MyApp implements \ArrayAccess
 		else:
 			ob_start();
 		endif;
+		$this->routerExport();
 	}
 	public function autoload_register($class)
 	{
 		$arr = explode('\\', $class);
-		$path = $this->datas['path']['appclass']. implode(DIRECTORY_SEPARATOR, $arr) . '.php';
+		$path = $this->datas['path']['appclass'] . implode(DIRECTORY_SEPARATOR, $arr) . '.php';
 		switch ($arr[0]):
 			case 'model':
 				return require(\plugin::parseFile($path));
@@ -84,6 +83,8 @@ class MyApp implements \ArrayAccess
 		$this->set_basepath('view', $conf['view_path'] ?? null);
 		#模板目录
 		$this->set_basepath('view/htm', $conf['htm_path'] ?? null);
+		#语言目录
+		$this->set_basepath('lang', $conf['lang_path'] ?? null);
 		#view资源目录WEB访问地址
 		if (isset($conf['view_url']) && str_contains($conf['view_url'], '://')):
 			$this->datas['site']['view'] = $conf['view_url'];
@@ -97,6 +98,7 @@ class MyApp implements \ArrayAccess
 			$this->datas['site']['upload'] = self::convert_site($this->datas['path']['upload']);
 		endif;
 		$this->datas['site'] += array(
+			'root' => APP_SITE,
 			'js' => $this->datas['site']['view'] . 'js/',
 			'css' => $this->datas['site']['view'] . 'css/',
 			'font' => $this->datas['site']['view'] . 'font/',
@@ -109,8 +111,9 @@ class MyApp implements \ArrayAccess
 			'avatar' => $this->datas['site']['upload'] . 'avatar/',
 		);
 		$this->datas['path'] += array(
+			'root' => APP_PATH,
 			'app' => XIUNOPHP_PATH,
-			'appclass' => XIUNOPHP_PATH.'class'.DIRECTORY_SEPARATOR,
+			'appclass' => XIUNOPHP_PATH . 'class' . DIRECTORY_SEPARATOR,
 			'js' => $this->datas['path']['view'] . 'js' . DIRECTORY_SEPARATOR,
 			'css' => $this->datas['path']['view'] . 'css' . DIRECTORY_SEPARATOR,
 			'scss' => $this->datas['path']['view'] . 'scss' . DIRECTORY_SEPARATOR,
@@ -122,7 +125,24 @@ class MyApp implements \ArrayAccess
 			'uploadtmp' => $this->datas['path']['upload'] . 'tmp' . DIRECTORY_SEPARATOR,
 			'forum' => $this->datas['path']['upload'] . 'forum' . DIRECTORY_SEPARATOR,
 			'avatar' => $this->datas['path']['upload'] . 'avatar' . DIRECTORY_SEPARATOR,
+			'htm' => $this->datas['path']['view/htm'],
+			'i18n' => $this->datas['path']['lang'] . $conf['lang'] . DIRECTORY_SEPARATOR,
 		);
+		#是否为 xxx/index.php
+		$this->datas['rewriteroot'] = $_SERVER['SCRIPT_NAME'];
+		$this->datas['isIndexPath'] = str_ends_with($_SERVER['SCRIPT_NAME'], 'index.php');
+		#定义伪静态模式
+		if (!empty($conf['url_rewrite_on'])):
+			$this->datas['rewrite_open'] = $conf['url_rewrite_on'];
+		endif;
+		if (empty($conf['url_rewrite_style'])&&$this->datas['isIndexPath']):
+			#当脚本为index.php 且使用 index.php/xxx/gg
+			$this->datas['rewriteroot'] = substr($_SERVER['SCRIPT_NAME'], 0, -9);
+		endif;
+		#定义编码
+		if (!empty($conf['charset'])):
+			$this->datas['charset'] = $conf['charset'];
+		endif;
 		$this->read_cookie_data($conf);
 	}
 	public function setConf(array $conf)
@@ -244,7 +264,7 @@ class MyApp implements \ArrayAccess
 			$data = session_encode();
 		}
 		chdir(APP_PATH);
-		$url = $_SERVER['REQUEST_URI_NO_PATH'] ?? '';
+		$url = $this->datas['querydata']['path'] ?? '';
 		if (strlen($url) > 32):
 			$url = substr($url, 0, 32);
 		endif;
@@ -338,7 +358,7 @@ class MyApp implements \ArrayAccess
 			return;
 		}
 		// 可能会暴涨
-		$url = $_SERVER['REQUEST_URI_NO_PATH'] ?? '';
+		$url = $this->datas['querydata']['path'] ?? '';
 		if (strlen($url) > 32):
 			$url = substr($url, 0, 32);
 		endif;
@@ -530,6 +550,13 @@ class MyApp implements \ArrayAccess
 	{
 		return self::convert_path(self::app()->datas['path']['htm'] . $name);
 	}
+	/**
+	 * 返回默认模板目录下的文件绝对物理路径
+	 */
+	public static function i18n_path(string $name = '')
+	{
+		return self::convert_path(self::app()->datas['path']['i18n'] . $name);
+	}
 	public static function app()
 	{
 		return self::$_app;
@@ -573,18 +600,15 @@ class MyApp implements \ArrayAccess
 	public static function convert_site(string $path): string
 	{
 		$myapp = self::app();
-		if (str_starts_with($path, APP_PATH)):
-			if (isset($myapp->datas['site']['upload'])):
-				if (str_starts_with($path, $myapp->datas['path']['view'])):
-					$path = str_replace($myapp->datas['path']['view'], $myapp->datas['site']['view'], $path);
-				elseif (str_starts_with($path, $myapp->datas['path']['upload'])):
-					$path = str_replace($myapp->datas['path']['upload'], $myapp->datas['site']['upload'], $path);
-				else:
-					$path = str_replace($_SERVER['DOCUMENT_ROOT'], '', $path);
-				endif;
-			else:
-				$path = str_replace($_SERVER['DOCUMENT_ROOT'], '', $path);
+		if (isset($myapp->datas['site']['upload'])):
+			if (str_starts_with($path, $myapp->datas['path']['view'])):
+				$path = str_replace($myapp->datas['path']['view'], $myapp->datas['site']['view'], $path);
+			elseif (str_starts_with($path, $myapp->datas['path']['upload'])):
+				$path = str_replace($myapp->datas['path']['upload'], $myapp->datas['site']['upload'], $path);
 			endif;
+		endif;
+		if (str_starts_with($path,$_SERVER['DOCUMENT_ROOT'])):
+			$path = str_replace($_SERVER['DOCUMENT_ROOT'], '', $path);
 		endif;
 		$path = str_replace('\\', '/', $path);
 		return $path;
@@ -668,13 +692,11 @@ class MyApp implements \ArrayAccess
 	}
 	public static function http_location($url)
 	{
-		while (ob_get_level() > 0):
-			@ob_end_clean();
-		endwhile;
-		if (!str_starts_with($url, 'http')):
+		@ob_clean();
+		if (str_contains($url, '://')):
 			header('Location:' . $url);
 		else:
-			header('Location:' . self::site($url));
+			header('Location://' . $_SERVER['HTTP_HOST'] . self::site($url));
 		endif;
 		exit;
 	}
@@ -743,13 +765,49 @@ class MyApp implements \ArrayAccess
 	 */
 	private function routerExport(): void
 	{
-		$query = isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : '';
-		$query = urldecode($query);
-		$scriptArr = explode('&', $query);
 		$this->datas['querydata'] = array(
-			'query' => $query,
+			'query' => '',
 			'param' => array(),
+			'url' => urldecode($_SERVER['REQUEST_URI']),
 		);
+		$scriptname = basename($_SERVER['SCRIPT_NAME']) . '/';
+		if (!empty($_SERVER['PATH_INFO'])):
+			$path = str_replace($scriptname, '/', $_SERVER['PATH_INFO']);
+		endif;
+		if (function_exists('mb_check_encoding')):
+			if (mb_check_encoding($this->datas['querydata']['url'],'GBK')):
+				if (!empty($path)):
+					$path = mb_convert_encoding($path, $this->datas['charset'], 'GBK');
+				endif;
+				$this->datas['querydata']['url'] = mb_convert_encoding($this->datas['querydata']['url'], $this->datas['charset'], 'GBK');
+			endif;
+		else:
+			if (str_contains($_SERVER['SERVER_SOFTWARE'], 'IIS')):
+				#IIS 默认情况下是GBK编码
+				if (!empty($path)):
+					$path = iconv('GBK', $this->datas['charset'], $path);
+				endif;
+				$this->datas['querydata']['url'] = iconv('GBK', $this->datas['charset'], $this->datas['querydata']['url']);
+			endif;
+		endif;
+		if (!empty($path)):
+			$this->routerReadPath($path);
+		endif;
+		if (!empty($_SERVER['QUERY_STRING'])):
+			$query = $_SERVER['QUERY_STRING'];
+			$query = trim($query, ' .\/\\');
+			$query = urldecode($query);
+			if ($this->datas['isIndexPath']):
+				#这个情况很可能 abc/index.php/abc/def/ 被重写为 abc/index.php?index.php/abc/def/
+				if (str_starts_with($query, $scriptname)):
+					$query = substr($query, strlen($scriptname));
+				endif;
+			endif;
+		//$this->datas['querydata']['url'] = $_SERVER['SCRIPT_NAME'].'?'. $query;
+		else:
+			$query = '';
+		endif;
+		$scriptArr = explode('&', $query);
 		foreach ($scriptArr as $index => $data):
 			$arr = explode('=', $data);
 			$key = array_shift($arr);
@@ -761,8 +819,8 @@ class MyApp implements \ArrayAccess
 					$this->routerReadPath(trim($key));
 				elseif (is_numeric($value)):
 					$this->datas['querydata']['param'][$key] = intval($value);
-				elseif (!is_null($value)):
-					$this->datas['querydata']['param'][$key] = $value;
+				elseif (is_string($value)):
+					$this->datas['querydata']['param'][$key] = trim($value);
 				endif;
 			endif;
 		endforeach;
@@ -772,28 +830,34 @@ class MyApp implements \ArrayAccess
 	}
 	private function routerReadPath(string $path): void
 	{
-		$this->datas['querydata']['path'] = $path;
 		$path = trim($path, '.\\/');
 		if (!empty($path)):
-			$path = strtolower($path);
-			$pathlist = explode('/', $path);
-			$last = array_pop($pathlist);
-			if (!empty($last)):
-				$extension = pathinfo($last, PATHINFO_EXTENSION);
-				if ($extension):
-					$filename = pathinfo($last, PATHINFO_FILENAME);
-					$filename = trim($filename);
-					$filename = trim($filename, '-');
-					$pathlist[] = $filename;
-					#$router_list = explode('-', trim($filename));
-					#array_push($pathlist, ...$router_list);
-					$this->datas['querydata']['filename'] = $filename;
-					$this->datas['querydata']['extension'] = $extension;
-				else:
-					$pathlist[] = $last;
+			if (empty($this->datas['querydata']['path'])):
+				$this->datas['querydata']['path'] = $path;
+				if (!empty($path)):
+					$path = strtolower($path);
+					$pathlist = explode('/', $path);
+					$last = array_pop($pathlist);
+					if (!empty($last)):
+						$extension = pathinfo($last, PATHINFO_EXTENSION);
+						if ($extension):
+							$filename = pathinfo($last, PATHINFO_FILENAME);
+							$filename = trim($filename);
+							$filename = trim($filename, '-');
+							$pathlist[] = $filename;
+							#$router_list = explode('-', trim($filename));
+							#array_push($pathlist, ...$router_list);
+							$this->datas['querydata']['filename'] = $filename;
+							$this->datas['querydata']['extension'] = $extension;
+						else:
+							$pathlist[] = $last;
+						endif;
+					endif;
+					$this->routerSetValue($pathlist);
 				endif;
+			else:
+				$this->routerSetValue([$path]);
 			endif;
-			$this->routerSetValue($pathlist);
 		endif;
 	}
 	private function routerIsUUID(string $uuid): bool
@@ -954,11 +1018,11 @@ class MyApp implements \ArrayAccess
 	/**
 	 * 返回相对URL
 	 */
-	public function get_url_href(string|array $router = 'index', string|array $param = array(), bool $width = false): string
+	public function get_url_href(string|array $router = 'index', string|array $param = array(), bool $width = false,$top=false): string
 	{
 		if (empty($router)):
 			$router = '';
-			if ($this->datas['rewriteMode'] && empty($router) && $this->datas['extension'] != 'php'):
+			if ($this->datas['rewrite_open'] && empty($router) && $this->datas['extension'] != 'php'):
 				#设置 如index.html默认地址
 				$router = 'index.' . $this->datas['extension'];
 			endif;
@@ -975,8 +1039,13 @@ class MyApp implements \ArrayAccess
 			endif;
 		endif;
 		$param = $this->get_url_param($param, $width);
+		$rewriteroot = $this->datas['rewriteroot'];
+		if($top):
+			$arr = explode('/',$rewriteroot);
+			$rewriteroot = APP_SITE.(array_pop($arr) ?'index.php':'');
+		endif;
 		#index.php 为引导文件
-		if ($this->datas['rewriteopen'] && $this->datas['rewriteMode']):
+		if ($this->datas['isIndexPath'] && $this->datas['rewrite_open']):
 			#是否支持伪静态重写
 			if (!empty($param)):
 				if (empty($router)):
@@ -985,27 +1054,47 @@ class MyApp implements \ArrayAccess
 					$router .= '&' . $param;
 				endif;
 			endif;
-			return $this->datas['rewriteroot'] . $router;
+			return $rewriteroot . $router;
 		endif;
-		if (!empty($param)):
-			if (empty($router)):
-				$router = $param;
-			else:
-				$router .= '&' . $param;
+		if (empty($this->conf['url_rewrite_style'])):
+			if (!empty($param)):
+				if (empty($router)):
+					$router = $param;
+				else:
+					$router .= '&' . $param;
+				endif;
 			endif;
+			if (!empty($router)):
+				$router = '?' . $router;
+			endif;
+			return $rewriteroot . $router;
+		else:
+			if (!empty($param)):
+				$router .= '?' . $param;
+			endif;
+			return $rewriteroot . '/' . $router;
 		endif;
-		if (!empty($router)):
-			$router = '?' . $router;
-		endif;
-		return $this->datas['rewriteroot'] . $router;
 	}
-	public static function url(string|array $router = 'index', string|array $param = array(), bool $width = false): string
+	/**
+	 * URL
+	 */
+	public static function url(string|array $router = 'index', string|array $param = array(), bool $with = false): string
 	{
-		return self::app()->get_url_href($router, $param, $width);
+		return self::app()->get_url_href($router, $param, $with);
 	}
-	public static function purl(string|array $router = '', string|array $param = array(), bool $width = false)
+	/**
+	 * 模块目录URL
+	 */
+	public static function purl(string|array $router = '', string|array $param = array(), bool $with = false)
 	{
-		return self::app()->get_url_href(self::value('module') . '/' . $router, $param, $width);
+		return self::app()->get_url_href(self::value('module') . '/' . $router, $param, $with);
+	}
+	/**
+	 * 顶级目录URL
+	 */
+	public static function topurl(string|array $router = 'index', string|array $param = array(), bool $with = false)
+	{
+		return self::app()->get_url_href($router, $param, $with,true);
 	}
 	public static function cookies($name, ?string $value = null, int $time = 0)
 	{
@@ -1086,25 +1175,25 @@ class MyApp implements \ArrayAccess
 		if ($page >= $maxpage) $page = $maxpage;
 		$result = array($page);
 		$j = 1;
-		while(true):
-			if($page+$j<=$maxpage):
-				$result[] = $page+$j;
+		while (true):
+			if ($page + $j <= $maxpage):
+				$result[] = $page + $j;
 			endif;
-			if($page-$j>0):
-				array_unshift($result,$page-$j);
+			if ($page - $j > 0):
+				array_unshift($result, $page - $j);
 			endif;
-			$j+=1;
-			if($page+$j>$maxpage&&$page-$j<0):
-			break;
+			$j += 1;
+			if ($page + $j > $maxpage && $page - $j < 0):
+				break;
 			endif;
-			if(count($result)>=$maxnum):
+			if (count($result) >= $maxnum):
 				break;
 			endif;
 		endwhile;
-		if($result[count($result)-1]):
-			$result[count($result)-1] = $maxpage;
+		if ($result[count($result) - 1]):
+			$result[count($result) - 1] = $maxpage;
 		endif;
-		if($result[0]):
+		if ($result[0]):
 			$result[0] = 1;
 		endif;
 		return $result;

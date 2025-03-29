@@ -1,15 +1,15 @@
-<?php include _include(APP_PATH.'view/htm/header.inc.htm');?>
+<!--{template(MyApp::htm_path('header.inc.htm'))}-->
 
 <!--{hook user_post_start.htm}-->
 
 <div class="row">
 	<div class="col-lg-8 mx-auto">
 	
-		<?php include _include(APP_PATH.'view/htm/user_profile.inc.htm');?>
+		<!--{template(MyApp::htm_path('user_profile.inc.htm'))}-->
 		
 		<div class="card user-postlist">
 			<div class="card-header">
-				<?php include _include(APP_PATH.'view/htm/user_nav.inc.htm');?>
+				<!--{template(MyApp::htm_path('user_nav.inc.htm'))}-->
 			</div>
 			<div class="card-body">
 				<ul class="list-unstyled postlist">
@@ -34,6 +34,6 @@
 
 <!--{hook user_post_end.htm}-->
 
-<?php include _include(APP_PATH.'view/htm/footer.inc.htm');?>
+<!--{template(MyApp::htm_path('footer.inc.htm'))}-->
 
 <!--{hook user_post_js.htm}-->

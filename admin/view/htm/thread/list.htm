@@ -1,12 +1,6 @@
 <!--{template(ADMIN_PATH.'view/htm/new-header.htm')}-->
-<!--{hook admin_thread_list_start.htm}-->
-<div class="row">
-	<div class="col-12">
-		<div class="btn-group mb-3" role="group">
-		</div>
-	</div>
-</div>
-<form action="{{ $_SERVER['REQUEST_URI'] }}" method="post">
+<form action="{{ MyApp::value('url') }}" method="post">
+	<!--{hook admin_thread_list_htm_start.htm}-->
 	<details class="card" {{ $maxlength>0?'close':'open' }}>
 		<summary class="card-header"><!--{lang search_condition}--></summary>
 		<div class="card-body row">
@@ -25,7 +19,7 @@
 				<div class="form-floating mb-3"><!--{{ \route_admin::input_text('keyword',MyApp::post('keyword'),'keyword') }}--></div>
 			</div>
 			<div class="col-md-6">
-				<div class="form-floating mb-3"><!--{{ \route_admin::input_date_text('create_date_start',MyApp::post('create_date_start',date('Y-m-d',mktime(-24,0,0,))),'start_date',' max="'.date('Y-m-d').'"') }}--></div>
+				<div class="form-floating mb-3"><!--{{ \route_admin::input_date_text('create_date_start',MyApp::post('create_date_start'),'start_date',' max="'.date('Y-m-d').'"') }}--></div>
 			</div>
 			<div class="col-md-6">
 				<div class="form-floating mb-3"><!--{{ \route_admin::input_date_text('create_date_end',MyApp::post('create_date_end',date('Y-m-d',mktime(24,0,0,))),'end_date',' max="'.date('Y-m-d',mktime(24,0,0,)).'"') }}--></div>
@@ -39,15 +33,16 @@
 			<div class="col-md-6">
 				<button type="submit" id="search" class="btn btn-primary" data-loading-text="<!--{lang searching}-->... "><!--{lang search}--></button>
 			</div>
+			<!--{hook admin_thread_list_search_end.htm}-->
 		</div>
-		<!--{hook admin_thread_list_search_before.htm}-->
 	</details>
 	<details class="card" {{ $maxlength>0?'open':'close' }}>
 		<summary class="card-header"><!--{{ \lang('thread_search_result', array('n' => '<b id="threads">'.$maxlength.'</b>')) }}--></summary>
-		<div class="card-body" id="search_result">
+		<div class="card-body">
 			<!--{if !empty($threadlist)}-->
-			<nav aria-label="Page navigation example">
+			<nav aria-label="Page navigation example" class="mb-3">
 				<ul class="pagination gap-2">
+					<!--{hook admin_thread_list_page_start.htm}-->
 					<!--{each $pagination $pagenum}-->
 					<li class="page-item">
 						<!--{if $pagenum == $page}-->
@@ -65,29 +60,33 @@
 						<!--{/if}-->
 					</li>
 					<!--{/each}-->
-					<button type="button" class="btn btn-outline-teal" onmethods="checkall" data-match="[name^=tids]"><!--{lang checkall}--></button>
-					<button type="button" class="btn btn-outline-teal" onmethods="adimin_thread_delete">删除勾选主题</button>
+					<!--{hook admin_thread_list_page_end.htm}-->
 				</ul>
+				<nav class="pagination gap-2">
+					<!--{hook admin_thread_list_action_start.htm}-->
+					<button type="button" class="btn btn-outline-teal" onmethods="checkall" data-match="[name^=tids]"><!--{lang checkall}--></button>
+					<button type="button" class="btn btn-outline-danger" onmethods="adimin_thread_delete" data-match="[name^=tids]" data-url="{{ MyApp::purl('delete') }}">删除勾选主题</button>
+					<button type="button" class="btn btn-outline-teal" onpost="adimin_thread_lock" data-type="closed" data-match="[name^=tids]" data-url="{{ MyApp::purl('closed') }}">关闭勾选主题</button>
+					<button type="button" class="btn btn-outline-teal" onpost="adimin_thread_lock" data-type="open" data-match="[name^=tids]" data-url="{{ MyApp::purl('open') }}">打开勾选主题</button>
+					<button type="button" class="btn btn-outline-danger" onpost="adimin_thread_lock" data-type="block" data-match="[name^=tids]" data-url="{{ MyApp::purl('block') }}">封禁勾选主题</button>
+					<button type="button" class="btn btn-outline-danger" onpost="adimin_thread_lock" data-type="unblock" data-match="[name^=tids]" data-url="{{ MyApp::purl('unblock') }}">解禁勾选主题</button>
+					<!--{hook admin_thread_list_action_end.htm}-->
+				</nav>
 			</nav>
 			<div id="delete-result"></div>
 			<!--{each $threadlist $_thread}-->
-			<div class="row mb-2" id="tid-{{ $_thread['tid'] }}">
-				<div class="col-md-1">
-					<div class="form-check form-switch mb-3"><input class="form-check-input" type="checkbox" name="tids[]" value="{{ $_thread['tid'] }}">
-					</div>
-				</div>
-				<div class="col-md-8">
-					<a href="{{ MyApp::site('?thread-'.$_thread['tid']) }}"><!--{{ $_thread['subject'] }}--></a>
-				</div>
-				<div class="col-md-2">
-					<a class="btn btn-pink" href="{{ MyApp::purl('delete/'.$_thread['tid']) }}"><!--{lang thread_delete}--></a>
-				</div>
+			<div id="tid-{{ $_thread['tid'] }}" class="form-check form-switch mb-3">
+				<input class="form-check-input" type="checkbox" name="tids[]" value="{{ $_thread['tid'] }}">
+				<!--{hook admin_thread_list_item_start.htm}-->
+				<i id="block-{{ $_thread['tid'] }}" class="mdi mdi-database-lock-outline" {if empty($_thread['deleted'])}hidden{/if}></i>
+				<i id="closed-{{ $_thread['tid'] }}" class="mdi mdi-delete-clock" {if empty($_thread['closed'])}hidden{/if}></i>
+				<a class="fs-6" href="{{ MyApp::topurl('thread-'.$_thread['tid']) }}"><!--{{ $_thread['subject'] }}--></a>
+				<!--{hook admin_thread_list_item_end.htm}-->
 			</div>
 			<!--{/each}-->
 			<!--{/if}-->
 		</div>
 	</details>
+	<!--{hook admin_thread_list_htm_end.htm}-->
 </form>
-<!--{hook admin_thread_list_end.htm}-->
 <!--{template(ADMIN_PATH.'view/htm/new-footer.htm')}-->
-<!--{hook admin_thread_list_js.htm}-->

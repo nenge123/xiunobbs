@@ -1,4 +1,4 @@
-<?php include _include(APP_PATH.'view/htm/header.inc.htm');?>
+<!--{template(MyApp::htm_path('header.inc.htm'))}-->
 
 <!--{hook index_start.htm}-->
 
@@ -17,13 +17,13 @@
 			<div class="card-body">
 				<ul class="list-unstyled threadlist mb-0">
 					<!--{hook index_threadlist_before.htm}-->
-					<?php include _include(APP_PATH.'view/htm/thread_list.inc.htm');?>
+					<!--{template(MyApp::htm_path('thread_list.inc.htm'))}-->
 					<!--{hook index_threadlist_after.htm}-->
 				</ul>
 			</div>
 		</div>
 		
-		<?php include _include(APP_PATH.'view/htm/thread_list_mod.inc.htm');?>
+		<!--{template(MyApp::htm_path('thread_list_mod.inc.htm'))}-->
 		
 		<!--{hook index_page_before.htm}-->
 		<nav class="my-3"><ul class="pagination justify-content-center flex-wrap"><?php echo $pagination; ?></ul></nav>
@@ -70,7 +70,7 @@
 
 <!--{hook index_end.htm}-->
 
-<?php include _include(APP_PATH.'view/htm/footer.inc.htm');?>
+<!--{template(MyApp::htm_path('footer.inc.htm'))}-->
 
 <script>
 $('li[data-active="fid-0"]').addClass('active');

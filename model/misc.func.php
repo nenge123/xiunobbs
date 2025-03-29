@@ -12,6 +12,7 @@
 	/thread/create/1
 */
 function url($url, $extra = array()) {
+	return MyApp::url($url,$extra);
 	$conf = _SERVER('conf');
 	!isset($conf['url_rewrite_on']) AND $conf['url_rewrite_on'] = 0;
 	

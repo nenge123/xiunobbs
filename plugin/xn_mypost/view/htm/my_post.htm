@@ -1,17 +1,17 @@
-<?php include _include(APP_PATH.'view/htm/header.inc.htm');?>
+<!--{template(MyApp::htm_path('header.inc.htm'))}-->
 
 <div class="row">
 	<div class="col-lg-8 mx-auto">
 	
-		<?php include _include(APP_PATH.'view/htm/my_profile.inc.htm');?>
+		<!--{template(MyApp::htm_path('my_profile.inc.htm'))}-->
 		
 		<div class="card card-postlist">
 			<div class="card-header">
-				<?php include _include(APP_PATH.'view/htm/my_nav.inc.htm');?>
+				<!--{template(MyApp::htm_path('my_nav.inc.htm'))}-->
 			</div>
 			<div class="card-body">
 				<ul class="list-unstyled postlist mb-0">
-					<?php include _include(APP_PATH.'view/htm/post_list.inc.htm');?>
+					<!--{template(MyApp::htm_path('post_list.inc.htm'))}-->
 				</ul>
 				
 				<?php if($pagination) { ?>
@@ -23,4 +23,4 @@
 	</div>
 </div>
 
-<?php include _include(APP_PATH.'view/htm/footer.inc.htm');?>
+<!--{template(MyApp::htm_path('footer.inc.htm'))}-->

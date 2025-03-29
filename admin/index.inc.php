@@ -24,6 +24,7 @@ $route = MyApp::value('module', 'index');
 if(empty(MyApp::cookies('admin_token'))):
 	$route = 'index';
 endif;
+//print_r(MyApp::data());exit;
 switch ($route) {
 	// hook admin_index_route_case_start.php
 	case 'index':		include _include(ADMIN_PATH.'route/index.php'); 	break;

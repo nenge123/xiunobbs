@@ -22,7 +22,6 @@ define('MESSAGE_HTM_PATH', ADMIN_PATH.'view/htm/message.htm');
 include(__DIR__.'/class/admin.class.php');
 define('SKIP_ROUTE', TRUE);
 include '../index.php';
-MyApp::app()->datas['rewriteMode'] = true;
 $lang += include _include(APP_PATH."lang/$conf[lang]/bbs_admin.php");
 $_SERVER['lang'] = $lang;
 include _include(ADMIN_PATH."admin.func.php");

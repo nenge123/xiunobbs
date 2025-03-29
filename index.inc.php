@@ -49,9 +49,10 @@ check_runlevel();
 // $setting = kv_get('setting');
 
 $route = param(0, 'index');
-
+$route = MyApp::value('module');
+//print_r(MyApp::data('querydata'));exit;
+//print_r($_REQUEST);exit;
 // hook index_inc_route_before.php
-
 if (!defined('SKIP_ROUTE')) {
 
 	// 按照使用的频次排序，增加命中率，提高效率
@@ -86,6 +87,12 @@ if (!defined('SKIP_ROUTE')) {
 			include _include(APP_PATH . 'route/browser.php');
 			break;
 		// hook index_route_case_end.php
+		case 'admin':
+			MyApp::http_location('admin/');
+		break;
+		case 'install':
+			MyApp::http_location('install/');
+		break;
 		default:
 			// hook index_route_case_default.php
 			include _include(APP_PATH . 'route/index.php');

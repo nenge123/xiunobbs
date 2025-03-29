@@ -15,7 +15,7 @@
 	
 	<!--{hook footer_nav_before.htm}-->
 	
-	<?php include _include(APP_PATH.'view/htm/footer_nav.inc.htm');?>
+	<!--{template(MyApp::htm_path('footer_nav.inc.htm'))}-->
 	
 	<!--{hook footer_nav_after.htm}-->
 	
@@ -29,13 +29,13 @@
 	<?php if($browser['name'] == 'ie') { ?>
 	<script src="https://cdn.bootcdn.net/ajax/libs/es6-shim/0.35.8/es6-shim.min.js"></script>
 	<?php } ?>
-	<script src="lang/<?php echo $conf['lang'];?>/bbs.js<?php echo $static_version;?>"></script>
+	<script src="{{ \plugin::parseJS(MyApp::i18n_path('bbs.js')) }}{{ \MyApp::conf('static_version') }}"></script>
 	<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 	<script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.0.0/js/bootstrap.bundle.min.js"></script>
-	<script src="<?php echo $conf['view_url'];?>js/xiuno.js<?php echo $static_version;?>"></script>
-	<script src="<?php echo $conf['view_url'];?>js/bootstrap-plugin.js<?php echo $static_version;?>"></script>
-	<script src="<?php echo $conf['view_url'];?>js/async.js<?php echo $static_version;?>"></script>
-	<script src="<?php echo $conf['view_url'];?>js/form.js<?php echo $static_version;?>"></script>
+	<script src="{{ MyApp::view_site('js/xiuno.js'.MyApp::conf('static_version')) }}"></script>
+	<script src="{{ MyApp::view_site('js/bootstrap-plugin.js'.MyApp::conf('static_version')) }}"></script>
+	<script src="{{ MyApp::view_site('js/async.js'.MyApp::conf('static_version')) }}"></script>
+	<script src="{{ MyApp::view_site('js/form.js'.MyApp::conf('static_version')) }}"></script>
 	<script>
 	var debug = DEBUG = <?php echo DEBUG; ?>;
 	var url_rewrite_on = <?php echo $conf['url_rewrite_on'];?>;
@@ -45,10 +45,17 @@
 	var gid = <?php echo intval($gid);?>;
 	xn.options.water_image_url = '<?php echo MyApp::view_site("img/water-small.png");?>';	// 水印图片 / watermark image
 	</script>
-	<script src="<?php echo $conf['view_url'];?>js/bbs.js<?php echo $static_version;?>"></script>
+	<script src="{{ MyApp::view_site('js/bbs.js'.MyApp::conf('static_version')) }}"></script>
 	<!--{hook footer_js_after.htm}-->
-	<script type="module" src="<?=MyApp::site('view/js/common.js')?>"></script>
-	
+	<script type="module">
+		import X from "{{ MyApp::view_site('js/common.js') }}{{ MyApp::conf('static_version') }}";
+		/** 额外js{if !empty($importjs)}{each $importjs $js} **/
+		import "{{ $js }}";
+		/** {/each}{/if} **/
+		X.rewrite = "{{ MyApp::conf('url_rewrite_on') }}";
+		X.webroot = "{{ APP_SITE }}";
+		X.toEvent(new CustomEvent('ready'));
+	</script>
 </body>
 <!--{hook footer_body_after.htm}-->
 </html>

@@ -123,6 +123,36 @@ class MyDB
 	{
 		return self::app()->wlink ?? self::app()->connect_master();
 	}
+	/**
+	 * 创建MyDB初始化
+	 */
+	public static function create($dbconf=array())
+	{
+		if(empty($dbconf)):
+			$dbconf = MyApp::conf('db');
+		endif;
+		if ($dbconf['type']) {
+			//print_r($dbconf);
+			// 代码不仅仅是给人看的，更重要的是给编译器分析的，不要玩 $db = new $dbclass()，那样不利于优化和 opcache 。
+			switch ($dbconf['type']) {
+				case 'mysql':
+					return new self($dbconf['mysql']);
+					break;
+				case 'pdo_mysql':
+					return new self($dbconf['pdo_mysql'], 'mysql');
+					break;
+				case 'pdo_sqlite':
+					return new self($dbconf['pdo_sqlite'], 'sqlite');
+					break;
+				case 'pdo_mongodb':
+					return new self($dbconf['pdo_mongodb'], 'mongodb');
+					break;
+				default:
+					return xn_error(-1, 'Not suppported db type:' . $dbconf['type']);
+			}
+		}
+		return NULL;
+	}
 	public function setConfig(array $conf, ?string $scheme = null)
 	{
 		$this->conf = $conf;
@@ -971,20 +1001,20 @@ class MyDB
 	 */
 	public static function database(): array|bool
 	{
-		return array_column(self::query('SHOW DATABASES', self::MODE_ALL_NUM),0);
+		return array_column(self::query('SHOW DATABASES', self::MODE_ALL_NUM), 0);
 	}
 	/**
 	 * 获取当前数据库所有表
 	 */
-	public static function tablelist(?string $dbname=null,?string $tablepre=null): array
+	public static function tablelist(?string $dbname = null, ?string $tablepre = null): array
 	{
-		return array_column(self::t('information_schema.TABLES')->where(array('TABLE_SCHEMA' => $dbname?? self::rconf('name'),'%TABLE_NAME' => $tablepre ?? self::rconf('tablepre') . '%'),'',2,array('TABLE_NAME')),0);
+		return array_column(self::t('information_schema.TABLES')->where(array('TABLE_SCHEMA' => $dbname ?? self::rconf('name'), '%TABLE_NAME' => $tablepre ?? self::rconf('tablepre') . '%'), '', 2, array('TABLE_NAME')), 0);
 	}
 	/**
 	 * 获取当前数据库所有自定义函数
 	 */
-	public static function functions(?string $dbname=null)
+	public static function functions(?string $dbname = null)
 	{
-		return array_column(self::t('information_schema.routines')->where(array('ROUTINE_TYPE'=>'FUNCTION','ROUTINE_SCHEMA'=>$dbname ?? self::rconf('name')),'',2,['ROUTINE_NAME']),0);
+		return array_column(self::t('information_schema.routines')->where(array('ROUTINE_TYPE' => 'FUNCTION', 'ROUTINE_SCHEMA' => $dbname ?? self::rconf('name')), '', 2, ['ROUTINE_NAME']), 0);
 	}
 }

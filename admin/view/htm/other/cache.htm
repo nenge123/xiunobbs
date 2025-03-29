@@ -1,0 +1,19 @@
+<!--{template(ADMIN_PATH.'view/htm/new-header.htm')}-->
+<!--{hook admin_other_cache_start.htm}-->
+<div class="card">
+	<div class="card-header">
+		<h4 class="card-title"><!--{lang admin_other_cache}--></h4>
+	</div>
+	<div class="card-body">
+		<form action="{{ MyApp::value('url') }}" method="post" onpost="true">
+		<div class="form-check form-switch mb-3"><!--{{ \route_admin::input_check('clear_tmp',1,'admin_clear_tmp') }}--></div>
+		<div class="form-check form-switch mb-3"><!--{{ \route_admin::input_check('clear_cache',1,'admin_clear_cache') }}--></div>
+		<div class="mb-3 text-center">
+		<button type="submit" class="btn btn-primary btn-block" id="submit" data-loading-text="{lang submiting}..."><!--{lang confirm}--></button>
+		</div>
+		</form>
+	</div>
+</div>
+<!--{hook admin_other_cache_end.htm}-->
+<!--{template(ADMIN_PATH.'view/htm/new-footer.htm')}-->
+<!--{hook admin_other_cache_js.htm}-->

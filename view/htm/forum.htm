@@ -1,4 +1,4 @@
-<?php include _include(APP_PATH.'view/htm/header.inc.htm');?>
+<!--{template(MyApp::htm_path('header.inc.htm'))}-->
 
 <!--{hook forum_start.htm}-->
 
@@ -44,13 +44,13 @@
 			<div class="card-body">
 				<ul class="list-unstyled threadlist mb-0">
 					<!--{hook forum_threadlist_before.htm}-->
-					<?php include _include(APP_PATH.'view/htm/thread_list.inc.htm');?>
+					<!--{template(MyApp::htm_path('thread_list.inc.htm'))}-->
 					<!--{hook forum_threadlist_after.htm}-->
 				</ul>
 			</div>
 		</div>
 
-		<?php include _include(APP_PATH.'view/htm/thread_list_mod.inc.htm');?>
+		<!--{template(MyApp::htm_path('thread_list_mod.inc.htm'))}-->
 		
 		<!--{hook forum_page_before.htm}-->
 		<nav class="my-3"><ul class="pagination justify-content-center flex-wrap"><?php echo $pagination; ?></ul></nav>
@@ -105,7 +105,7 @@
 				<div class="row">
 					<?php foreach ($forum['modlist'] as $mod) { ?>
 					<div class="col-3 mb-1 text-center">
-						<a href="#"><img src="<?php echo $conf['view_url'];?>img/avatar.png" alt="..." width="32" height="32" class="img-circle"></a><br>
+						<a href="#"><img src="{{ \MyApp::view_site('img/avatar.png') }}" alt="..." width="32" height="32" class="img-circle"></a><br>
 						<a href="<?php echo url("user-$mod[uid]");?>" class="small text-muted text-nowrap"><?php echo $mod['username'];?></a>
 					</div>
 					<?php } ?>
@@ -121,7 +121,7 @@
 
 <!--{hook forum_end.htm}-->
 
-<?php include _include(APP_PATH.'view/htm/footer.inc.htm');?>
+<!--{template(MyApp::htm_path('footer.inc.htm'))}-->
 
 <script>
 $('li[data-active="fid-<?php echo $fid;?>"]').addClass('active');

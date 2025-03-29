@@ -250,7 +250,7 @@
             <!--End 切换主题配色-->
             <!--{if !empty($user)}-->
             <li class="dropdown">
-              <a href="{{ \MyApp::site('?my') }}">
+              <a href="{{ \MyApp::topurl('my') }}">
                 <img class="avatar-sm rounded-circle" src="{{ $user['avatar_url'] }}">
                 <span><!--{{ $user['username'] }}--></span>
               </a>
@@ -263,7 +263,7 @@
               </a>
             </li>
             <li>
-              <a href="{{ \MyApp::site() }}">
+              <a href="{{ \MyApp::topurl() }}">
                 <i class="mdi-home"></i>
                 <span><!--{lang front_index_page}--></span>
               </a>

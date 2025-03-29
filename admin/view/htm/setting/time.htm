@@ -5,7 +5,7 @@
 		<h4 class="card-title"><!--{lang admin_setting_time}--></h4>
 	</div>
 	<div class="card-body">
-		<form action="{{ $_SERVER['REQUEST_URI'] }}" method="post" onpost="true">
+		<form action="{{ MyApp::value('url') }}" method="post" onpost="true">
 			<!--{hook admin_setting_timezone_before.htm}-->
 			<div class="form-floating mb-3"><!--{{ \route_admin::input_required_text('timezone',null,'setting_timezone') }}--></div>
 			<div class="form-floating mb-3"><!--{{ \route_admin::input_required_number('online_hold_time') }}--></div>

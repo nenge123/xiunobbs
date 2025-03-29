@@ -74,8 +74,13 @@ export class editor {
 			},
 			toolbar: ['myattach viewattach savedata'], // 界面按钮
 			//automatic_uploads:true,
+			image_default_type:'absolute',
 			block_unsupported_drop: false,
 			images_reuse_filename:true,
+			image_urlconvertor_callback(url){
+				console.log(url);
+				return url.replace(/^[\.\/]+\/(.+?)\/forum\//ig,'/$1/forum/');
+			},
 			async images_upload_handler(blobInfo, progress, failure) {
 				return new Promise((back, err) => {
 					const request = E.createPOST('upload', function (result) {
@@ -104,7 +109,9 @@ export class editor {
 				console.log('Save canceled',editor,this);
 				const post = new FormData;
 				//console.log(editor.save());
-				post.set(E.name, editor.getContent());
+				let html = editor.getContent();
+				html = html.replace(/"[\.\/]+\/(.+?)\/forum\//ig,'"/$1/forum/');
+				post.set(E.name, html);
 				const request = E.createAjax(function (response) {
 					E.execAlert(response.message);
 					editor.dispatch('save',true);
