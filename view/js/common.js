@@ -34,6 +34,7 @@ class xiuno extends EventTarget {
 	}
 	ready() {
 		console.log('ready');
+		this.vieworigin = (new URL(this.viewroot||'',location.href)).origin;
 		const sw = navigator.serviceWorker;
 		if (sw) {
 			sw.addEventListener('message', e => this.callMethod('sw', e.data, e.source, e.type));

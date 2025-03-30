@@ -153,12 +153,49 @@ switch ($action):
 	default:
 		$header['title'] = lang('user_admin');
 		$header['mobile_title'] = lang('user_admin');
-
 		$pagesize = 20;
-		$srchtype = param(2);
-		$keyword  = trim(xn_urldecode(param(3)));
-		$page     = param(4, 1);
-
+		$size = 0;
+		if($_SERVER['REQUEST_METHOD']=='POST'):
+			$page     = intval(MyApp::post('page',1));
+			$where = array();
+			if(MyApp::post('uid')):
+				$size = 1;
+				$userlist = MyDB::t('user')->where(['uid'=>MyApp::post('uid')],'',10);
+			else:
+				if(MyApp::post('gid')):
+					$where['gid'] = intval(MyApp::post('gid'));
+				endif;
+				if(MyApp::post('email')):
+					$where['%email'] = MyApp::post('email');
+				endif;
+				if(MyApp::post('username')):
+					$where['%username'] = MyApp::post('username');
+				endif;
+				if(MyApp::post('create_ip')):
+					$_ip = MyApp::post('create_ip');
+					if(str_contains($_ip,'::')):
+						//ipv6
+						MyApp::message(-1,'程序目前不支持IPV6');
+					elseif(!preg_match('/\d+\.\d+\.\d+\.\d+/',$_ip)):
+						$where['create_ip'] =ip2long($_ip);
+					else:
+						MyApp::message(-1,'程序目前不支持IPV4 范围搜索');
+					endif;
+				endif;
+				$size = MyDB::t('user')->whereCount($where);
+				$userlist = MyDB::t('user')->where(
+					$where,
+					MyDB::ORDER(['uid'=>'asc']).
+					MyDB::LIMIT($page,$pagesize),
+					MyDB::MODE_ITERATOR
+				);
+			endif;
+			if($size>0):				
+				$maxpage = ceil($size / $pagesize);
+				$pagination = MyApp::pagination($maxpage, $page);
+			endif;
+		endif;
+/*
 		// hook admin_user_list_start.php
 
 		$cond = array();
@@ -180,9 +217,9 @@ switch ($action):
 		foreach ($userlist as &$_user) {
 			$_user['group'] = array_value($grouplist, $_user['gid'], '');
 		}
-
+*/
 		// hook admin_user_list_end.php
-
+		$importjs[] = route_admin::site('view/js/user_methods.js');
 		include _include(ADMIN_PATH . "view/htm/user/list.htm");
 		break;
 endswitch;

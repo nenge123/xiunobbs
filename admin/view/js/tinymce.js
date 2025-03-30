@@ -1,10 +1,12 @@
 import LANG from './tinymce7_langs.js';
 export class editor {
+	cdn_unpkg_path = 'https://lf6-unpkg.zstaticcdn.com/';
+	webp_wasm_path = this.cdn_unpkg_path + 'wasm-webp@0.0.2/dist/esm/';
+	wasm_js = this.webp_wasm_path+'webp-wasm.js';
+	wasm_buf = this.webp_wasm_path+'webp-wasm.wasm';
 	base_url = 'https://cdn.bootcdn.net/ajax/libs/tinymce/7.6.0/';
-	wasm_js = '//unpkg.com/wasm-webp@0.0.2/dist/esm/webp-wasm.js';
-	wasm_buf = '//unpkg.com/wasm-webp@0.0.2/dist/esm/webp-wasm.wasm';
-	zip_js = '//unpkg.com/@zip.js/zip.js@2.7.53/dist/zip.min.js';
-	form_js = '//unpkg.com/formdata-polyfill@4.0.10/formdata.min.js';
+	zip_js = this.cdn_unpkg_path + '@zip.js/zip.js@2.7.53/dist/zip.min.js';
+	form_js = this.cdn_unpkg_path + 'formdata-polyfill@4.0.10/formdata.min.js';
 	//skin_url = 'https://cdn.tiny.cloud/1/qagffr3pkuv17a8on1afax661irst1hbr4e6tbv888sz91jc/tinymce/7.7.1-150/skins/ui/fluent';
 	plugins = [
 		"accordion", "advlist", "anchor", "autolink", "autoresize", "autosave", 
@@ -777,21 +779,11 @@ export class editor {
 			let newfile;
 			if (mime != filetype) {
 				if (self.WebAssembly) {
-					if (!self.WasmWebp) {
-						self.WasmWebp = this.webpConver(progress);
-					}
-					const wasmwebp = await self.WasmWebp;
-					if (wasmwebp) {
-						const img = ctx.getImageData(0, 0, width, height);
-						/**
-						 * quality是图片质量 lossless好像是失真还是无损
-						 */
-						const result = wasmwebp.encode(img.data, width, height, true, {
-							quality: 80,
-							lossless: 0
-						});
-						progress.text('图片已转换为webp');
-						return [new File([result], filename + '.webp', { type: 'image/webp' }), width, height];
+					const result = await X.callMethod('imagedata2webp', ctx.getImageData(0, 0, width, height)).catch(e => false);
+					if (result) {
+						console.log(result);
+						return [new File([result], filename + '.webp', { type: 'image/webp' }),width,height];
+	
 					}
 				}
 				if (file.type != 'image/png') {

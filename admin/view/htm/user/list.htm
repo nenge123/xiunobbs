@@ -3,119 +3,100 @@
 <!--{hook admin_user_list_start.htm}-->
 
 <form action="{{ MyApp::value('url') }}" method="post">
-	<details class="card" open>
+	<details class="card" {{ $size>0?'close':'open' }}>
 		<summary class="card-header"><!--{lang search_condition}--></summary>
 		<div class="card-body">
-			<div class="form-floating mb-3">
-				<select class="form-control" name="fid" id="fid">
-					<option value="uid"><?php echo lang('uid');?>：</option>
-					<option value="username" selected><?php echo lang('username');?>：</option>
-					<option value="email"><?php echo lang('email');?>：</option>
-					<option value="gid"><?php echo lang('user_group');?>：</option>
-					<option value="create_ip"><?php echo lang('create_ip');?>：</option>
-					<!--{hook admin_user_list_option_create_ip_after.htm}-->
-				</select>
-				<label for="fid"><!--{lang search_type}-->：</label>
+			<div class="form-floating mb-3"><!--{{ \route_admin::input_required_text('username',MyApp::post('username'),'username','') }}--></div>
+			<div class="row">
+				<div class="col-md-6">
+					<div class="form-floating mb-3"><!--{{ \route_admin::input_required_text('create_ip',MyApp::post('create_ip'),'create_ip','') }}--></div>
+				</div>
+				<div class="col-md-6">
+					<div class="form-floating mb-3"><!--{{ \route_admin::input_email('email',MyApp::post('email'),'email','') }}--></div>
+				</div>
+				<div class="col-md-6">
+					<div class="form-floating mb-3"><!--{{ \route_admin::input_required_number('uid',MyApp::post('uid'),'uid','') }}--></div>
+				</div>
+				<div class="col-md-6">
+					<div class="form-floating mb-3"><!--{{ \route_admin::input_select_list('gid',array_column($grouplist,'name','gid'),MyApp::post('gid'),'user_group','') }}--></div>
+				</div>
 			</div>
-			<div class="form-floating mb-3"><!--{{ \route_admin::input_text('keyword',MyApp::post('keyword'),'keyword') }}--></div>
 			<div class="mb-3">
-				<button id="search" class="form-control btn btn-primary"><?php echo lang('search');?></button>
+				<button type="submit" class=" btn btn-primary"><!--{lang search}--></button>
 			</div>
 		</div>
 	</details>
-</form>
-<div class="row">
-	<div class="col-lg-12">
-		<div class="card">
-			<div class="card-body">
-				<div class="table-responsive">
-					<table class="table" style="min-width: 800px">
-						<thead>
-							<tr>
-								<th width="60" class="text-center"><?php echo lang('delete');?></th>
-								<th width="50">ID：</th>
-								<!--{hook admin_user_list_id_th_after.htm}-->
-								<th width="150"><?php echo lang('email');?></th>
-								<th width="150"><?php echo lang('username');?></th>
-								<th width="100"><?php echo lang('user_group');?></th>
-								<th width="100"><?php echo lang('create_date');?></th>
-								<th width="100"><?php echo lang('create_ip');?></th>
-								<th width="60"><?php echo lang('operation');?></th>
-							</tr>
-						</thead>
-						<tbody id="userlist">
-					<?php foreach($userlist as &$_user){ ?>
-						<tr uid="<?php echo $_user['uid']; ?>">
-							<td class="text-center"><input type="checkbox" name="delete" /></td>
-							<td><?php echo $_user['uid']; ?></td>
-							<!--{hook admin_user_list_id_td_after.htm}-->
-							<td><?php echo $_user['email']; ?></td>
-							<td><?php echo $_user['username']; ?></td>
-							<td><?php echo $_user['groupname']; ?></td>
-							<td><?php echo $_user['create_date_fmt']; ?></td>
-							<td><?php echo $_user['create_ip_fmt']; ?></td>
-							<td><a href="<?php echo url("user-update-$_user[uid]"); ?>"><?php echo lang('edit');?></a></td>
+	<!--{if !empty($userlist)}-->
+	<details class="card" open>
+		<summary class="card-header"><!--{lang search_condition}--></summary>
+		<div class="card-body">
+			<nav aria-label="Page navigation example" class="mb-3">
+				<ul class="pagination gap-2">
+					<!--{hook admin_thread_list_page_start.htm}-->
+					<!--{each $pagination $pagenum}-->
+					<li class="page-item">
+						<!--{if $pagenum == $page}-->
+						<a class="btn-outline-pink page-link" href="#">
+							<!--{if $pagenum==1}-->
+							<!--{lang page_index}-->
+							<!--{elseif $pagenum==$maxpage}-->
+							<!--{lang page_last}-->
+							<!--{else}-->
+							<!--{{ $pagenum }}-->
+							<!--{/if}-->
+						</a>
+						<!--{else}-->
+						<input type="submit" class="page-link" name="page" value="{{ $pagenum }}">
+						<!--{/if}-->
+					</li>
+					<!--{/each}-->
+					<!--{hook admin_thread_list_page_end.htm}-->
+				</ul>
+				<nav class="nav gap-2">
+					<!--{hook admin_user_list_action_start.htm}-->
+					<button type="button" class="btn btn-outline-teal" onmethods="checkall" data-match="[name^=tids]"><!--{lang checkall}--></button>
+					<button type="button" class="btn btn-outline-danger" onmethods="adimin_thread_delete" data-match="[name^=tids]" data-url="{{ MyApp::purl('delete') }}">封禁</button>
+					<button type="button" class="btn btn-outline-teal" onpost="adimin_thread_lock" data-type="closed" data-match="[name^=tids]" data-url="{{ MyApp::purl('closed') }}">仅删除</button>
+					<button type="button" class="btn btn-outline-teal" onpost="adimin_thread_lock" data-type="open" data-match="[name^=tids]" data-url="{{ MyApp::purl('open') }}">彻底删除</button>
+					<!--{hook admin_user_list_action_end.htm}-->
+				</nav>
+			</nav>
+			<div class="table-responsive">
+				<table class="table" style="min-width: 800px">
+					<thead>
+						<tr>
+							<th width="60" class="text-center"><!--{lang delete}--></th>
+							<th width="50">ID：</th>
+							<!--{hook admin_user_list_id_th_after.htm}-->
+							<th width="150"><!--{lang email}--></th>
+							<th width="150"><!--{lang username}--></th>
+							<th width="100"><!--{lang user_group}--></th>
+							<th width="100"><!--{lang create_date}--></th>
+							<th width="100"><!--{lang create_ip}--></th>
+							<th width="60"><!--{lang operation}--></th>
 						</tr>
-					<?php } ?>
-						</tbody>
-					</table>
-				</div>
-				<hr class="mt-0" />
-				<p><button class="btn btn-sm ml-3" id="confirm"><?php echo lang('delete');?></button></p>
+					</thead>
+					<tbody id="userlist">
+						<!--{each $userlist $_user}-->
+						<tr uid="{{ $_user['uid'] }}">
+							<td class="text-center"><input type="checkbox" name="delete" /></td>
+							<td><!--{{ $_user['uid'] }}--></td>
+							<!--{hook admin_user_list_id_td_after.htm}-->
+							<td><!--{{ $_user['email'] }}--></td>
+							<td><!--{{ $_user['username'] }}--></td>
+							<td><!--{{ $grouplist[$_user['gid']]['name'] }}--></td>
+							<td><!--{{ \date('Y-d-m',$_user['create_date']) }}--></td>
+							<td><!--{{ \long2ip($_user['create_ip']) }}--></td>
+							<td><a href="<?php echo url("user-update-$_user[uid]"); ?>"><!--{lang edit}--></a></td>
+						</tr>
+						<!--{/each}-->
+					</tbody>
+				</table>
 			</div>
 		</div>
-		<nav><ul class="pagination justify-content-center"><?php echo $pagination; ?></ul></nav>
-	</div>
-</div>
-
+	</details>
+	<!--{/if}-->
+</form>
 <!--{hook admin_user_list_end.htm}-->
-
 <!--{template(ADMIN_PATH.'view/htm/new-footer.htm')}-->
-
-<script>
-var jbody = $("#userbody");
-var jcreate = $('#create');
-var jconfirm = $("#confirm");
-var jsearch = $("#search");
-var jsrchtype = $("#srchtype");
-var jkeyword = $('#keyword');
-var juserlist = $('#userlist');
-jsrchtype.val(jsrchtype.attr('value'));
-
-jcreate.on('click', function(event) {
-	window.location = xn.url('user-create');
-});
-
-jsearch.on('click', function(){
-	var srchtype = jsrchtype.val();
-	srchtype = srchtype ? srchtype : 'uid';
-	var keyword = $("#keyword").val();
-	var url = xn.url('user-list-'+srchtype+'-'+xn.urlencode(keyword)+'-1');
-	window.location = url;
-});
-jkeyword.on('keydown', function(e) {
-	if(e.keyCode == 13) jsearch.trigger('click');
-});
-
-// 删除选中的用户
-jconfirm.on('click', function(){
-	var jchecked = juserlist.find('input[name="delete"]').filter(function(){ return this.checked; });
-	if(jchecked.length < 1) return alert("<?php echo lang('please_check_delete_user');?>");
-	if(!window.confirm("<?php echo lang('user_delete_confirm');?>")) return false;
-	jchecked.each(function() {
-		jtr = $(this).parents('tr');
-		var uid = jtr.attr('uid');
-		if(uid == 1) return alert('<?php echo lang('user_admin_cant_be_deleted');?>');
-		$.xpost(xn.url('user-delete'), {uid:uid}, function(code, message) {
-			if(code != 0) return $.alert(message);
-			jtr.remove();
-		});
-	});
-});
-
-
-$('#nav li.nav-item-user').addClass('active');
-
-</script>
-
 <!--{hook admin_user_list_js.htm}-->

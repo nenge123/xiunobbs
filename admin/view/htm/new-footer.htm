@@ -18,6 +18,8 @@
 	X.rewrite = "{{ MyApp::conf('url_rewrite_on') }}";
 	X.admin_jsroot = "{{ route_admin::site('view/js/') }}";
 	X.webroot = "{{ APP_SITE }}";
+	/* 定义资源目录地址 */
+	X.viewroot = "{{ MyApp::data('site')['view'] }}";
 	X.toEvent(new CustomEvent('ready'));
 </script>
 </body>

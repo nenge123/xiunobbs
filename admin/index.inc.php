@@ -22,6 +22,10 @@ if(DEBUG < 3) {
 }
 $route = MyApp::value('module', 'index');
 if(empty(MyApp::cookies('admin_token'))):
+	if($route!='index'&&MyApp::value(0)!='login'):
+		#改为跳转 避免误用接口
+		MyApp::http_location(MyApp::url('index/login'));
+	endif;
 	$route = 'index';
 endif;
 //print_r(MyApp::data());exit;

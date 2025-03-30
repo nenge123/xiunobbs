@@ -207,5 +207,22 @@ export default {
 			const bool = !lists[0].checked;
 			lists.forEach(e=>e.checked=bool);
 		});
+	},
+	checkURL(url){
+		const surl = new URL(url,location.href);
+		/** 必须是受信任域 */
+		if(surl.origin!==location.origin&&surl.origin!==this.vieworigin){
+			$.alert('对不起不允许执行站外代码!');
+			return false;
+		}
+		return surl;
+
+	},
+	async loadmodule(elm){
+		const url =this.callMethod('checkURL',elm.getAttribute('module-url'));
+		if(url){
+			const {default:Module} = await import(url.href);
+			return new Module(elm,this);
+		}
 	}
 }

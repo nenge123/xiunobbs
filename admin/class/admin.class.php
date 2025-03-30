@@ -134,6 +134,14 @@ class route_admin
 		$id = self::input_format_id('text-' . $name . '-' . $_SERVER['REQUEST_TIME']);
 		return '<input type="text" class="form-control" id="' . $id . '" name="' . $name . '" value="' . $value . '" ' . $required . '><label for="' . $id . '">' . self::input_format_lang($name, $lang) . '：</label>';
 	}
+	public static function input_email(string $name, mixed $value = null, ?string $lang = null, $required = 'required')
+	{
+		if (!isset($value)):
+			$value = MyApp::conf($name);
+		endif;
+		$id = self::input_format_id('text-' . $name . '-' . $_SERVER['REQUEST_TIME']);
+		return '<input type="email" class="form-control" id="' . $id . '" name="' . $name . '" value="' . $value . '" ' . $required . '><label for="' . $id . '">' . self::input_format_lang($name, $lang) . '：</label>';
+	}
 	public static function input_required_number(string $name, mixed $value = null, ?string $lang = null, $required = 'required')
 	{
 		if (!isset($value)):
@@ -185,6 +193,23 @@ class route_admin
 			endforeach;
 		endif;
 		$html .= '</select><label for="' . $id . '">' . lang($lang) . '：</label>';
+		return $html;
+	}
+	public static function input_select_list(string $name, mixed $list, mixed $value = null, ?string $lang = null, ?string $required = 'required')
+	{
+		if (!isset($value)):
+			$value = MyApp::conf($name);
+		endif;
+		$id = self::input_format_id('textarea-' . $name . '-' . $_SERVER['REQUEST_TIME']);
+		$lang = lang(empty($lang) ? $name : $lang);
+		$html = '<select class="form-select" name="' . $name . '" id="' . $id . '" aria-label="' . $lang . '" ' . $required . '>';
+		if(!str_contains($required,'required')):
+			$html .= '<option value="" ' . (empty($value) ? 'selected' : '') . '>' . $lang. '</option>';
+		endif;
+		foreach ($list as $k => $v):
+			$html .= '<option value="' . $k . '" ' . ($k == $value ? 'selected' : '') . '>' . $v. '</option>';
+		endforeach;
+		$html .= '</select><label for="' . $id . '">' . $lang . '：</label>';
 		return $html;
 	}
 	public static function input_select(string $name, mixed $list, mixed $value = null, ?string $lang = null)
@@ -268,7 +293,7 @@ class route_admin
 			self::eventMessage('close',$id,array('message'=>'没有勾选主题!!','url'=>MyApp::purl('forum/list')));
 			exit;
 		endif;
-		$tids = explode(',',$tids);
+		$tids = explode('|',$tids);
 		$threadlist = MyDB::t('thread')->where(['tid'=>$tids],'',MyDB::MODE_ITERATOR,array('uid', 'tid', 'subject'));
 		if ($threadlist->valid()):
 			self::eventMessage('progress',$id,array('message'=>sprintf(lang('forum_event_stream_progress'),count($tids))));

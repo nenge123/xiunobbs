@@ -190,6 +190,7 @@ class MyApp implements \ArrayAccess
 		ini_set('session.gc_maxlifetime', $this->datas['online_hold_time']);	// 活动时间 $conf['online_hold_time']
 		ini_set('session.gc_probability', 1); 	// 垃圾回收概率 = gc_probability/gc_divisor
 		ini_set('session.gc_divisor', 500); 	// 垃圾回收时间 5 秒，在线人数 * 10 
+		ini_set('session.cache_limiter','none');
 		session_set_save_handler(
 			[$this, 'sess_open'],
 			[$this, 'sess_close'],
