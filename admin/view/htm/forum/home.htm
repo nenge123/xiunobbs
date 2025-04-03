@@ -1,0 +1,51 @@
+<!--{template(ADMIN_PATH.'view/htm/new-header.htm')}-->
+<div class="card">
+	<div class="card-header">
+		<h4 class="card-title"><!--{lang admin_forum_setting}--></h4>
+	</div>
+	<div class="card-body">
+		<form action="{{ url }}" method="post" id="form" onpost="true" {{ \route_admin::js_module('forum-list') }}>
+			<div class="table-responsive arrlist">
+				<table class="table table-info table-striped-columns" style="min-width: 800px">
+					<thead>
+						<tr align="center">
+							<th width="90"><!--{lang forum_id}--></th>
+							<th width="60" align="left"><!--{lang forum_icon}--></th>
+							<th><!--{lang forum_name}--></th>
+							<th width="100"><!--{lang forum_rank}--></th>
+							<th width="100" class="text-center"><!--{lang forum_edit}--></th>
+							<th width="100" class="text-center"><!--{lang forum_delete}--></th>
+						</tr>
+						<thead>
+						<tbody>
+							<!--{each $newforumlist $_fid $_forum}-->
+							<tr align="center" rowid="{{ $_fid }}">
+								<td class="50">
+									<div class="form-floating mb-3"><!--{{ \model\tpl::char('fid['.$_fid.']',$_forum['fid'],MyApp::Lang('forum_id'),'disabled') }}--></div>
+								</td>
+								<td align="left">
+									<img  class="uploadimage" src="{{ $_forum['icon']?MyApp::upload_site('forum/'.$_forum['fid'].'.png'):MyApp::view_site('img/forum.png') }}" base-url="{{ MyApp::view_site('img/forum.png') }}" class="forum" width="48" id="img_{{ $_fid }}" />
+									<input type="hidden" name="icon[{{ $_fid }}]" value="{{ $_forum['icon'] }}">
+								</td>
+								<td>
+									<div class="form-floating mb-3"><!--{{ \model\tpl::char('name['.$_fid.']',$_forum['name'],MyApp::Lang('forum_name')) }}--></div>
+								</td>
+								<td>
+									<div class="form-floating mb-3"><!--{{ \model\tpl::number('rank['.$_fid.']',$_forum['rank'],MyApp::Lang('forum_rank')) }}--></div>
+								</td>
+								<td><a class="btn row_edit" tabindex="0" href="{{ MyApp::purl('update/'.$_forum['fid']) }}"><!--{lang forum_edit}--></a></td>
+								<td><a class="btn row_delete" role="button" tabindex="0" href="{{ MyApp::purl('delete/'.$_forum['fid']) }}"><!--{lang forum_delete}--></a></td>
+							</tr>
+							<!--{/each}-->
+						</tbody>
+				</table>
+			</div>
+			<p><a role="button" class="btn row_add" max-id="{{ \max(1,...array_column($newforumlist,'fid')) }}">[+]<!--{lang add_new_line}--></a></p>
+			<p class="text-center">
+				<button type="submit" class="btn btn-primary" id="submit" data-loading-text="{lang submiting}..." style="width: 10rem;"><!--{lang confirm}--></button>
+			</p>
+		</form>
+		<p class="small text-grey"><!--{lang tips}-->：<!--{lang forum_edit_tip}--></p>
+	</div>
+</div>
+<!--{template(ADMIN_PATH.'view/htm/new-footer.htm')}-->

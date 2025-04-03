@@ -1,0 +1,26 @@
+<!--{template(ADMIN_PATH.'view/htm/new-header.htm')}-->
+<div class="card">
+	<div class="card-header">
+		<h3 class="card-title"><!--{lang user_edit}-->:{{ $_group['name'] }}</h3>
+	</div>
+	<form class="card-body" action="{{ url }}" method="post" onpost="true">
+		<!--{each $_group $key $value}-->
+		<!--{if str_starts_with ($key,'allow')}-->
+		<div class="form-check form-switch mb-3" style="order: 15;"><!--{{ \model\tpl::checkbox($key,$value,MyApp::Lang('group-key-'.$key)) }}--></div>
+		<!--{elseif $key=='gid'}-->
+		<div class="form-floating mb-3"><!--{{ \model\tpl::number($key,$value,MyApp::Lang('group-key-'.$key),in_array($_gid, $system_group)?'disabled':'') }}--></div>
+		<!--{elseif in_array($key,['creditsfrom','creditsto'])}-->
+		<div class="form-floating mb-3"><!--{{ \model\tpl::number($key,$value,MyApp::Lang('group-key-'.$key),'disabled') }}--></div>
+		<!--{elseif is_numeric($value)}-->
+		<div class="form-floating mb-3"><!--{{ \model\tpl::number($key,$value,MyApp::Lang('group-key-'.$key)) }}--></div>
+		<!--{else}-->
+		<div class="form-floating mb-3"><!--{{ \model\tpl::char($key,$value,MyApp::Lang('group-key-'.$key)) }}--></div>
+		<!--{/if}-->
+		<!--{/each}-->
+		<div class="mb-3 text-center" style="order: 100;">
+			<!--{hook admin_userupdate_htm_submit.htm}-->
+			<button type="submit" class="btn btn-primary btn-block" data-loading-text="{lang submiting}..."><!--{lang confirm}--></button>
+		</div>
+	</form>
+</div>
+<!--{template(ADMIN_PATH.'view/htm/new-footer.htm')}-->

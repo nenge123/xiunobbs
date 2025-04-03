@@ -1,0 +1,49 @@
+<!--{template(ADMIN_PATH.'view/htm/new-header.htm')}-->
+<div class="row">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-body">
+				<div class="d-flex" style="flex-wrap: wrap;flex-direction: column;gap: 15px;">
+					<!--{each $pluginlist $dir $plugin}-->
+					<!--{eval $url_base = MyApp::purl($dir)}-->
+					<!--{eval $url_install = MyApp::purl($dir.'/install')}-->
+					<!--{eval $url_unstall = MyApp::purl($dir.'/unstall')}-->
+					<!--{eval $url_setting = MyApp::purl($dir.'/setting')}-->
+					<!--{eval $url_disable = MyApp::purl($dir.'/disable')}-->
+					<!--{eval $url_enable = MyApp::purl($dir.'/enable')}-->
+					<div style="display: grid;grid-template-columns:64px 3fr 1fr;gap: 10px;border-bottom: 1px solid currentColor;padding-bottom: 10px;">
+						<img src="{{ plugin::site($dir . '/icon.png') }}" style="max-width: 64px;" />
+						<div class="plugin-brief">
+							<div style="display: flex;align-items: center;justify-content:space-between;gap:5px">
+								<a href="{{ $url_base }}" class="m-1"><b><!--{{ $plugin['name'] }}--></b>(v<!--{{ $plugin['version'] }}-->)</a>
+								<p class="plugin-root m-1"><!--{{ $dir }}--></p>
+							</div>
+							<!--{{ $plugin['brief'] }}-->
+						</div>
+						<div style="display: flex;align-items: center;justify-content: flex-end;gap: 5px;">
+							<!--{if $plugin['installed']}-->
+							<!--{if is_file(plugin::path($dir . '/setting.php'))}-->
+							<a role="button" class="btn btn-primary btn-sm setting" href="{{ $url_setting }}"><!--{lang setting}--></a>
+							<!--{/if}-->
+							<!--{if $plugin['enable']}-->
+							<a role="button" class="btn btn-secondary btn-sm disable" href="{{ $url_disable }}"><!--{lang disable}--></a>
+							<!--{else}-->
+							<a role="button" class="btn btn-secondary btn-sm enable" href="{{ $url_enable }}"><!--{lang enable}--></a>
+							<!--{/if}-->
+							<a role="button" class="btn btn-danger btn-sm unstall confirm" data-confirm-text="{{ MyApp::Lang('plugin_unstall_confirm_tips', array('name' => $plugin['name'])) }}" href="{{ $url_unstall }}"><!--{lang unstall}--></a>
+							<!--{else}-->
+							<a role="button" class="btn btn-primary btn-sm install" href="{{ $url_install }}"><!--{lang install}--></a>
+							<!--{/if}-->
+						</div>
+					</div>
+					<!--{/each}-->
+				</div>
+			</div>
+		</div>
+		<!--{if $pagination}-->
+		<nav>
+			<ul class="pagination justify-content-center"><!--{{ $pagination }}--></ul>
+		</nav> <!--{/if}-->
+	</div>
+</div>
+<!--{template(ADMIN_PATH.'view/htm/new-footer.htm')}-->

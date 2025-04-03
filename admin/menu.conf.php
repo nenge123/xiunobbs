@@ -1,56 +1,48 @@
 <?php
 
 return array(
+	'index'=>array(
+		'text'=>MyApp::Lang('admin_index'), 
+		'icon'=>'mdi-home-analytics', 
+		'tab'=> array (
+			'index'=>array('url'=>MyApp::url('index'), 'text'=>MyApp::Lang('site_stat_info')),
+			'phpinfo'=>array('url'=>MyApp::url('index/phpinfo'), 'text'=>MyApp::Lang('server_info')),
+		)
+	),
 	'setting' => array(
-		'url'=>MyApp::url('setting/base'), 
-		'text'=>lang('setting'), 
+		'text'=>MyApp::Lang('setting'), 
 		'icon'=>'icon-cog', 
 		'tab'=> array (
-			'base'=>array('url'=>MyApp::url('setting/base'), 'text'=>lang('admin_setting_base')),
-			'smtp'=>array('url'=>MyApp::url('setting/smtp'), 'text'=>lang('admin_setting_smtp')),
-			'time'=>array('url'=>MyApp::url('setting/time'), 'text'=>lang('admin_setting_time')),
-			'rewrite'=>array('url'=>MyApp::url('setting/rewrite'), 'text'=>lang('admin_setting_rewrite')),
+			'index'=>array('url'=>MyApp::url('setting'), 'text'=>MyApp::Lang('admin_setting_base')),
+			'smtp'=>array('url'=>MyApp::url('setting/smtp'), 'text'=>MyApp::Lang('admin_setting_smtp')),
+			'time'=>array('url'=>MyApp::url('setting/time'), 'text'=>MyApp::Lang('admin_setting_time')),
+			'rewrite'=>array('url'=>MyApp::url('setting/rewrite'), 'text'=>MyApp::Lang('admin_setting_rewrite')),
+			'clear'=>array('url'=>MyApp::url('setting/clear'), 'text'=>MyApp::Lang('admin_other_cache')),
 		)
 	),
 	'forum' => array(
-		'url'=>MyApp::url('forum/list'), 
-		'text'=>lang('forum'), 
+		'text'=>MyApp::Lang('forum_admin'), 
 		'icon'=>'icon-comment',
 		'tab'=> array (
-		)
-	),
-	'thread' => array(
-		'url'=>MyApp::url('thread/list'), 
-		'text'=>lang('thread'), 
-		'icon'=>'icon-comment',
-		'tab'=> array (
-			'list'=>array('url'=>MyApp::url('thread/list'), 'text'=>lang('admin_thread_batch')),
+			'index'=>array('url'=>MyApp::url('forum'), 'text'=>MyApp::Lang('forum_list')),
+			'thread'=>array('url'=>MyApp::url('forum/thread'), 'text'=>MyApp::Lang('admin_thread_batch')),
 		)
 	),
 	'user' => array(
-		'url'=>MyApp::url('user/list'), 
-		'text'=>lang('user'), 
+		'text'=>MyApp::Lang('user'), 
 		'icon'=>'icon-user',
 		'tab'=> array (
-			'list'=>array('url'=>MyApp::url('user/list'), 'text'=>lang('admin_user_list')),
-			'group'=>array('url'=>MyApp::url('group/list'), 'text'=>lang('admin_user_group')),
-			'create'=>array('url'=>MyApp::url('user/create'), 'text'=>lang('admin_user_create')),
-		)
-	),
-	'other' => array(
-		'url'=>url('other'), 
-		'text'=>lang('other'), 
-		'icon'=>'icon-wrench',
-		'tab'=> array (
-			'cache'=>array('url'=>MyApp::url('other/cache'), 'text'=>lang('admin_other_cache')),
+			'index'=>array('url'=>MyApp::url('user'), 'text'=>MyApp::Lang('admin_user_list')),
+			'group'=>array('url'=>MyApp::url('user/group'), 'text'=>MyApp::Lang('admin_user_group')),
+			'create'=>array('url'=>MyApp::url('user/create'), 'text'=>MyApp::Lang('admin_user_create')),
 		)
 	),
 	'plugin' => array(
 		'url'=>MyApp::url('plugin'), 
-		'text'=>lang('plugin'), 
+		'text'=>MyApp::Lang('plugin'), 
 		'icon'=>'icon-cogs',
 		'tab'=> array (
-			'local'=>array('url'=>MyApp::url('plugin'), 'text'=>lang('admin_plugin_local_list')),
+			'index'=>array('url'=>MyApp::url('plugin'), 'text'=>MyApp::Lang('admin_plugin_local_list')),
 		)
 	)
 );

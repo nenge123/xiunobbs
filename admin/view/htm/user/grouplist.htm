@@ -1,0 +1,82 @@
+<!--{template(ADMIN_PATH.'view/htm/new-header.htm')}-->
+<details class="card admin-group-card" close>
+	<summary class="card-header"><!--{lang group_system_list}--></summary>
+	<form class="card-body" action="{{ url }}" method="post" onpost="true">
+		<div class="alert alert-danger">
+			系统用户组是独立保存,如果准备修改自定义用户组前,应请先保存!<br>如果修改了自定义用户,应先保存自定义用户组,再修改系统用户组.
+		</div>
+		<!--{each $system_group $k}-->
+		<!--{eval $groupkey = 'system['.$k.']';}-->
+		<!--{eval $groupname = $grouplist[$k]['name'] ?? '';}-->
+		<!--{eval $creditsto = $grouplist[$k]['creditsto'] ??'0';}-->
+		<div class="group-system-list mb-3">
+			<input type="hidden" name="{{ $groupkey.'[gid]' }}" value="{{ $k }}">
+			<div class="group-gid form-floating"><!--{{ \model\tpl::number('',$k,MyApp::Lang('group_id'),'disabled') }}--></div>
+			<div class="group-name form-floating"><!--{{ \model\tpl::char($groupkey.'[name]',$groupname,MyApp::Lang('group_'.$k),'required') }}--></div>
+			<!--{if $k==101}-->
+			<div class="group-credits form-floating">
+				<!--{{ \model\tpl::number($groupkey.'[creditsto]',$creditsto,MyApp::Lang('group_credits_to'),'required','system-credits') }}-->
+			</div>
+			<!--{/if}-->
+			<div class="group-edit">
+				<a href="{{ MyApp::purl('access/'.$k) }}" class="btn btn-danger"><!--{lang admin_privilege}--></a>
+			</div>
+		</div>
+		<!--{/each}-->
+		<p class="text-center">
+			<button type="submit" class="btn btn-primary" id="submit" data-loading-text="{lang submiting}..." style="width: 10rem;"><!--{lang confirm}--></button>
+		</p>
+	</form>
+</details>
+<details class="card admin-group-card" open>
+	<summary class="card-header"><!--{lang group_member_list}--></summary>
+	<form class="card-body" action="{{ url }}" {{ \route_admin::js_module('groupadd') }} method="post" onpost="true">
+		<input type="hidden" id="group-delete-list" name="delete" value="">
+		<!--{each $grouplist $k $_group}-->
+		<!--{eval if(in_array($_group['gid'],$system_group))continue;}-->
+		<!--{eval $groupkey = 'member['.$k.']';}-->
+		<!--{eval $groupname = $_group['name'] ?? '';}-->
+		<!--{eval $creditsfrom = $_group['creditsfrom'] ??'';}-->
+		<!--{eval $creditsto = $_group['creditsto'] ??'';}-->
+		<div class="group-member-list mb-3">
+			<div class="group-gid form-floating"><!--{{ \model\tpl::number($groupkey.'[gid]',$k,MyApp::Lang('group_id'),'required','member-gid-'.$_group['gid']) }}--></div>
+			<div class="group-name form-floating"><!--{{ \model\tpl::char($groupkey.'[name]',$groupname,MyApp::Lang('group_name'),'required','member-name-'.$_group['gid']) }}--></div>
+			<div class="group-creditsfrom form-floating">
+				<!--{{ \model\tpl::number($groupkey.'[creditsfrom]',$creditsfrom,MyApp::Lang('group_credits_from'),'required','member-from-'.$_group['gid']) }}-->
+			</div>
+			<div class="group-credits form-floating">
+				<!--{{ \model\tpl::number($groupkey.'[creditsto]',$creditsto,MyApp::Lang('group_credits_to'),'required','member-to-'.$_group['gid']) }}-->
+			</div>
+			<div class="group-edit">
+				<a href="{{ MyApp::purl('access/'.$k) }}" class="btn btn-danger"><!--{lang admin_privilege}--></a>
+				<button data-gid="{{ $_group['gid'] }}" type="button" class="group-remove btn btn-danger"><!--{lang delete}--></button>
+			</div>
+		</div>
+		<!--{/each}-->
+		<div id="new-group-list"></div>
+		<p><a role="button" class="btn group_add">[+]<!--{lang add_new_line}--></a></p>
+		<p class="text-center">
+		<button type="submit" class="btn btn-primary" id="submit" data-loading-text="{lang submiting}..." style="width: 10rem;"><!--{lang confirm}--></button>
+		<button type="button" class="group-unlock btn btn-primary">解除积分锁定</button>
+		</p>
+		<div class="alert alert-danger">
+		<!--{lang group_edit_tips}-->
+		</div>
+	</form>
+</details>
+<template id="tpl_group" hidden>
+	<div class="group-member-list mb-3">
+		<div class="group-gid form-floating"><!--{{ \model\tpl::number('new[gid][]','{gid}',MyApp::Lang('group_id'),'required','new-gid-{time}') }}--></div>
+		<div class="group-name form-floating"><!--{{ \model\tpl::char('new[name][]',MyApp::Lang('group_member_list').'{gid}',MyApp::Lang('group_name'),'required','new-name-{time}') }}--></div>
+		<div class="group-creditsfrom form-floating">
+			<!--{{ \model\tpl::number('new[creditsfrom][]','{creditsfrom}',MyApp::Lang('group_credits_from'),'required','new-from-{time}') }}-->
+		</div>
+		<div class="group-credits form-floating">
+			<!--{{ \model\tpl::number('new[creditsto][]','{creditsto}',MyApp::Lang('group_credits_to'),'required','new-to-{time}') }}-->
+		</div>
+		<div class="group-edit">
+			<button type="button" class="group-remove btn btn-danger"><!--{lang delete}--></button>
+		</div>
+	</div>
+</template>
+<!--{template(ADMIN_PATH.'view/htm/new-footer.htm')}-->

@@ -1,0 +1,16 @@
+<!--{template(ADMIN_PATH.'view/htm/new-header.htm')}-->
+<div class="card">
+	<div class="card-header">
+		<h3 class="card-title"><!--{lang admin_user_create}--></h3>
+	</div>
+	<form class="card-body" action="{{ url }}" method="post" onpost="true">
+		<div class="form-floating mb-3"><!--{{ \model\tpl::char('email','abc@qq.com',MyApp::Lang('email'),'autocomplete="off" required') }}--></div>
+		<div class="form-floating mb-3"><!--{{ \model\tpl::char('username','',MyApp::Lang('username'),'autocomplete="off" required') }}--></div>
+		<div class="form-floating mb-3"><!--{{ \model\tpl::password('password','',MyApp::Lang('password'),'autocomplete="off" required') }}--></div>
+		<div class="form-floating mb-3"><!--{{ \model\tpl::select(array_column($grouplist,'name','gid'),101,'gid',MyApp::Lang('user_group')) }}--></div>
+		<div class="mb-3 text-center" style="order: 100;">
+			<button type="submit" class="btn btn-primary btn-block" data-loading-text="{lang submiting}..."><!--{lang confirm}--></button>
+		</div>
+	</form>
+</div>
+<!--{template(ADMIN_PATH.'view/htm/new-footer.htm')}-->

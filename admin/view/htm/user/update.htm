@@ -1,0 +1,29 @@
+<!--{template(ADMIN_PATH.'view/htm/new-header.htm')}-->
+<div class="card">
+	<div class="card-header">
+		<h3 class="card-title"><!--{lang user_edit}--></h3>
+	</div>
+	<form class="card-body" action="{{ url }}" method="post" onpost="true">
+		<!--{each $_user $key $value}-->
+		<!--{if $key=='gid'}-->
+		<div class="form-floating mb-3"><!--{{ \model\tpl::select(array_column($grouplist,'name','gid'),$value,$key,MyApp::Lang('user-key-'.$key)) }}--></div>
+		<!--{elseif str_ends_with($key,'_ip')}-->
+		<!--{if is_numeric($value)}-->
+		<!--{eval $value = long2ip($value)}-->
+		<!--{/if}-->
+		<div class="form-floating mb-3"><!--{{ \model\tpl::char($key,$value,MyApp::Lang('user-key-'.$key)) }}--></div>
+		<!--{elseif str_ends_with($key,'_date')}-->
+		<div class="form-floating mb-3"><!--{{ \model\tpl::fulltime($key,date('Y-m-d H:i:s',$value?:0),MyApp::Lang('user-key-'.$key)) }}--></div>
+		<!--{elseif is_numeric($value)}-->
+		<div class="form-floating mb-3"><!--{{ \model\tpl::number($key,$value,MyApp::Lang('user-key-'.$key)) }}--></div>
+		<!--{else}-->
+		<div class="form-floating mb-3"><!--{{ \model\tpl::char($key,$value,MyApp::Lang('user-key-'.$key)) }}--></div>
+		<!--{/if}-->
+		<!--{/each}-->
+		<div class="mb-3 text-center" style="order: 100;">
+			<!--{hook admin_userupdate_htm_submit.htm}-->
+			<button type="submit" class="btn btn-primary btn-block" data-loading-text="{lang submiting}..."><!--{lang confirm}--></button>
+		</div>
+	</form>
+</div>
+<!--{template(ADMIN_PATH.'view/htm/new-footer.htm')}-->

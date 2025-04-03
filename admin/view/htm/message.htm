@@ -1,24 +1,17 @@
 <!--{template(ADMIN_PATH.'view/htm/new-header.htm')}-->
-
 <!--{hook admin_message_start.htm}-->
-
 <div class="row">
 	<div class="col-lg-8 mx-auto">
 		<div class="card">
 			<div class="card-body">
 				<h4 class="card-title text-center">
-					<i class="icon-<?$code == 0 ? 'ok' : 'warning-sign'?>"></i> 
+					<i class="icon-{{ $code == 0 ? 'ok' : 'warning-sign' }}"></i> 
 					<?php echo $message;?>
-					
 					<!--{hook admin_message_message_after.htm}-->
 				</h4>
 			</div>
 		</div>
 	</div>
 </div>
-
 <!--{hook admin_message_end.htm}-->
-
 <!--{template(ADMIN_PATH.'view/htm/new-footer.htm')}-->
-
-<!--{hook admin_message_js.htm}-->

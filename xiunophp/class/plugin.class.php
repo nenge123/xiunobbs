@@ -38,22 +38,23 @@ class plugin
 			$temppath = MyApp::convert_site($temppath);
 			$pathinfo = pathinfo($temppath);
 			$ext = $pathinfo['extension'];
-			if (!empty($pathinfo['dirname'])&&$pathinfo['dirname'] != '.'):
+			if (!empty($pathinfo['dirname']) && $pathinfo['dirname'] != '.'):
 				$file_arr = explode('/', $pathinfo['dirname']);
 			endif;
 			#endif;
-			if(empty($pathinfo['filename'])):
-				xn_log($srcfile,'error');
-				echo $srcfile;exit;
+			if (empty($pathinfo['filename'])):
+				xn_log($srcfile, 'error');
+				echo $srcfile;
+				exit;
 			endif;
 			$file_arr[] = $pathinfo['filename'] . '.php';
-			if (in_array($file_arr[0], ['route', 'model', 'view', 'admin'])):
+			if (in_array($file_arr[0], ['route', 'model', 'view'])):
 				$tmpfile = MyApp::tmp_path($file_arr[0] . '/' . implode('_', array_slice($file_arr, 1)));
-			elseif ($file_arr[0] == 'xiunophp'):
+			elseif (in_array($file_arr[0],['admin','xiunophp'])):
 				$tmpfile = MyApp::tmp_path(implode(DIRECTORY_SEPARATOR, $file_arr));
 			elseif ($file_arr[0] == 'plugin' || $isphar):
-				if($isphar):
-					$tmpfile = MyApp::tmp_path('plugin/phar/'.implode(DIRECTORY_SEPARATOR, $file_arr));
+				if ($isphar):
+					$tmpfile = MyApp::tmp_path('plugin/phar/' . implode(DIRECTORY_SEPARATOR, $file_arr));
 				else:
 					$tmpfile = MyApp::tmp_path('plugin/' . $file_arr[1] . '/' . implode('_', array_slice($file_arr, 2)));
 				endif;
@@ -104,7 +105,7 @@ class plugin
 	 */
 	public static function parseJS(string $srcfile, ?string $name = null)
 	{
-		$path = 'js/hook/' . ($name ?? pathinfo($srcfile,PATHINFO_FILENAME)).'.js';
+		$path = 'js/hook/' . ($name ?? pathinfo($srcfile, PATHINFO_FILENAME)) . '.js';
 		$tmpfile = MyApp::view_path($path);
 		self::parseFile($srcfile, $tmpfile);
 		return MyApp::view_site($path);
@@ -191,7 +192,7 @@ class plugin
 			$template
 		);
 		#模板文字 语言
-		$template = preg_replace_callback('/\{lang ([^\}]+)\}/', fn($m) => lang(trim($m[1])), $template);
+		$template = preg_replace_callback('/\{lang ([^\}]+)\}/', fn($m) => MyApp::Lang(trim($m[1])), $template);
 		#echo
 		$template = preg_replace_callback(
 			'/\{echo (.+?)\}/s',
@@ -295,11 +296,26 @@ class plugin
 				case '\\':
 					return '<?=' . $param1 . '?>';
 					break;
+				case '\'':
+				case '"':
+					return '{{ ' . trim($param1, '\'" ') . ' }}';
+					break;
+				case ':':
+					$param1 = substr($param1,1);
+					if (ctype_alnum($param1)):
+						return '<?=MyApp::data(\'' . $param1 . '\')?>';
+					endif;
+					return '{{ '.trim($param1,'.: ').' }}';
+				break;
 				default:
 					#纯数字或字母
 					if (ctype_alnum($param1)):
-						return '<?=MyApp::data(\'' . $param1 . '\')?>';
-					elseif (str_contains($param1, '::')||str_contains($param1, '->')):
+						return '<?=MyApp::value(\'' . $param1 . '\')?>';
+					elseif (str_starts_with($param1, 'get_')):
+						return '<?=MyApp::param(\'' . substr($param1, 4) . '\')?>';
+					elseif (str_starts_with($param1, 'post_')):
+						return '<?=MyApp::param(\'' . substr($param1, 5) . '\')?>';
+					elseif (str_contains($param1, '::') || str_contains($param1, '->')):
 						return '<?=' . $param1 . '?>';
 					elseif (str_ends_with($param1, ')')):
 						return '<?=MyApp::app()->' . $param1 . '??\'\'?>';

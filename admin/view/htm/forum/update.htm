@@ -1,31 +1,30 @@
 <!--{template(ADMIN_PATH.'view/htm/new-header.htm')}-->
-<form action="{{ MyApp::value('url') }}" method="post" onpost="true" onmethods="admin_forum_update">
+<form action="{{ url }}" method="post" onpost="true" {{ \route_admin::js_module('forum-update') }}>
 	<div class="card">
 		<div class="card-header">
 			<h4 class="card-title">{lang admin_forum_edit}:<?= $_forum['name'] ?></h4>
 		</div>
-		<div class="card-body">
-			<div class="form-floating mb-3"><!--{{ \route_admin::input_required_text('name',$_forum['name'],'forum_name') }}--></div>
-			<div class="mb-3">
-				<div class="form-check form-switch mb-3" onmethods="admin_forum_edit"><!--{{  route_admin::input_check('',0,'brief_edit') }}--></div>
+		<div class="card-body" class="d-flex flex-column">
+			<!--{hook admin_forumupdate_htm_form.htm}-->
+			<div class="form-floating mb-3" style="order: 5;"><!--{{ \model\tpl::char('name',$_forum['name'],MyApp::Lang('forum_name')) }}--></div>
+			<div class="mb-3" style="order: 10;">
+				<div data-edit="tinymce" class="form-check form-switch mb-3"><!--{{ \model\tpl::checkbox('',0,MyApp::Lang('brief_edit')) }}--></div>
 				<div name="brief"><!--{{ $_forum['brief'] }}--></div>
 			</div>
-			<!--{hook admin_forum_update_forum_brief_after.htm}-->
-			<div class="mb-3">
-				<div class="form-check form-switch mb-3" onmethods="admin_forum_edit"><!--{{  route_admin::input_check('',0,'announcement_edit') }}--></div>
+			<div class="mb-3" style="order: 15;">
+				<div data-edit="tinymce" class="form-check form-switch mb-3"><!--{{ \model\tpl::checkbox('',0,MyApp::Lang('announcement_edit')) }}--></div>
 				<div name="announcement"><!--{{ $_forum['announcement'] }}--></div>
 			</div>
-			<!--{hook admin_forum_update_forum_announcement_after.htm}-->
-			<div class="form-floating mb-3">
-				<!--{{ \route_admin::input_text('modnames',$_forum['modnames'],'moderator') }}-->
+			<div class="form-floating mb-3" style="order: 20;">
+				<!--{{ \model\tpl::char('modnames',$_forum['modnames'],MyApp::Lang('moderator')) }}-->
 				<p class="small text-muted mt-2" id="modnames"><!--{lang forum_moduid_format_tips}--></p>
 			</div>
-			<div class="form-check form-switch mb-3"><!--{{ \route_admin::input_check('accesson',$_forum['accesson'],'user_privilege') }}--></div>
-			<div class="mb-3 text-center">
+			<div class="form-check form-switch mb-3" style="order: 25;"><!--{{ \model\tpl::checkbox('accesson',$_forum['accesson'],MyApp::Lang('user_privilege')) }}--></div>
+			<div class="mb-3 text-center" style="order: 100;">
+				<!--{hook admin_forumupdate_htm_submit.htm}-->
 				<button type="submit" class="btn btn-primary" id="submit" data-loading-text="<!--{lang submiting}-->..."><!--{lang confirm}--></button>
-				<a role="button" class="btn btn-secondary" href="{{ MyApp::purl('forum/list') }}"><!--{lang back}--></a>
+				<a role="button" class="btn btn-secondary" href="{{ MyApp::purl('index') }}"><!--{lang back}--></a>
 			</div>
-			<!--{hook admin_forum_update_submit_after.htm}-->
 		</div>
 	</div>
 	<div id="accesslist" class="card mb-3" {{ $_forum['accesson']?'':'hidden' }}>
@@ -33,7 +32,6 @@
 			<h4 class="card-title">{lang user_privilege}</h4>
 		</div>
 		<div class="card-body">
-			<!--{hook admin_forum_update_privilete_before.htm}-->
 			<table class="table  text-small" style="min-width: 700px;">
 				<thead>
 					<tr align="center">
@@ -44,29 +42,27 @@
 						<td width="60"><!--{lang allow_post}--></td>
 						<td width="60"><!--{lang allow_upload}--></td>
 						<td width="60"><!--{lang allow_download}--></td>
-						<!--{hook admin_forum_update_access_title_end.htm}-->
 					</tr>
 					<thead>
 					<tbody>
 						<!--{each $accesslist $access}-->
 						<tr align="center">
-							<td><label class="custom-input c-checkbox"><input type="checkbox" /></label></td>
+							<td>
+								<div class="custom-input form-check form-switch"><!--{{ \model\tpl::checkbox() }}--></div>
+								<input type="hidden" name="gid[{{ $access['gid'] }}]" value="{{ $access['gid'] }}">
 							<td align="left"><?php echo $access['name']; ?></td>
 							<!--{each $access $a $b}-->
 							<!--{if in_array($a,['allowread','allowthread','allowpost','allowattach','allowdown'])}-->
 							<td>
-								<div class="form-check form-switch"><!--{{ \route_admin::input_check($a.'['.$access['gid'].']',$access[$a],'') }}--></div>
+								<div class="form-check form-switch"><!--{{ \model\tpl::checkbox($a.'['.$access['gid'].']',$access[$a]) }}--></div>
 							</td>
 							<!--{/if}-->
 							<!--{/each}-->
-							<!--{hook admin_forum_update_access_input_end.htm}-->
 						</tr>
 						<!--{/each}-->
 					</tbody>
 			</table>
-			<!--{hook admin_forum_update_privilete_after.htm}-->
 		</div>
 	</div>
 </form>
-<!--{hook admin_forum_update_js.htm}-->
 <!--{template(ADMIN_PATH.'view/htm/new-footer.htm')}-->

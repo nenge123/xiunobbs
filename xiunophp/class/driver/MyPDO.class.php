@@ -34,7 +34,7 @@ class MyPDO extends \PDO
 			$dsn .= ';dbname=' . $settings['name'];
 		endif;
 		$options = array(
-			self::ATTR_ERRMODE => !empty($conf['error'])?self::ERRMODE_EXCEPTION:self::ERR_NONE,
+			self::ATTR_ERRMODE => defined('MYSQL_DEBUG')?self::ERRMODE_EXCEPTION:self::ERR_NONE,
 		);
 		if (defined('\PDO::MYSQL_ATTR_COMPRESS')):
 			$options[self::MYSQL_ATTR_COMPRESS] = true;

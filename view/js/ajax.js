@@ -59,6 +59,7 @@ export default {
 				return $.alert('输入数据不合法!')
 			}
 		}
+		$(jform).find('[name]').removeClass('is-invalid');
 		$.ajax({
 			type: 'POST',
 			url:jform.getAttribute('action'),
@@ -76,16 +77,18 @@ export default {
 			success(r) {
 				submitButton.disabled(!1);
 				if (X.isOBJ(r)) {
+					if (r.message) $.alert(r.message);
 					if(!isNaN(r.code))r.code = parseInt(r.code);
 					if (typeof r.code == 'string') {
-						return $(jform).find('[name=' + r.code + ']').val('');
+						const ipt =  $(jform).find('[name=' + r.code + ']');
+						ipt.addClass('is-invalid');
+						ipt.val('');
 					} else if (r.code == 0) {
 						if(r.delay||r.url){
 							const deply = r.delay || 2;
 							return $.alert(r.message).delay(deply*1000).location(r.url && r.url || './');
 						}
 					}
-					if (r.message) $.alert(r.message);
 				} else {
 					$.alert(lang['http_error_response']);
 				}
@@ -133,47 +136,5 @@ export default {
 				error
 			});
 		},'image/*');
-	},
-	eventsourcemessage(elm){
-		const X = this;
-		console.log(elm);
-		elm.once('submit',function(event){
-			event.preventDefault();
-			const E =this;
-			E.innerHTML = '';
-			$(E).disabled();
-			const scroll = E.getAttribute('data-scroll');
-			E.style.cssText = 'white-space: pre;';
-			X.callMethod('createEventSource',E.getAttribute('action'),{
-				open(event){
-					console.log(event);
-					if(event.data){
-						let p = JSON.parse(event.data);
-						p&&E.append(p.message+"\n");
-					}
-				},
-				progress(event){
-					console.log(event);
-					if(event.data){
-						let p = JSON.parse(event.data);
-						p&&E.append(p.message+"\n");
-						X.callMethod('scrollView',scroll)
-					}
-				},
-				close(event){
-					if(event.data){
-						let p = JSON.parse(event.data);
-						if(p){
-							E.append(p.message+"\n");
-							if(p.url){
-								$(E).delay(1000).location(p.url);
-							}
-						}
-	
-					}
-					this.close();
-				}
-			});
-		})
 	}
 }

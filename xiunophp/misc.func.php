@@ -171,7 +171,11 @@ function param_force($val, $defval, $htmlspecialchars = TRUE, $addslashes = FALS
 	lang('mobile_length_error');
 	lang('mobile_length_error', array('mobile'=>$mobile));
 */
+/**
+ * @deprecated  4.1
+ */
 function lang($key, $arr = array()) {
+	return MyApp::lang($key,$arr);
 	$lang = $_SERVER['lang'];
 	if(!isset($lang[$key])) return 'lang['.$key.']';
 	$s = $lang[$key];
@@ -469,7 +473,7 @@ function mid($n, $min, $max) {
 }
 
 function humandate($timestamp, $lan = array()) {
-	$lang = $_SERVER['lang'];
+	$lang = MyApp::getLang();
 	$seconds = $_SERVER['REQUEST_TIME'] - $timestamp;
 	$lan = empty($lang) ? $lan : $lang;
 	empty($lan) AND $lan = array(

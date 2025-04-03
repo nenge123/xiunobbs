@@ -1,0 +1,79 @@
+<!--{template(ADMIN_PATH.'view/htm/new-header.htm')}-->
+<form action="{{ url }}" method="post" {{ \route_admin::js_module('thread') }}>
+	<!--{hook admin_threaddelete_htm_start.htm}-->
+	<details id="thread-search-details" class="card" open>
+		<summary class="card-header"><!--{lang search_condition}--></summary>
+		<div class="card-body row">
+			<!--{hook admin_threaddelete_htm_search_start.htm}-->
+			<div id="div-fid" class="col-md-6">
+				<div class="form-floating mb-3">
+					<select class="form-control" name="fid" id="fid">
+						<option value="0"><!--{lang none}--></option>
+						<!--{each $forumlist $forum}-->
+						<option value="{{ $forum['fid'] }}"><!--{{  $forum['name'] }}--></option>
+						<!--{/each}-->
+					</select>
+					<label for="fid"><!--{lang forum}-->：</label>
+				</div>
+			</div>
+			<div id="div-keyword" class="col-md-6">
+				<div class="form-floating mb-3"><!--{{ \model\tpl::char('keyword',MyApp::post('keyword'),MyApp::Lang('keyword')) }}--></div>
+			</div>
+			<div id="div-date-start" class="col-md-6">
+				<div class="form-floating mb-3"><!--{{ \model\tpl::date('create_date_start',MyApp::post('create_date_start'),MyApp::Lang('start_date')) }}--></div>
+			</div>
+			<div id="div-date-end" class="col-md-6">
+				<div class="form-floating mb-3"><!--{{ \model\tpl::date('create_date_end',MyApp::post('create_date_end',date('Y-m-d',mktime(24,0,0,))),MyApp::Lang('end_date')) }}--></div>
+			</div>
+			<div id="div-userip" class="col-md-6">
+				<div class="form-floating mb-3"><!--{{ \model\tpl::char('userip',MyApp::post('userip'),MyApp::Lang('thread_userip')) }}--></div>
+			</div>
+			<div id="div-uid" class="col-md-6">
+				<div class="form-floating mb-3"><!--{{ \model\tpl::char('uid',MyApp::post('uid'),MyApp::Lang('uid')) }}--></div>
+			</div>
+			<!--{hook admin_threaddelete_htm_search_end.htm}-->
+			<div id="div-search" class="col-md-6">
+				<button type="submit" id="search" class="btn btn-primary" data-loading-text="<!--{lang searching}-->... "><!--{lang search}--></button>
+			</div>
+		</div>
+	</details>
+</form>
+<details id="data-details" class="card" close>
+	<summary class="card-header"><!--{{ \MyApp::Lang('thread_search_result', array('n' => '<b id="threads-total">0</b>')) }}--></summary>
+	<div class="card-body">
+		<nav aria-label="Page navigation example" class="mb-3">
+			<nav id="page-list" class="pagination gap-2 mb-3">
+			</nav>
+			<nav class="pagination gap-2">
+				<!--{hook admin_threaddelete_htm_action_start.htm}-->
+				<button type="button" class="btn btn-outline-teal" data-type="check"><!--{lang checkall}--></button>
+				<button type="button" class="btn btn-outline-danger" data-type="delete">删除主题</button>
+				<button type="button" class="btn btn-outline-teal" data-type="closed">关闭主题</button>
+				<button type="button" class="btn btn-outline-teal" data-type="open">打开主题</button>
+				<button type="button" class="btn btn-outline-danger" data-type="block">封禁主题</button>
+				<button type="button" class="btn btn-outline-danger" data-type="unblock">解禁主题</button>
+				<!--{hook admin_threaddelete_htm_action_end.htm}-->
+			</nav>
+		</nav>
+		<div id="delete-result"></div>
+		<div id="data-list"></div>
+	</div>
+</details>
+<template type="text/template" id="thread-list-item" hidden>
+	<div id="tid-{tid}" class="form-check form-switch mb-3">
+		<input class="form-check-input" type="checkbox" id="input-{tid}" value="{tid}">
+		<!--{hook admin_threaddelete_htm_item_start.htm}-->
+		<i class="thread-icon-lock mdi mdi-database-lock-outline" {closed_hidden}></i>
+		<i class="thread-icon-delete mdi mdi-delete-clock" {deleted_hidden}></i>
+		<a class="fs-6" href="{url}">{subject}</a>
+		<!--{hook admin_threaddelete_htm_item_end.htm}-->
+	</div>
+</template>
+<template type="text/template" id="thread-list-page" hidden>
+	<!--{hook admin_threaddelete_htm_page_start.htm}-->
+	<div class="page-item {active}">
+		<a id="page-{page}" class="btn-outline-pink page-link" href="#">{page}</a>
+	</div>
+	<!--{hook admin_threaddelete_htm_page_end.htm}-->
+</template>
+<!--{template(ADMIN_PATH.'view/htm/new-footer.htm')}-->

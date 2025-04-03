@@ -7,12 +7,7 @@ define('INSTALL_PATH', __DIR__.'/');
 define('MESSAGE_HTM_PATH', INSTALL_PATH . 'view/htm/message.htm');
 
 // 切换到上一级目录，操作很方便。
-
 $conf = (include APP_PATH . 'conf/conf.default.php');
-$lang = include APP_PATH . 'lang/' . $conf['lang'] . '/bbs.php';
-$lang += include APP_PATH . 'lang/' . $conf['lang'] . '/bbs_install.php';
-$conf['tmp_path'] = APP_PATH . $conf['tmp_path'];
-
 include APP_PATH . 'xiunophp/xiunophp.php';
 include APP_PATH . 'model/misc.func.php';
 include APP_PATH . 'model/plugin.func.php';
@@ -21,11 +16,13 @@ include APP_PATH . 'model/group.func.php';
 include APP_PATH . 'model/form.func.php';
 include APP_PATH . 'model/forum.func.php';
 include INSTALL_PATH . 'install.func.php';
-
+MyApp::addLang('bbs.php');
+$lang = MyApp::addLang('bbs_install.php');
+//$_SERVER['lang'] = $lang;
+$conf['tmp_path'] = APP_PATH . $conf['tmp_path'];
 $action = param('action');
-
 // 安装初始化检测,放这里
-is_file(APP_PATH . 'conf/conf.php') and DEBUG != 2 and message(0, jump(lang('installed_tips'), '../'));
+is_file(APP_PATH . 'conf/conf.php') and DEBUG != 2 and message(0, jump(MyApp::Lang('installed_tips'), '../'));
 
 // 从 cookie 中获取数据，默认为中文
 $_lang = param('lang', 'zh-cn');
@@ -49,7 +46,7 @@ if (empty($action)) {
 		//$conf['lang'] = $_lang;
 		//xn_copy(APP_PATH.'./conf/conf.default.php', APP_PATH.'./conf/conf.backup.php');
 		//$r = file_replace_var(APP_PATH.'conf/conf.default.php', array('lang'=>$_lang));
-		//$r === FALSE AND message(-1, jump(lang('please_set_conf_file_writable'), ''));
+		//$r === FALSE AND message(-1, jump(MyApp::Lang('please_set_conf_file_writable'), ''));
 
 		http_location('index.php?action=license');
 	}
@@ -78,7 +75,7 @@ if (empty($action)) {
 		$myisam_support = extension_loaded('pdo_mysql');
 		$innodb_support = extension_loaded('pdo_mysql');
 
-		(!$mysql_support && !$pdo_mysql_support) and message(-1, lang('evn_not_support_php_mysql'));
+		(!$mysql_support && !$pdo_mysql_support) and message(-1, MyApp::Lang('evn_not_support_php_mysql'));
 
 		include INSTALL_PATH . 'view/htm/db.htm';
 	} else {
@@ -95,11 +92,11 @@ if (empty($action)) {
 		$adminuser = param('adminuser');
 		$adminpass = param('adminpass');
 
-		empty($host) and message('host', lang('dbhost_is_empty'));
-		empty($name) and message('name', lang('dbname_is_empty'));
-		empty($user) and message('user', lang('dbuser_is_empty'));
-		empty($adminpass) and message('adminpass', lang('adminuser_is_empty'));
-		empty($adminemail) and message('adminemail', lang('adminpass_is_empty'));
+		empty($host) and message('host', MyApp::Lang('dbhost_is_empty'));
+		empty($name) and message('name', MyApp::Lang('dbname_is_empty'));
+		empty($user) and message('user', MyApp::Lang('dbuser_is_empty'));
+		empty($adminpass) and message('adminpass', MyApp::Lang('adminuser_is_empty'));
+		empty($adminemail) and message('adminemail', MyApp::Lang('adminpass_is_empty'));
 
 
 
@@ -180,26 +177,26 @@ if (empty($action)) {
 		file_replace_var(APP_PATH . 'conf/conf.php', $replace);
 
 		// 处理语言包
-		group_update(0, array('name' => lang('group_0')));
-		group_update(1, array('name' => lang('group_1')));
-		group_update(2, array('name' => lang('group_2')));
-		group_update(4, array('name' => lang('group_4')));
-		group_update(5, array('name' => lang('group_5')));
-		group_update(6, array('name' => lang('group_6')));
-		group_update(7, array('name' => lang('group_7')));
-		group_update(101, array('name' => lang('group_101')));
-		group_update(102, array('name' => lang('group_102')));
-		group_update(103, array('name' => lang('group_103')));
-		group_update(104, array('name' => lang('group_104')));
-		group_update(105, array('name' => lang('group_105')));
+		group_update(0, array('name' => MyApp::Lang('group_0')));
+		group_update(1, array('name' => MyApp::Lang('group_1')));
+		group_update(2, array('name' => MyApp::Lang('group_2')));
+		group_update(4, array('name' => MyApp::Lang('group_4')));
+		group_update(5, array('name' => MyApp::Lang('group_5')));
+		group_update(6, array('name' => MyApp::Lang('group_6')));
+		group_update(7, array('name' => MyApp::Lang('group_7')));
+		group_update(101, array('name' => MyApp::Lang('group_101')));
+		group_update(102, array('name' => MyApp::Lang('group_102')));
+		group_update(103, array('name' => MyApp::Lang('group_103')));
+		group_update(104, array('name' => MyApp::Lang('group_104')));
+		group_update(105, array('name' => MyApp::Lang('group_105')));
 
-		forum_update(1, array('name' => lang('default_forum_name'), 'brief' => lang('default_forum_brief')));
+		forum_update(1, array('name' => MyApp::Lang('default_forum_name'), 'brief' => MyApp::Lang('default_forum_brief')));
 
 		xn_mkdir(APP_PATH . 'upload/tmp', 0777);
 		xn_mkdir(APP_PATH . 'upload/attach', 0777);
 		xn_mkdir(APP_PATH . 'upload/avatar', 0777);
 		xn_mkdir(APP_PATH . 'upload/forum', 0777);
 
-		message(0, jump(lang('conguralation_installed'), '../'));
+		message(0, jump(MyApp::Lang('conguralation_installed'), '../'));
 	}
 }

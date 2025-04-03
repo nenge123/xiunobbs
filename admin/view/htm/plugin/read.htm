@@ -1,0 +1,134 @@
+<!--{template(ADMIN_PATH.'view/htm/new-header.htm')}-->
+
+<div class="row">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-body">
+				<div class="media">
+					<div>
+						<img src="<?= plugin::site($dir . '/icon.png') ?>" width="54" height="54" class="mr-3" />
+					</div>
+					<div class="media-body">
+						<h4><?php echo $plugin['name']; ?> v<?php echo $plugin['version']; ?></h4>
+						<p><?php echo $plugin['brief']; ?></p>
+					</div>
+				</div>
+				<hr />
+				<div class="row line-height-3">
+					<div class="col-md-6">
+						<span class="text-muted"><!--{lang dir}--></span>：
+						<?php echo $dir; ?>
+					</div>
+
+					<div class="col-md-6">
+						<span class="text-muted"><!--{lang plugin_bbs_version}--></span>：
+						<?php echo $plugin['bbs_version']; ?>
+					</div>
+
+					<div class="col-md-6">
+						<span class="text-muted"><!--{lang price}--></span>：
+						<span class="plugin-price" id="price">0元</span>
+					</div>
+
+					<div class="col-md-6">
+						<span class="text-muted"><!--{lang installs}--></span>：
+						<span id="plugin-installs"><?php echo $plugin['installs'] ?? 0; ?></span>
+					</div>
+
+					<div class="col-md-6">
+						<span class="text-muted"><!--{lang plugin_sells}--></span>：
+						<span id="plugin-sells"><?php echo $plugin['sells'] ?? 0; ?></span>
+					</div>
+					<div class="col-md-6">
+						<span class="text-muted"><!--{lang plugin_is_cert}--></span>：
+						<span id="plugin-cert">0</span>
+					</div>
+					<div class="col-md-6">
+						<span class="text-muted"><!--{lang plugin_brief_url}--></span>：
+						<span><a href="<?php echo $plugin['brief_url'] ?? '#'; ?>" target="_blank"><?php echo $plugin['brief_url'] ?? ''; ?></a></span>
+					</div>
+					<div class="col-md-6">
+						<span class="text-muted">客服QQ</span>：
+						<span class="font-weight-bold text-danger" id="qq"><?php echo $plugin['qq'] ?? ''; ?></span>
+					</div>
+
+				</div>
+
+				<hr />
+				<p class="text-center">
+					<?php if ($plugin['installed']): ?>
+						<?php if (is_file(plugin::path($dir . '/setting.php'))) { ?>
+							<a role="button" class="btn btn-primary setting" href="{{ $url_setting }}"><!--{lang setting}--></a>
+						<?php } ?>
+						<?php if ($plugin['enable']): ?>
+							<a role="button" class="btn btn-secondary disable" href="{{ $url_disable }}"><!--{lang disable}--></a>
+						<?php else: ?>
+							<a role="button" class="btn btn-secondary enable" href="{{ $url_enable }}"><!--{lang enable}--></a>
+						<?php endif; ?>
+						<a role="button" class="btn btn-danger unstall confirm" data-confirm-text="<?php echo lang('plugin_unstall_confirm_tips', array('name' => $plugin['name'])); ?>" href="{{ $url_unstall }}"><!--{lang unstall}--></a>
+					<?php else: ?>
+						<a role="button" class="btn btn-primary install" href="{{ $url_install }}"><!--{lang install}--></a>
+					<?php endif; ?>
+					<span id="plugin-update" hidden></span>
+				</p>
+			</div>
+			<p class="mt-3 text-center">
+				<a role="button" class="btn btn-secondary" href="{{  MyApp::purl() }}" style="width: 210px;"><!--{lang back}--></a>
+			</p>
+		</div>
+	</div>
+</div>
+<div class="card">
+	<div class="card-body">
+		<details>
+			<summary class="card-title">注入文件列表</summary>
+			<ul class="list-group">
+				<?php if (!empty($hooklist = route_admin::plugin_hook($dir))):
+					foreach ($hooklist as $filename):
+				?>
+						<li class="list-group-item"><?= $filename ?></li>
+					<?php endforeach;
+				else: ?>
+					<li class="list-group-item">没有文件</li>
+				<?php endif; ?>
+			</ul>
+		</details>
+		<details>
+			<summary class="card-title">覆盖列表</summary>
+			<ul class="list-group">
+				<?php if (!empty($overwritelist = route_admin::plugin_overwrite($dir))):
+					foreach ($overwritelist as $filename):
+				?>
+						<li class="list-group-item"><?= $filename ?></li>
+					<?php endforeach;
+				else: ?>
+					<li class="list-group-item">没有文件</li>
+				<?php endif; ?>
+			</ul>
+		</details>
+		<details>
+			<summary class="card-title">route列表</summary>
+			<ul class="list-group">
+				<?php if (!empty($overwritelist = route_admin::plugin_route($dir))):
+					foreach ($overwritelist as $filename):
+				?>
+						<li class="list-group-item"><?= $filename ?></li>
+					<?php endforeach;
+				else: ?>
+					<li class="list-group-item">没有文件</li>
+				<?php endif; ?>
+			</ul>
+		</details>
+	</div>
+</div>
+<?php if (!empty($plugin['update_url'])): ?>
+<script type="text/javascript">
+	$(function(){
+	const post = new FormData();
+	post.set("name","<?=$dir?>");
+	post.set("siteid","<?=plugin::siteid()?>");
+		A.pluginFetch("<?= $plugin['update_url'] ?>",post)
+	});
+</script>
+<?php endif; ?>
+<!--{template(ADMIN_PATH.'view/htm/new-footer.htm')}-->

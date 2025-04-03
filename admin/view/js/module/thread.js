@@ -15,7 +15,7 @@ export default class thread {
 			btn.disabled(false);
 			result && T.setList(result);
 		});
-		$(elm).on('click', '.page-link', async function (event) {
+		$('#page-list').on('click', '.page-link', async function (event) {
 			event.preventDefault();
 			btn.disabled();
 			const data = await X.callMethod('FormData', elm);
@@ -67,7 +67,7 @@ export default class thread {
 								if (p) {
 									p && p.message && E.append(p.message + "\n");
 									if (p.url) {
-										$(E).delay(3000).location(p.url);
+										$.reload(p.url,3000);
 									}
 								}
 
@@ -148,18 +148,18 @@ export default class thread {
 	setList(result) {
 		const X = this.X;
 		if(!X.isOBJ(result) || !result.list.length){
-			$('#threads-length').text(0);
+			$('#threads-total').text(0);
 			$('#thread-search-details').prop('open', true);
 			$('#data-details').prop('open', false);
 			return $.alert('结果为空!');
 		}
 		$('#thread-search-details').prop('open', false);
 		$('#data-details').prop('open', true);
-		$('#threads-length').text(result.maxlen);
+		$('#threads-total').text(result.total);
 		if (result && result.list) {
 			let html = '';
 			for (let item of result.list) {
-				let tpl_item = $('#thread-list-item').text();
+				let tpl_item = $('#thread-list-item').html();
 				Object.entries(item).forEach(entry => {
 					tpl_item = tpl_item.replace(new RegExp('{' + entry[0] + '}', 'g'), entry[1]);
 				});
@@ -173,7 +173,7 @@ export default class thread {
 		if (result && result.pagelist) {
 			let html = '';
 			for (let item of result.pagelist) {
-				let tpl_item = $('#thread-list-page').text();
+				let tpl_item = $('#thread-list-page').html();
 				tpl_item = tpl_item.replace(/{page}/ig, item);
 				tpl_item = tpl_item.replace(/{active}/ig, item == result.page ? 'active' : '');
 				html += tpl_item;

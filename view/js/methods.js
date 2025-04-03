@@ -45,22 +45,22 @@ export default {
 	/**
 	 * 水印 
 	 */
-	canvasWaterText(ctx,width,height) {
+	canvasWaterText(ctx, width, height) {
 		ctx.save();
 		ctx.font = '24px system-ui';
 		ctx.lineWidth = 2;
 		ctx.strokeStyle = '#00000090';
 		let w = ctx.measureText(this.watertext).width;
-		let b = w>width?width/w:1;
-		if(w>width){
-			ctx.scale(width/w,width/w);
+		let b = w > width ? width / w : 1;
+		if (w > width) {
+			ctx.scale(width / w, width / w);
 		}
 		console.log(w);
-		let x = w>width ? 0:width-w;
-		let y =(height-24)/b; 
-		ctx.strokeText(this.watertext,x,y);
+		let x = w > width ? 0 : width - w;
+		let y = (height - 24) / b;
+		ctx.strokeText(this.watertext, x, y);
 		ctx.fillStyle = '#ffffff90';
-		ctx.fillText(this.watertext,x,y);
+		ctx.fillText(this.watertext, x, y);
 		ctx.closePath();
 		ctx.save();
 	},
@@ -82,7 +82,7 @@ export default {
 		ctx.drawImage(imgbit, 0, 0);
 		if (this.watertext) {
 			//文字水印
-			this.callMethod('canvasWaterText', ctx,width,height);
+			this.callMethod('canvasWaterText', ctx, width, height);
 		}
 		const mime = this.callMethod('webpsupport');
 		if (mime != filetype) {
@@ -111,10 +111,10 @@ export default {
 	/**
 	 * 压缩一个文件
 	 */
-	async formatZip(files,progress) {
+	async formatZip(files, progress) {
 		const X = this;
 		if (!self.zip) {
-			X.callMethod('zip_progress',{text:'加载压缩程序!'})
+			X.callMethod('zip_progress', { text: '加载压缩程序!' })
 			await import(X.zip_js);
 		}
 		const type = 'application/x-zip-compressed';
@@ -124,34 +124,34 @@ export default {
 		let length = 0;
 		for (const file of files) {
 			if (file instanceof File && file.size) {
-				X.callMethod('zip_progress',{text:'压缩文件:' + file.name});
-				await writer.add(file.name, new zip.BlobReader(file), {onprogress:(start, end)=>X.callMethod('zip_progress',{progress:Math.floor(100*start/end)})});
+				X.callMethod('zip_progress', { text: '压缩文件:' + file.name });
+				await writer.add(file.name, new zip.BlobReader(file), { onprogress: (start, end) => X.callMethod('zip_progress', { progress: Math.floor(100 * start / end) }) });
 				length++;
 			}
 		}
 		await writer.close(new TextEncoder().encode('能哥网 nenge.net', {
 			onprogress(start, end, entry) {
-				X.callMethod('zip_progress',{text:'压缩文件:' + entry.filename});
-				X.callMethod('zip_progress',{progress:Math.floor(100*start/end)})
+				X.callMethod('zip_progress', { text: '压缩文件:' + entry.filename });
+				X.callMethod('zip_progress', { progress: Math.floor(100 * start / end) })
 			}
 		}));
-		if(!length) throw 'empty file';
+		if (!length) throw 'empty file';
 		const data = new Uint8Array(await zipFileWriter.getData());
 		return new File([data], files[0].name.split('.').slice(0, -1).join('.') + '.zip', { type });
 	},
-	async upload(callback, accept,multiple) {
+	async upload(callback, accept, multiple) {
 		const input = document.createElement('input');
 		input.type = 'file';
 		if (accept) input.accept = accept;
-		input.multiple = multiple?true:false;
+		input.multiple = multiple ? true : false;
 		input.once('change', async function () {
 			const files = Array.from(this.files).filter(file => (file instanceof File) && file.size > 0);
-			if(files.length)callback(files);
+			if (files.length) callback(files);
 		});
 		input.click();
 		input.remove();
 	},
-	async FormData(...arg){
+	async FormData(...arg) {
 		const FormData = self.FormData;
 		if (!FormData || !FormData.prototype || !FormData.prototype.set || !FormData.prototype.entries) {
 			/** 还原QQ浏览器篡改内置对象 */
@@ -159,70 +159,117 @@ export default {
 		}
 		return new self.FormData(...arg);
 	},
-	async admin_forum_edit(elm){
+	get_form_elm(elm) {
 		const X = this;
-		$(elm).find('input').one('click',async function(){
-			const {editor} = await import(X.admin_jsroot+'tinymce.js');
-			const p = $(elm).next();
-			const E = new editor(p[0]);
-			$(this).prop('disabled',true);
-			//E.name = $(elm).next().attr('name');
-			E.form = this.form;
-		});
-	},
-	get_form_elm(elm){
-		const X = this;
-		if(X.isJQ(elm)){
-			if(X.isFrom(elm[0])){
+		if (X.isJQ(elm)) {
+			if (X.isFrom(elm[0])) {
 				return elm[0];
 			}
 			elm = elm[0];
-		}else if(X.isFrom(elm)){
+		} else if (X.isFrom(elm)) {
 			return elm;
 		}
-		if(elm.from&&X.isFrom(elm.from)){
+		if (elm.from && X.isFrom(elm.from)) {
 			return elm.from;
 		}
 		return false;
 	},
-	scrollView(id){
+	scrollView(id) {
+		if (id instanceof HTMLElement) {
+			return elm.scrollIntoView();
+		}
+		if (id instanceof jQuery) {
+			return elm[0].scrollIntoView();
+		}
 		const elm = document.querySelector(id);
-		if(elm instanceof HTMLElement){
+		if (elm instanceof HTMLElement) {
 			elm.scrollIntoView();
 		}
 	},
-	createEventSource(url,opt){
+	createEventSource(url, opt) {
 		const link = new EventSource(url);
-		if(opt){
-			for(const e in opt){
-				link.on(e,opt[e]);
+		if (opt) {
+			for (const e in opt) {
+				link.on(e, opt[e]);
 			}
 		}
-		link.once('close',function(){this.close()});
+		link.once('close', function () { this.close() });
 		return link;
 	},
-	checkall(elm){
-		elm.on('click',function(event){
+	checkall(elm) {
+		elm.on('click', function (event) {
 			const lists = document.querySelectorAll(this.getAttribute('data-match'));
 			const bool = !lists[0].checked;
-			lists.forEach(e=>e.checked=bool);
+			lists.forEach(e => e.checked = bool);
 		});
 	},
-	checkURL(url){
-		const surl = new URL(url,location.href);
+	checkURL(url) {
+		const surl = new URL(url, location.href);
 		/** 必须是受信任域 */
-		if(surl.origin!==location.origin&&surl.origin!==this.vieworigin){
+		if (surl.origin !== location.origin && surl.origin !== this.vieworigin) {
 			$.alert('对不起不允许执行站外代码!');
 			return false;
 		}
 		return surl;
 
 	},
-	async loadmodule(elm){
-		const url =this.callMethod('checkURL',elm.getAttribute('module-url'));
-		if(url){
-			const {default:Module} = await import(url.href);
-			return new Module(elm,this);
+	async loadmodule(elm) {
+		const url = this.callMethod('checkURL', elm.getAttribute('module-url'));
+		if (url) {
+			const { default: Module } = await import(url.href);
+			return new Module(elm, this);
 		}
+	},
+	reload(elm) {
+		$.reload(elm.getAttribute('href') || elm.getAttribute('url'), elm.getAttribute('seconds') || 2);
+	},
+	addJS(src) {
+		const version = src.match(/\d[\d\.]+/ig);
+		const id = ('script-' + (version?version[0]:'')+'-'+src.split('/').pop()).replace(/[\.\_]/ig, '-');
+		if (document.querySelector('.' + id) instanceof HTMLScriptElement) {
+			return true;
+		}
+		console.log(src);
+		const script = document.body.appendChild(document.createElement('script'));
+		script.src = src;
+		script.type = 'text/javascript';
+		script.classList.add(id);
+		return new Promise(back => script.onload = e => back(e));
+	},
+	addCSS(src) {
+		const version = src.match(/\d[\d\.]+/ig);
+		const id = ('link-' + (version?version[0]:'')+'-'+src.split('/').pop()).replace(/[\.\_]/ig, '-');
+		if (document.querySelector('.' + id) instanceof HTMLLinkElement) {
+			return true;
+		}
+		console.log(src);
+		const script = document.head.appendChild(document.createElement('link'));
+		script.href = src;
+		script.rel = 'stylesheet';
+		script.type = 'text/css';
+		script.classList.add(id);
+		return new Promise(back => script.onload = e => back(e));
+	},
+	load_datetimepicker(){
+		this.methods.set('load_datetimepicker',new Promise(async back=>{
+			await this.callMethod('addJS', this.viewroot+'vendor/momentjs/moment.min.js');
+			await this.callMethod('addJS', this.viewroot+'vendor/momentjs/locale/zh-cn.min.js');
+			await import(this.viewroot+'vendor/bootstrap-datetimepicker/bootstrap-datetimepicker.min.js');
+			await this.callMethod('addCSS', this.viewroot+'vendor/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css');
+			back(true);
+			/**
+			 * await this.callMethod('addJS', this.viewroot+'vendor/bootstrap-datepicker/bootstrap-datepicker.min.js');
+			 * await this.callMethod('addJS', this.viewroot+'vendor/bootstrap-datepicker/locales/bootstrap-datepicker.zh-CN.min.js');
+			 * await this.callMethod('addCSS', this.viewroot+'vendor/bootstrap-datepicker/bootstrap-datepicker3.min.css');
+			 */
+		}));
+		return this.callMethod('load_datetimepicker');
+	},
+	async datetimepicker(elm) {
+		await this.callMethod('load_datetimepicker');
+        let options = $(elm).data();
+		delete options.provide;
+		console.log(options);
+        $(elm).datetimepicker(options);
 	}
 }

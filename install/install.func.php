@@ -1,15 +1,15 @@
 <?php
 
 function get_env(&$env, &$write) {
-	$env['os']['name'] = lang('os');
+	$env['os']['name'] = MyApp::Lang('os');
 	$env['os']['must'] = TRUE;
 	$env['os']['current'] = PHP_OS;
-	$env['os']['need'] = lang('unix_like');
+	$env['os']['need'] = MyApp::Lang('unix_like');
 	$env['os']['status'] = 1;
 	// glob gzip
 	//$env['os']['disable'] = 1;
 	
-	$env['php_version']['name'] = lang('php_version');
+	$env['php_version']['name'] = MyApp::Lang('php_version');
 	$env['php_version']['must'] = TRUE;
 	$env['php_version']['current'] = PHP_VERSION;
 	$env['php_version']['need'] = '8.0';
@@ -17,16 +17,16 @@ function get_env(&$env, &$write) {
 
 	// 目录可写
 	$writedir = array(
-		'../conf/',
-		'../log/',
-		'../tmp/',
-		'../upload/',
-		'../plugin/'
+		'conf/',
+		'log/',
+		'tmp/',
+		'upload/',
+		'plugin/'
 	);
 
 	$write = array();
 	foreach($writedir as &$dir) {
-		$write[$dir] = xn_is_writable('./'.$dir);
+		$write[$dir] = xn_is_writable(APP_PATH.$dir);
 	}
 }
 

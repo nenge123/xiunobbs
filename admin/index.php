@@ -1,6 +1,5 @@
 <?php
 
-
 //$_SERVER['REQUEST_URI'] = '/?plugin-install-xn_user_recent_thread.htm';
 //$_SERVER['REQUEST_URI'] = '/?forum-update-1.htm';
 //$_SERVER['REQUEST_METHOD'] = 'POST';
@@ -16,16 +15,16 @@ if(DEBUG == 3) {
 	$_COOKIE['bbs_token'] = 'OQz5bz7trnFQQQA_2BW3D_2Bx4JL_2BGxTCa16F_2FnyCQ_3D_3D	';
 }
 */
-
-define('ADMIN_PATH', dirname(__FILE__).'/'); // __DIR__
+define('ADMIN_PATH',__DIR__.'/'); // __DIR__
 define('MESSAGE_HTM_PATH', ADMIN_PATH.'view/htm/message.htm');
-include(__DIR__.'/class/admin.class.php');
 define('SKIP_ROUTE', TRUE);
 include '../index.php';
-$lang += include _include(APP_PATH."lang/$conf[lang]/bbs_admin.php");
-$_SERVER['lang'] = $lang;
-include _include(ADMIN_PATH."admin.func.php");
-MyApp::app()->datas['menus'] = include _include(ADMIN_PATH.'menu.conf.php');
+#加载语言
+$lang = MyApp::addLang('bbs_admin.php');
+//$_SERVER['lang'] = $lang;
+#加载核心函数
+MyApp::app()->datas['rewrite_open'] = false;
+MyApp::app()->datas['rewrite_style'] = true;
+include _include(ADMIN_PATH.'class/admin.class.php');
+#加载逻辑处理
 include _include(ADMIN_PATH.'index.inc.php');
-
-?>

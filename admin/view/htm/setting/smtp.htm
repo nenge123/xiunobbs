@@ -1,10 +1,9 @@
 <!--{template(ADMIN_PATH.'view/htm/new-header.htm')}-->
-<!--{hook admin_setting_smtp_start.htm}-->
 <div class="card">
 	<div class="card-header">
 		<h4 class="card-title"><!--{lang admin_setting_smtp}--></h4>
 	</div>
-	<form action="{{ MyApp::value('url') }}" method="post" class="card-body table-responsive smtp_list" onpost="true">
+	<form action="{{ url }}" method="post" class="card-body table-responsive smtp_list" onpost="true">
 		<table class="table table-info table-striped-columns">
 			<thead>
 				<tr>
@@ -16,16 +15,16 @@
 					<th><!--{lang delete}--></th>
 				</tr>
 				<thead>
-				<tbody id="smtp_body" onmethods="setsmtp">
+				<tbody id="smtp_body" {{ route_admin::js_module('smtp') }}>
 					<!--{each $smtplist $k $v}-->
 					<tr align="center" rowid="{{ $k }}">
 						<td>
-							<input type="text" class="form-control" name="email[]" value="{{ $v['email'] }}" placeholder="<!--{lang email}-->" require/>
+							<input type="text" class="form-control" name="email[]" value="{{ $v['email'] }}" placeholder="{lang email}" require />
 						</td>
-						<td><input type="text" class="form-control" name="host[]" value="{{ $v['host'] }}" placeholder="<!--{lang host}-->" require/></td>
-						<td width="100" class="text-center"><input type="text" class="form-control" name="port[]" value="{{ $v['port'] }}" placeholder="<!--{lang port}-->" require/></td>
-						<td><input type="text" class="form-control" name="user[]" value="{{ $v['user'] }}" placeholder="<!--{lang username}-->" require/></td>
-						<td><input type="password" class="form-control" name="pass[]" value="{{ $v['pass'] }}" placeholder="<!--{lang password}-->" require/></td>
+						<td><input type="text" class="form-control" name="host[]" value="{{ $v['host'] }}" placeholder="{lang host}" require /></td>
+						<td width="100" class="text-center"><input type="text" class="form-control" name="port[]" value="{{ $v['port'] }}" placeholder="{lang port}" require /></td>
+						<td><input type="text" class="form-control" name="user[]" value="{{ $v['user'] }}" placeholder="{lang username}" require /></td>
+						<td><input type="password" class="form-control" name="pass[]" value="{{ $v['pass'] }}" placeholder="{lang password}" require /></td>
 						<td><a class="btn row_delete" role="btn"><!--{lang delete}--></a></td>
 					</tr>
 					<!--{/each}-->
@@ -33,23 +32,20 @@
 		</table>
 		<p><a role="button" class="btn row_add">[+]<!--{lang add_new_line}--></a></p>
 		<p class="text-center">
-			<button type="submit" class="btn btn-primary" id="submit" data-loading-text="<!--{lang submiting}-->..." style="width: 10rem;"><!--{lang confirm}--></button>
+			<button type="submit" class="btn btn-primary" id="submit" data-loading-text="{lang submiting}..."><!--{lang confirm}--></button>
 		</p>
-		<p>
-			注：<a href="https://bbs.xiuno.com/thread-19712.htm" target="_blank">如何设置 SMTP？ / How to set up SMTP ?</a>
+		<p> 注：<a href="https://bbs.xiuno.com/thread-19712.htm" target="_blank">如何设置 SMTP？ / How to set up SMTP ?</a>
 		</p>
 	</form>
 </div>
-<script type="text/plain" id="smtp_tpl">
-<tr align="center" rowid="{rowid}">
-	<td><input type="text" class="form-control" name="email[]" value="{email}" placeholder="<!--{lang email}-->" require/></td>
-	<td><input type="text" class="form-control" name="host[]" value="{host}"  placeholder="<!--{lang host}-->" require/></td>
-	<td width="100" class="text-center"><input type="text" class="form-control" name="port[]" value="{port}" placeholder="<!--{lang port}-->" require/></td>
-	<td><input type="text" class="form-control" name="user[]" value="{user}" placeholder="<!--{lang username}-->"  require/></td>
-	<td><input type="password" class="form-control" name="pass[]" value="{pass}" placeholder="<!--{lang password}-->" require/></td>
-	<td><a class="btn row_delete" role="btn"><!--{lang delete}--></a></td>
-</tr>
-</script>
-<!--{hook admin_setting_smtp_end.htm}-->
+<template type="text/plain" id="smtp_tpl" hidden>
+	<tr align="center" rowid="{rowid}">
+		<td><input type="text" class="form-control" name="email[]" value="{email}" placeholder="{lang email}" require /></td>
+		<td><input type="text" class="form-control" name="host[]" value="{host}" placeholder="{lang host}" require /></td>
+		<td width="100" class="text-center"><input type="text" class="form-control" name="port[]" value="{port}" placeholder="{lang port}" require /></td>
+		<td><input type="text" class="form-control" name="user[]" value="{user}" placeholder="{lang username}" require /></td>
+		<td><input type="password" class="form-control" name="pass[]" value="{pass}" placeholder="{lang password}" require /></td>
+		<td><a class="btn row_delete" role="btn"><!--{lang delete}--></a></td>
+	</tr>
+</template>
 <!--{template(ADMIN_PATH.'view/htm/new-footer.htm')}-->
-<!--{hook admin_setting_smtp_js.htm}-->

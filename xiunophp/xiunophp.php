@@ -88,7 +88,6 @@ $method = $_SERVER['REQUEST_METHOD'];
 $_SERVER['ip'] = $ip;
 $_SERVER['longip'] = $longip;
 $_SERVER['conf'] = $conf;
-$_SERVER['lang'] = $lang;
 $_SERVER['errno'] = $errno;
 $_SERVER['errstr'] = $errstr;
 $_SERVER['method'] = $method;

@@ -28,7 +28,7 @@ class MySQL extends \mysqli
 				$settings[$k] = $v;
 			endif;
 		endforeach;
-		$this->setReport(!empty($settings['error']));
+		$this->setReport(defined('MYSQL_DEBUG'));
 		#\mysqli_report(defined('\DEBUG')?MYSQLI_REPORT_ALL:MYSQLI_REPORT_OFF);
 		$this->real_connect(
 			$settings['host'],

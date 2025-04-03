@@ -1,29 +1,25 @@
 <!--{template(ADMIN_PATH.'view/htm/new-header.htm')}-->
-<!--{hook admin_setting_base_start.htm}-->
+<!--{hook admin_settingindex_htm_start.htm}-->
 <div class="card">
 	<div class="card-header">
 		<h4 class="card-title"><!--{lang admin_setting_base}--></h4>
 	</div>
 	<div class="card-body">
-		<form action="{{ MyApp::value('url') }}" method="post" onpost="true">
-			<!--{hook admin_setting_sitename_before.htm}-->
-			<div class="form-floating mb-3"><!--{{ \route_admin::input_required_text('sitename') }}--></div>
-			<!--{hook admin_setting_sitename_after.htm}-->
-			<div class="form-floating mb-3"><!--{{ \route_admin::input_textarea('sitebrief') }}--></div>
-			<!--{hook admin_setting_sitebrief_after.htm}-->
-			<div class="form-check form-switch mb-3"><!--{{ \route_admin::input_check('user_create_on') }}--></div>
-			<div class="form-check form-switch mb-3"><!--{{ \route_admin::input_check('user_create_email_on') }}--></div>
-			<div class="form-check form-switch mb-3"><!--{{ \route_admin::input_check('user_resetpw_on') }}--></div>
-			<div class="form-floating mb-3"><!--{{ \route_admin::input_required_select('runlevel', 5) }}--></div>
-			<!--{hook admin_setting_runlevel_after.htm}-->
-			<div class="form-floating mb-3"><!--{{ \route_admin::input_langlist() }}--></div>
-			<!--{hook admin_setting_base_lang_after.htm}-->
-			<div class="mb-3 text-center">
-				<button type="submit" class="btn btn-primary btn-block" data-loading-text="<!--{lang submiting}-->..."><!--{lang confirm}--></button>
+		<form action="{{ url }}" method="post" onpost="true" class="d-flex flex-column">
+			<!--{hook admin_settingindex_htm_form.htm}-->
+			<div class="form-floating mb-3" style="order: 5;"><!--{{ \model\tpl::conf_char('sitename','required') }}--></div>
+			<div class="form-floating mb-3" style="order: 10;"><!--{{ \model\tpl::conf_txt('sitebrief') }}--></div>
+			<div class="form-check form-switch mb-3" style="order: 15;"><!--{{ \model\tpl::conf_check('user_create_on') }}--></div>
+			<div class="form-check form-switch mb-3" style="order: 20;"><!--{{ \model\tpl::conf_check('user_create_email_on') }}--></div>
+			<div class="form-check form-switch mb-3" style="order: 25;"><!--{{ \model\tpl::conf_check('user_resetpw_on') }}--></div>
+			<div class="form-floating mb-3" style="order: 30;"><!--{{ \model\tpl::conf_list_num(5,'runlevel') }}--></div>
+			<div class="form-floating mb-3" style="order: 35;"><!--{{ \model\tpl::conf_i18n() }}--></div>
+			<div class="mb-3 text-center" style="order: 100;">
+				<!--{hook admin_settingindex_htm_submit.htm}-->
+				<button type="submit" class="btn btn-primary btn-block" data-loading-text="{lang submiting}..."><!--{lang confirm}--></button>
 			</div>
 		</form>
 	</div>
 </div>
-<!--{hook admin_setting_base_end.htm}-->
+<!--{hook admin_settingindex_htm_end.htm}-->
 <!--{template(ADMIN_PATH.'view/htm/new-footer.htm')}-->
-<!--{hook admin_setting_base_js.htm}-->

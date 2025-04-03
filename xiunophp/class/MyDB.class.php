@@ -5,13 +5,13 @@ class MyDB
 	 * 主链接
 	 * @var MySQL|MyPDO
 	 */
-	public MySQL|MyPDO $wlink;  // 写连接
+	public MySQL|MyPDO $wdb;  // 写连接
 	/**
 	 * 从链接
 	 *
 	 * @var MySQL|MyPDO
 	 */
-	public MySQL|MyPDO $rlink;  // 读连接
+	public MySQL|MyPDO $rdb;  // 读连接
 	/**
 	 * 主配置
 	 *
@@ -101,14 +101,14 @@ class MyDB
 	 */
 	public static function rlink()
 	{
-		return self::app()->rlink ?? self::app()->connect_slave();
+		return self::app()->rdb ?? self::app()->connect_slave();
 	}
 	/**
 	 * 从配置
 	 */
 	public static function rconf(string $name = ''): mixed
 	{
-		if (!isset(self::app()->rlink)):
+		if (!isset(self::app()->rdb)):
 			self::app()->connect_slave();
 		endif;
 		if (!empty($name)):
@@ -121,7 +121,7 @@ class MyDB
 	 */
 	public static function wlink()
 	{
-		return self::app()->wlink ?? self::app()->connect_master();
+		return self::app()->wdb ?? self::app()->connect_master();
 	}
 	/**
 	 * 创建MyDB初始化
@@ -164,36 +164,36 @@ class MyDB
 	// 根据配置文件连接
 	public function connect()
 	{
-		$this->wlink = $this->connect_master();
-		$this->rlink = $this->connect_slave();
-		return $this->wlink && $this->rlink;
+		$this->wdb = $this->connect_master();
+		$this->rdb = $this->connect_slave();
+		return $this->wdb && $this->rdb;
 	}
 	// 连接写服务器
 	public function connect_master()
 	{
-		if (isset($this->wlink)) return $this->wlink;
-		$this->wlink = $this->real_connect($this->conf['master']);
-		return $this->wlink;
+		if (isset($this->wdb)) return $this->wdb;
+		$this->wdb = $this->real_connect($this->conf['master']);
+		return $this->wdb;
 	}
 	// 连接从服务器，如果有多台，则随机挑选一台，如果为空，则与主服务器一致。
 	public function connect_slave()
 	{
-		if (isset($this->rlink)):
-			return $this->rlink;
+		if (isset($this->rdb)):
+			return $this->rdb;
 		endif;
 		if (empty($this->conf['slaves'])):
-			if (!isset($this->wlink)):
+			if (!isset($this->wdb)):
 				$this->connect_master();
 			endif;
-			$this->rlink = &$this->wlink;
+			$this->rdb = &$this->wdb;
 			$this->rconf = $this->conf['master'];
 		else:
 			$n = array_rand($this->conf['slaves']);
 			$conf = $this->conf['slaves'][$n];
 			$this->rconf = $conf;
-			$this->rlink = $this->real_connect($conf);
+			$this->rdb = $this->real_connect($conf);
 		endif;
-		return $this->rlink;
+		return $this->rdb;
 	}
 	public function real_connect($conf)
 	{
@@ -215,12 +215,12 @@ class MyDB
 	}
 	public function close()
 	{
-		if (isset($this->wlink)):
-			if ($this->wlink instanceof MySQL):
-				$this->wlink->close();
-				$this->rlink->close();
+		if (isset($this->wdb)):
+			if ($this->wdb instanceof MySQL):
+				$this->wdb->close();
+				$this->rdb->close();
 			else:
-				unset($this->wlink, $this->rlink);
+				unset($this->wdb, $this->rdb);
 			endif;
 		endif;
 	}
@@ -971,10 +971,10 @@ class MyDB
 	public static function PROFILES(): array
 	{
 		$mydb = self::app();
-		if (isset($mydb->wlink)):
-			$querylist = $mydb->wlink->querySQL('SHOW PROFILES;', 2);
-			if (isset($mydb->rlink) && $mydb->rlink != $mydb->wlink):
-				$querylist += $mydb->rlink->querySQL('SHOW PROFILES;', 2);
+		if (isset($mydb->wdb)):
+			$querylist = $mydb->wdb->querySQL('SHOW PROFILES;', 2);
+			if (isset($mydb->rdb) && $mydb->rdb != $mydb->wdb):
+				$querylist += $mydb->rdb->querySQL('SHOW PROFILES;', 2);
 			endif;
 			return $querylist;
 		endif;
@@ -987,10 +987,10 @@ class MyDB
 	{
 
 		$mydb = self::app();
-		if (isset($mydb->wlink)):
-			$length = $mydb->wlink->length;
-			if (isset($mydb->rlink) && $mydb->rlink != $mydb->wlink):
-				$length += $mydb->rlink->length;
+		if (isset($mydb->wdb)):
+			$length = $mydb->wdb->length;
+			if (isset($mydb->rdb) && $mydb->rdb != $mydb->wdb):
+				$length += $mydb->rdb->length;
 			endif;
 			return $length;
 		endif;

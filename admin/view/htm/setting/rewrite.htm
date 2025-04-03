@@ -1,25 +1,25 @@
 <!--{template(ADMIN_PATH.'view/htm/new-header.htm')}-->
-<!--{hook admin_setting_base_start.htm}-->
+<!--{hook admin_settingrewrite_htm_start.htm}-->
 <div class="card">
 	<div class="card-header">
 		<h4 class="card-title"><!--{lang admin_setting_rewrite}--></h4>
 	</div>
 	<div class="card-body">
-		<form action="{{ MyApp::value('url') }}" method="post" onpost="true">
-			<!--{hook admin_setting_rewrite_before.htm}-->
-			<div class="form-check form-switch mb-3"><!--{{ \route_admin::input_check('url_rewrite_on') }}--></div>
-			<div class="form-check form-switch mb-3"><!--{{ \route_admin::input_check('url_rewrite_style') }}--></div>
-			<div class="alert alert-danger"><!--{lang url_rewrite_style_msg}--></div>
-			<div class="form-check form-switch mb-3"><!--{{ \route_admin::input_check('cdn_on') }}--></div>
-			<div class="form-floating mb-3"><!--{{ \route_admin::input_required_text('view_url',null,'conf_view_url','') }}--></div>
-			<div class="form-floating mb-3"><!--{{ \route_admin::input_required_text('upload_url',null,'conf_upload_url','') }}--></div>
-			<div class="alert alert-danger"><!--{lang conf_upload_url_msg}--></div>
-			<div class="form-floating mb-3"><!--{{ \route_admin::input_required_text('view_path',MyApp::conf('conf_view_path','view/'),'conf_view_path') }}--></div>
-			<div class="form-floating mb-3"><!--{{ \route_admin::input_required_text('upload_path',MyApp::conf('conf_upload_path','upload/'),'conf_upload_path') }}--></div>
-			<div class="form-floating mb-3"><!--{{ \route_admin::input_required_text('htm_path',MyApp::conf('conf_htm_path','view/htm/'),'conf_htm_path') }}--></div>
-			<div class="alert alert-danger"><!--{lang conf_htm_path_msg}--></div>
-			<!--{hook admin_setting_rewrite_after.htm}-->
-			<div class="mb-3 text-center">
+		<form action="{{ url }}" method="post" onpost="true" class="d-flex flex-column">
+			<!--{hook admin_settingrewrite_htm_form.htm}-->
+			<div class="form-check form-switch mb-3" style="order: 5;"><!--{{ \model\tpl::conf_check('url_rewrite_on') }}--></div>
+			<div class="form-check form-switch mb-3" style="order: 10;"><!--{{ \model\tpl::conf_check('url_rewrite_style') }}--></div>
+			<div class="alert alert-danger" style="order: 15;"><!--{lang url_rewrite_style_msg}--></div>
+			<div class="form-check form-switch mb-3" style="order: 20;"><!--{{ \model\tpl::conf_check('cdn_on') }}--></div>
+			<div class="form-floating mb-3" style="order: 25;"><!--{{ \model\tpl::conf_char('view_url','','conf_view_url') }}--></div>
+			<div class="form-floating mb-3" style="order: 30;"><!--{{ \model\tpl::conf_char('upload_url','','conf_upload_url') }}--></div>
+			<div class="alert alert-danger" style="order: 35;"><!--{lang conf_upload_url_msg}--></div>
+			<div class="form-floating mb-3" style="order: 40;"><!--{{ \model\tpl::conf_char('view_path','','conf_view_path','view/') }}--></div>
+			<div class="form-floating mb-3" style="order: 45;"><!--{{ \model\tpl::conf_char('upload_path','','conf_upload_path','upload/') }}--></div>
+			<div class="form-floating mb-3" style="order: 55;"><!--{{ \model\tpl::conf_char('htm_path','','conf_htm_path','view/htm/') }}--></div>
+			<div class="alert alert-danger" style="order: 60;"><!--{lang conf_htm_path_msg}--></div>
+			<div class="mb-3 text-center" style="order: 100;">
+				<!--{hook admin_settingrewrite_htm_submit.htm}-->
 				<button type="submit" class="btn btn-primary btn-block" data-loading-text="<!--{lang submiting}-->..."><!--{lang confirm}--></button>
 			</div>
 		</form>
@@ -83,27 +83,6 @@
 	&lt;/system.webServer&gt;
 &lt;/configuration&gt;
 </textarea>
-		<h4>admin后台重写 <b>web.config</b></h4>
-		<textarea class="form-control" style="min-height: 400px;width: 100%;">
-&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
-&lt;configuration xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:noNamespaceSchemaLocation=&quot;web.xsd&quot;&gt;
-	&lt;system.webServer&gt;
-		&lt;rewrite&gt;
-			&lt;rules&gt;
-				&lt;clear/&gt;
-				&lt;rule name=&quot;admin重写&quot; stopProcessing=&quot;true&quot;&gt;
-					&lt;match url=&quot;.*&quot; /&gt;
-					&lt;conditions logicalGrouping=&quot;MatchAny&quot;&gt;
-						&lt;add input=&quot;{REQUEST_FILENAME}&quot; matchType=&quot;IsFile&quot; negate=&quot;true&quot; /&gt;
-						&lt;add input=&quot;{SCRIPT_FILENAME}&quot; pattern=&quot;(?!index\.php).*\.php$&quot; /&gt;
-					&lt;/conditions&gt;
-					&lt;action type=&quot;Rewrite&quot; url=&quot;index.php?{R:0}&quot; /&gt;
-				&lt;/rule&gt;
-			&lt;/rules&gt;
-		&lt;/rewrite&gt;
-	&lt;/system.webServer&gt;
-&lt;/configuration&gt;
-</textarea>
 	</div>
 </details>
 <details class="card">
@@ -133,15 +112,7 @@ RewriteRule ^(.*\/)*(.*\.(php|html|htm))$ index.php [L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule . index.php [L]	
 </textarea>
-<h4>ADMIN重写<b>.htaccess</b></h4>
-<textarea class="form-control" style="min-height: 200px;width: 100%;">
-RewriteEngine on
-RewriteBase /admin/
-RewriteCond %{REQUEST_FILENAME} (?!index\.php).*\.php$
-RewriteRule ^(.*)$ index.php?$1 [QSA,NC,NE,L]
-</textarea>
 	</div>
 </details>
-<!--{hook admin_setting_base_end.htm}-->
+<!--{hook admin_settingrewrite_htm_end.htm}-->
 <!--{template(ADMIN_PATH.'view/htm/new-footer.htm')}-->
-<!--{hook admin_setting_base_js.htm}-->

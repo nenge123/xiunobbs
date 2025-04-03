@@ -369,7 +369,7 @@ class table
 	/**
 	 * 插头数据
 	 */
-	public function insert(string $sql = '', array $param = array(), int $mode = -1): int
+	public function insert(string $sql = '', array $param = array(), int $mode = MyDB::MODE_INSERT_ID): int
 	{
 		// hook model_table_insert.php
 		return $this->execute_wlink($this->sql_insert() . $sql, $param, $mode);
@@ -377,14 +377,14 @@ class table
 	/**
 	 * 插入数组数据
 	 */
-	public function insert_json(array $json): int
+	public function insert_json(array $json,$mode=MyDB::MODE_INSERT_ID): int
 	{
 		// hook model_table_insert_json.php
 		if (empty($json)) return 0;
 		return $this->insert(
 			MyDB::INSERT_VALUES(array_keys($json), 1),
 			array_values($json),
-			-1
+			$mode
 		);
 	}
 	/**

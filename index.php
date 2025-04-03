@@ -2,6 +2,7 @@
 /*
  * Copyright (C) xiuno.com
  */
+defined('MYSQL_DEBUG');
 // 0: Production mode; 1: Developer mode; 2: Plugin developement mode;
 // 0: 线上模式; 1: 调试模式; 2: 插件开发模式;
 !defined('DEBUG') AND define('DEBUG', 1);

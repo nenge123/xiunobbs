@@ -1,0 +1,87 @@
+<!--{template(ADMIN_PATH.'view/htm/new-header.htm')}-->
+<form action="{{ url }}" method="post" {{ \route_admin::js_module('user-index') }}>
+	<details id="user-search-details" class="card" open>
+		<summary class="card-header"><!--{lang search_condition}--></summary>
+		<div class="card-body">
+			<!--{hook admin_userindex_htm_form.htm}-->
+			<div class="form-floating mb-3"><!--{{ \model\tpl::char('username',MyApp::post('username'),MyApp::Lang('username')) }}--></div>
+			<div class="row">
+				<div class="col-md-6">
+					<div class="form-floating mb-3"><!--{{ \model\tpl::char('create_ip',MyApp::post('create_ip'),MyApp::Lang('create_ip')) }}--></div>
+				</div>
+				<div class="col-md-6">
+					<div class="form-floating mb-3"><!--{{ \model\tpl::email('email',MyApp::post('email'),MyApp::Lang('email')) }}--></div>
+				</div>
+				<div class="col-md-6">
+					<div class="form-floating mb-3"><!--{{ \model\tpl::number('uid',MyApp::post('uid'),MyApp::Lang('uid')) }}--></div>
+				</div>
+				<div class="col-md-6">
+					<div class="form-floating mb-3"><!--{{ \model\tpl::select(array_column($grouplist,'name','gid'),MyApp::post('gid'),'gid',MyApp::Lang('user_group')) }}--></div>
+				</div>
+			</div>
+			<!--{hook admin_userindex_htm_form_end.htm}-->
+			<div class="mb-3">
+				<!--{hook admin_userindex_htm_submit.htm}-->
+				<button type="submit" class="btn btn-primary" data-loading-text="{lang submiting}..."><!--{lang confirm}--></button>
+			</div>
+		</div>
+	</details>
+</form>
+<details id="data-details" class="card" close>
+	<summary class="card-header"><!--{lang search_condition}--></summary>
+	<div class="card-body">
+		<nav aria-label="Page navigation example" class="mb-3">
+			<ul id="page-list" class="pagination gap-2">
+			</ul>
+			<nav class="nav gap-2">
+				<!--{hook admin_userindex_htm_action_start.htm}-->
+				<button type="button" class="btn btn-outline-teal" data-type="checkall"><!--{lang checkall}--></button>
+				<button type="button" class="btn btn-outline-danger" data-type="block" data-url="{{ MyApp::purl('block') }}">封禁</button>
+				<button type="button" class="btn btn-outline-danger" data-type="unblock" data-url="{{ MyApp::purl('block') }}">解封</button>
+				<button type="button" class="btn btn-outline-teal" data-type="clear" data-url="{{ MyApp::purl('clear') }}">彻底删除</button>
+				<!--{hook admin_userindex_htm_action_end.htm}-->
+			</nav>
+		</nav>
+		<div id="data-result"></div>
+		<div class="table-responsive">
+			<table class="table" style="min-width: 800px">
+				<thead>
+					<tr>
+						<th width="60" class="text-center"><!--{lang delete}--></th>
+						<th width="50">uid</th>
+						<th width="150"><!--{lang email}--></th>
+						<th width="150"><!--{lang username}--></th>
+						<th width="100"><!--{lang user_group}--></th>
+						<th width="100"><!--{lang create_date}--></th>
+						<th width="100"><!--{lang create_ip}--></th>
+						<th width="60"><!--{lang operation}--></th>
+					</tr>
+				</thead>
+				<tbody id="data-list">
+				</tbody>
+			</table>
+		</div>
+	</div>
+</details>
+<template id="tpl_page" hidden>
+	<li class="page-item {active}">
+		<a id="page-{page}" class="btn-outline-pink page-link" href="#">{page}</a>
+	</li>
+</template>
+<template id="tpl_datalist" hidden>
+	<tr id="uid-{uid}">
+		<td class="text-center">
+			<div class="form-check form-switch">
+				<input class="form-check-input" type="checkbox" name="delete[]" value="{uid}" />
+			</div>
+		</td>
+		<td>{uid}</td>
+		<td>{email}</td>
+		<td>{username}</td>
+		<td>{groupname}</td>
+		<td>{create_date_fmt}</td>
+		<td>{ip}</td>
+		<td><a href="{url}" target="_blank"><!--{lang edit}--></a></td>
+	</tr>
+</template>
+<!--{template(ADMIN_PATH.'view/htm/new-footer.htm')}-->

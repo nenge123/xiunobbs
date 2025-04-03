@@ -7,7 +7,8 @@
 $sid = MyApp::app()->sess_start();
 
 // 语言 / Language
-$_SERVER['lang'] = $lang = include _include(APP_PATH . "lang/$conf[lang]/bbs.php");
+$lang = MyApp::addLang('bbs.php');
+//$_SERVER['lang'] = $lang;
 
 // 用户组 / Group
 $grouplist = group_list_cache();

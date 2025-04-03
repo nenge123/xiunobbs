@@ -2,6 +2,46 @@ import methods from './methods.js';
 import ajaxs from './ajax.js';
 const url = import.meta.url;
 const jsroot = url.split('/').slice(0, -1).join('/') + '/';
+Object.assign(EventTarget.prototype, {
+	/**
+	 * 绑定事件
+	 * @param {*} evt 
+	 * @param {*} fun 
+	 * @param {*} opt 
+	 * @returns 
+	 */
+	on(evt, fun, opt) {
+		return this.addEventListener(evt, fun, opt), this;
+	},
+	/**
+	 * 解绑事件
+	 * @param {*} evt 
+	 * @param {*} fun 
+	 * @param {*} opt 
+	 * @returns 
+	 */
+	un(evt, fun, opt) {
+		return this.removeEventListener(evt, fun, opt), this;
+	},
+	/**
+	 * 绑定一次事件
+	 * @param {*} evt 
+	 * @param {*} fun 
+	 * @param {*} opt 
+	 * @returns 
+	 */
+	once(evt, fun) {
+		return this.on(evt, fun, { passive: !1, once: !0 }), this;
+	},
+	/**
+	 * 触发自定义事件
+	 * @param {*} evt 
+	 * @param {*} detail 
+	 */
+	toEvent(evt, detail) {
+		return this.dispatchEvent(typeof evt == 'string' ? new CustomEvent(evt, { detail }) : evt), this;
+	}
+});
 class xiuno extends EventTarget {
 	jsroot = jsroot;
 	cdn_unpkg_path = 'https://lf6-unpkg.zstaticcdn.com/';
@@ -92,46 +132,14 @@ $.fn.extend({
 			if (loading_text) this.html(loading_text);
 		}
 		return this;
-	}
+	},
 });
-Object.assign(EventTarget.prototype, {
-	/**
-	 * 绑定事件
-	 * @param {*} evt 
-	 * @param {*} fun 
-	 * @param {*} opt 
-	 * @returns 
-	 */
-	on(evt, fun, opt) {
-		return this.addEventListener(evt, fun, opt), this;
-	},
-	/**
-	 * 解绑事件
-	 * @param {*} evt 
-	 * @param {*} fun 
-	 * @param {*} opt 
-	 * @returns 
-	 */
-	un(evt, fun, opt) {
-		return this.removeEventListener(evt, fun, opt), this;
-	},
-	/**
-	 * 绑定一次事件
-	 * @param {*} evt 
-	 * @param {*} fun 
-	 * @param {*} opt 
-	 * @returns 
-	 */
-	once(evt, fun) {
-		return this.on(evt, fun, { passive: !1, once: !0 }), this;
-	},
-	/**
-	 * 触发自定义事件
-	 * @param {*} evt 
-	 * @param {*} detail 
-	 */
-	toEvent(evt, detail) {
-		return this.dispatchEvent(typeof evt == 'string' ? new CustomEvent(evt, { detail }) : evt), this;
+$.extend({
+	reload(url,time){
+		if(time&&time>0){
+			return setTimeout(()=>url.indexOf('javascript')!==-1?(new Function(url))():location.href=url,time>500?time:time*1000);
+		}
+		location.href=url;
 	}
 });
 const X = new xiuno();

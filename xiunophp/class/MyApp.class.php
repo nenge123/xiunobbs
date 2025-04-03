@@ -4,6 +4,7 @@ class MyApp implements \ArrayAccess
 	public static $_app;
 	public array $conf = array();
 	public array $datas = array();
+	public array $language = array();
 	public function __construct($conf = array())
 	{
 		self::$_app = $this;
@@ -18,7 +19,9 @@ class MyApp implements \ArrayAccess
 			'gzip' => str_contains($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip'),
 			'session' => array(),
 			'g_session_invalid' => FALSE,
+			'ip' => $this->get_client_ip()
 		);
+		$this->datas['longip'] = intval(ip2long($this->datas['ip']));
 		define('APP_SITE', $this->convert_site(APP_PATH));
 		$this->setConf($conf);
 		set_exception_handler(function ($exception) {
@@ -128,16 +131,11 @@ class MyApp implements \ArrayAccess
 			'htm' => $this->datas['path']['view/htm'],
 			'i18n' => $this->datas['path']['lang'] . $conf['lang'] . DIRECTORY_SEPARATOR,
 		);
-		#是否为 xxx/index.php
-		$this->datas['rewriteroot'] = $_SERVER['SCRIPT_NAME'];
-		$this->datas['isIndexPath'] = str_ends_with($_SERVER['SCRIPT_NAME'], 'index.php');
+		$this->datas['rewrite_style'] = empty($conf['url_rewrite_style'])?false:true;
 		#定义伪静态模式
 		if (!empty($conf['url_rewrite_on'])):
 			$this->datas['rewrite_open'] = $conf['url_rewrite_on'];
-		endif;
-		if (empty($conf['url_rewrite_style'])&&$this->datas['isIndexPath']):
-			#当脚本为index.php 且使用 index.php/xxx/gg
-			$this->datas['rewriteroot'] = substr($_SERVER['SCRIPT_NAME'], 0, -9);
+			$this->datas['rewrite_style'] = false;
 		endif;
 		#定义编码
 		if (!empty($conf['charset'])):
@@ -147,8 +145,12 @@ class MyApp implements \ArrayAccess
 	}
 	public function setConf(array $conf)
 	{
-		$this->setRoot($conf);
-		$this->conf = $conf;
+		if (empty($this->conf)):
+			$this->conf = $conf;
+			$this->setRoot($conf);
+		else:
+			$this->conf = array_merge($this->conf, $conf);
+		endif;
 	}
 	public function get_realpath($path): ?string
 	{
@@ -174,7 +176,6 @@ class MyApp implements \ArrayAccess
 	}
 	public function read_cookie_data($conf = array())
 	{
-		$this->datas['ip'] = $this->get_client_ip();
 		$this->datas['cookie_prefix'] = $conf['cookie_prefix'] ?? 'bbs_';
 		$this->datas['cookie_domain'] = $conf['cookie_domain'] ?? '';
 		$this->datas['online_hold_time'] = $conf['online_hold_time'] ?? 3600;
@@ -190,7 +191,7 @@ class MyApp implements \ArrayAccess
 		ini_set('session.gc_maxlifetime', $this->datas['online_hold_time']);	// 活动时间 $conf['online_hold_time']
 		ini_set('session.gc_probability', 1); 	// 垃圾回收概率 = gc_probability/gc_divisor
 		ini_set('session.gc_divisor', 500); 	// 垃圾回收时间 5 秒，在线人数 * 10 
-		ini_set('session.cache_limiter','none');
+		ini_set('session.cache_limiter', 'none');
 		session_set_save_handler(
 			[$this, 'sess_open'],
 			[$this, 'sess_close'],
@@ -210,6 +211,9 @@ class MyApp implements \ArrayAccess
 		foreach ($_COOKIE as $k => $v):
 			if (str_starts_with($k, $this->datas['cookie_prefix'])):
 				$k = substr($k, $len);
+				if (str_starts_with($v, '**')):
+					$v = self::decrypt(substr($v, 2));
+				endif;
 				$this->datas['cookies'][$k] = $v;
 			endif;
 		endforeach;
@@ -276,7 +280,7 @@ class MyApp implements \ArrayAccess
 			'url' => $url,
 			'last_date' => $_SERVER['REQUEST_TIME'],
 			'data' => $data,
-			'ip' => ip2long($this->datas['ip']),
+			'ip' => $this->datas['longip'],
 			'useragent' => $agent,
 			'bigdata' => 0,
 		);
@@ -342,7 +346,7 @@ class MyApp implements \ArrayAccess
 	function sess_new($sid)
 	{
 		$agent = $_SERVER['HTTP_USER_AGENT'];
-		$longip = ip2long($this->datas['ip']);
+		$longip = $this->datas['longip'];
 
 		/**
 		 * 未知作用
@@ -402,7 +406,7 @@ class MyApp implements \ArrayAccess
 				$ip = $_SERVER['REMOTE_ADDR'];
 			}
 		}
-		return long2ip(ip2long($ip));
+		return trim($ip);
 	}
 	public  function sess_restart()
 	{
@@ -419,6 +423,74 @@ class MyApp implements \ArrayAccess
 		session_start();
 		$this->datas['sid'] = session_id();
 		return $this->datas['sid'];
+	}
+
+	public static function ivcrypt(mixed $key = null): string
+	{
+		if (empty($key)):
+			$key = $_SERVER['HTTP_USER_AGENT'];
+		endif;
+		$len = openssl_cipher_iv_length(self::conf('encrypt_method', 'aes-128-cbc'));
+		return substr(hash('sha256', $key, true), 0, $len);
+	}
+	public static function encrypt_raw(string $txt, ?string $iv = null, ?string $key = null): string
+	{
+		#初始化向量
+		if (empty($iv)):
+			$iv = self::ivcrypt();
+		endif;
+		if (empty($key)):
+			#口令
+			$key = self::conf('auth_key') ?: hash('sha256', $_SERVER['HTTP_USER_AGENT'], false);
+		endif;
+		return openssl_encrypt(
+			$txt, #明文
+			self::conf('encrypt_method', 'aes-128-cbc'), #加密方式
+			$key,
+			OPENSSL_RAW_DATA, #标记
+			$iv,
+		);
+	}
+	public static function decrypt_raw(string $hash, ?string $iv = null, ?string $key = null): string
+	{
+		#初始化向量
+		if (empty($iv)):
+			$iv = self::ivcrypt();
+		endif;
+		if (empty($key)):
+			#口令
+			$key = self::conf('auth_key') ?: hash('sha256', $_SERVER['HTTP_USER_AGENT'], false);
+		endif;
+		return openssl_decrypt(
+			$hash, #密文
+			self::conf('encrypt_method', 'aes-128-cbc'), #加密方式
+			$key, #口令
+			OPENSSL_RAW_DATA, #标记
+			#初始化向量
+			$iv,
+		);
+	}
+	/**
+	 * 解密一个base64代码
+	 * @param string $hash
+	 * @param integer $iv
+	 * @param string $key
+	 */
+	public static function decrypt(string $base64hash, ?string $iv = null, ?string $key = null): string
+	{
+		$data = base64_decode($base64hash);
+		if (empty($data)) return '';
+		return self::decrypt_raw($data, $iv, $key);
+	}
+	/**
+	 * 加密并返回base64代码
+	 * @param string $hash
+	 * @param integer $iv
+	 * @param string $key
+	 */
+	public static function encrypt(string $txt, ?string $iv = null, ?string $key = null): string
+	{
+		return base64_encode(self::encrypt_raw(strval($txt), $iv, $key));
 	}
 	public function set_cookies_raw(string $name, mixed $data, int $time = 0)
 	{
@@ -490,10 +562,58 @@ class MyApp implements \ArrayAccess
 		endforeach;
 	}
 
-
-	public static function conf(string $name, mixed $defalut = '')
+	/**
+	 * 配置信息
+	 * @param string $name
+	 * @param mixed $defalut
+	 */
+	public static function conf(string $name, mixed $defalut = ''): mixed
 	{
 		return self::app()->conf[$name] ?? $defalut;
+	}
+	/**
+	 * 返回预定义语言
+	 * @param type $name
+	 * @param type ...$arg
+	 */
+	public static function Lang(string $name, ...$arg): string
+	{
+		if (empty($arg)):
+			return self::app()->language[$name] ?? $name;
+		endif;
+		$language = self::app()->language[$name] ?? $name;
+		if (is_array($arg[0])):
+			foreach ($arg[0] as $k => $v) {
+				$language = str_replace('{' . $k . '}', $v, $language);
+			}
+		endif;
+		return sprintf($language, ...$arg);
+	}
+	public static function getLang()
+	{
+		return self::app()->language;
+	}
+	public static function setLang(mixed $data):void
+	{
+		if (is_array($data)):
+			if (empty(self::app()->language)):
+				self::app()->language = $data;
+			else:
+				$language = self::app()->language;
+				self::app()->language = array_merge($language, $data);
+			endif;
+		endif;
+	}
+	public static function addLang(string $file):array
+	{
+		if(!str_starts_with($file,APP_PATH)):
+			$file = self::app()->datas['path']['i18n'].$file;
+		endif;
+		$lang = include(plugin::parseFile($file));
+		if(is_array($lang)):
+			self::setLang($lang);
+		endif;
+		return self::app()->language;
 	}
 	/**
 	 * 返回网站目录下的文件绝对物理路径
@@ -608,7 +728,7 @@ class MyApp implements \ArrayAccess
 				$path = str_replace($myapp->datas['path']['upload'], $myapp->datas['site']['upload'], $path);
 			endif;
 		endif;
-		if (str_starts_with($path,$_SERVER['DOCUMENT_ROOT'])):
+		if (str_starts_with($path, $_SERVER['DOCUMENT_ROOT'])):
 			$path = str_replace($_SERVER['DOCUMENT_ROOT'], '', $path);
 		endif;
 		$path = str_replace('\\', '/', $path);
@@ -776,7 +896,7 @@ class MyApp implements \ArrayAccess
 			$path = str_replace($scriptname, '/', $_SERVER['PATH_INFO']);
 		endif;
 		if (function_exists('mb_check_encoding')):
-			if (mb_check_encoding($this->datas['querydata']['url'],'GBK')):
+			if (mb_check_encoding($this->datas['querydata']['url'], 'GBK')):
 				if (!empty($path)):
 					$path = mb_convert_encoding($path, $this->datas['charset'], 'GBK');
 				endif;
@@ -901,7 +1021,7 @@ class MyApp implements \ArrayAccess
 					endif;
 					continue;
 				endif;
-				if (empty($value)) continue;
+				if (empty($value)&&!is_int($value)) continue;
 				$this->datas['querydata'][] = $value;
 			endforeach;
 		endif;
@@ -919,8 +1039,11 @@ class MyApp implements \ArrayAccess
 	/**
 	 * 获取myapp中data[querydata]数据
 	 */
-	public static function value(mixed $key, string $defalut = ''): mixed
+	public static function value(mixed $key=null, string $defalut = ''): mixed
 	{
+		if(empty($key)&&!is_numeric($key)): 
+			return self::app()->datas['querydata'];
+		endif;
 		return self::app()->datas['querydata'][$key] ?? $defalut;
 	}
 	/**
@@ -976,11 +1099,13 @@ class MyApp implements \ArrayAccess
 		@ob_clean();
 		//$header['title'] = self::conf('sitename');
 		if (empty(self::head('ajax-fetch'))):
-			$header = $GLOBALS['header'] ?? array();
-			$url = empty($extra['url']) ? 'javascript:history.back()' : $extra['url'];
-			$message = '<a href="' . $url . '">' . $message . '</a>';
-			if (!empty($extra['delay'])):
-				$message .= '<script>setTimeout(function() {' . (empty($extra['url']) ? 'history.back()' : 'window.location="' . $extra['url'] . '";') . '}, ' . ($extra['delay'] * 1000) . ');</script>';
+			if (empty($extra['url']) && !empty($extra['delay'])):
+				$url = 'javascript:history.back()';
+			elseif (!empty($extra['url'])):
+				$url = $extra['url'];
+			endif;
+			if (!empty($url)):
+				$message = '<a href="' . $url . '" ' . (!empty($extra['url']) ? 'onmethods="reload" seconds="' . (empty($extra['delay']) ? 2 : $extra['delay']) . '"' : '') . '>' . $message . '</a>';
 			endif;
 			if (defined('MESSAGE_HTM_PATH')):
 				include _include(MESSAGE_HTM_PATH);
@@ -1016,11 +1141,25 @@ class MyApp implements \ArrayAccess
 		endif;
 		return http_build_query($param, "", null, PHP_QUERY_RFC3986);
 	}
+	public function setRewriteRoot()
+	{
+		#是否为 xxx/index.php
+		$this->datas['rewriteroot'] = $_SERVER['SCRIPT_NAME'];
+		$this->datas['isIndexPath'] = str_ends_with($_SERVER['SCRIPT_NAME'], 'index.php');
+		if (!$this->datas['rewrite_style']&& $this->datas['isIndexPath']):
+			#当脚本为index.php 且使用 index.php/xxx/gg
+			$this->datas['rewriteroot'] = substr($_SERVER['SCRIPT_NAME'], 0, -9);
+		endif;
+	}
 	/**
 	 * 返回相对URL
 	 */
-	public function get_url_href(string|array $router = 'index', string|array $param = array(), bool $width = false,$top=false): string
+	public function get_url_href(string|array $router = 'index', string|array $param = array(), bool $width = false, $top = false): string
 	{
+
+		if(!isset($this->datas['rewriteroot'])):
+			$this->setRewriteRoot();
+		endif;
 		if (empty($router)):
 			$router = '';
 			if ($this->datas['rewrite_open'] && empty($router) && $this->datas['extension'] != 'php'):
@@ -1041,9 +1180,9 @@ class MyApp implements \ArrayAccess
 		endif;
 		$param = $this->get_url_param($param, $width);
 		$rewriteroot = $this->datas['rewriteroot'];
-		if($top):
-			$arr = explode('/',$rewriteroot);
-			$rewriteroot = APP_SITE.(array_pop($arr) ?'index.php':'');
+		if ($top):
+			$arr = explode('/', $rewriteroot);
+			$rewriteroot = APP_SITE . (array_pop($arr) ? 'index.php' : '');
 		endif;
 		#index.php 为引导文件
 		if ($this->datas['isIndexPath'] && $this->datas['rewrite_open']):
@@ -1095,7 +1234,7 @@ class MyApp implements \ArrayAccess
 	 */
 	public static function topurl(string|array $router = 'index', string|array $param = array(), bool $with = false)
 	{
-		return self::app()->get_url_href($router, $param, $with,true);
+		return self::app()->get_url_href($router, $param, $with, true);
 	}
 	public static function cookies($name, ?string $value = null, int $time = 0)
 	{
