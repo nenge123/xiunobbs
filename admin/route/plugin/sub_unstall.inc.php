@@ -22,7 +22,7 @@ $plugin['enable'] = 0;
 if(route_admin::plugin_save($plugin,$dir)):
 	$unstallfile = plugin::path($dir . '/unstall.php');
 	if (is_file($unstallfile)):
-		include _include($unstallfile);
+		include \plugin::parseFile($unstallfile);
 	endif;
 	// 卸载插件
 endif;

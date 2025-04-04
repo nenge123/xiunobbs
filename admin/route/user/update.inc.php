@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET'):
 	$_user['password'] = '';
 	#密码盐不可随意更改
 	unset($_user['salt']);
-	include _include(ADMIN_PATH . 'view/htm/user/update.htm');
+	include(route_admin::tpl_link('user/update.htm'));
 elseif ($_SERVER['REQUEST_METHOD'] == 'POST'):
 	route_admin::format_post();
 	if (empty($_POST['uid']) || $_POST['uid']<1):

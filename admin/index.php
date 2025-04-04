@@ -15,10 +15,11 @@ if(DEBUG == 3) {
 	$_COOKIE['bbs_token'] = 'OQz5bz7trnFQQQA_2BW3D_2Bx4JL_2BGxTCa16F_2FnyCQ_3D_3D	';
 }
 */
-define('ADMIN_PATH',__DIR__.'/'); // __DIR__
+define('ADMIN_PATH',__DIR__.DIRECTORY_SEPARATOR); // __DIR__
 define('MESSAGE_HTM_PATH', ADMIN_PATH.'view/htm/message.htm');
 define('SKIP_ROUTE', TRUE);
 include '../index.php';
+define('ADMIN_SITE',MyApp::convert_site(ADMIN_PATH));
 #加载语言
 $lang = MyApp::addLang('bbs_admin.php');
 //$_SERVER['lang'] = $lang;

@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 	// hook admin_group_list_get_start.php
 	MyApp::setValue('title', MyApp::Lang('group_admin'));
 	// hook admin_group_list_get_end.php
-	include _include(ADMIN_PATH . "view/htm/user/grouplist.htm");
+	include(route_admin::tpl_link('user/grouplist.htm'));
 } elseif ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	if(!empty($_POST['system'])):
 		$update = [];

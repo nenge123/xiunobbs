@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * 后台控制函数
+ */
 class route_admin
 {
 	public static function plugin_exists($dir)
@@ -96,7 +98,7 @@ class route_admin
 	}
 	public static function site($dir = ''): string
 	{
-		return MyApp::convert_site(ADMIN_PATH . $dir);
+		return ADMIN_SITE . $dir;
 	}
 	public static function js_module($name)
 	{
@@ -192,6 +194,35 @@ class route_admin
 			return $admin_token;
 		endif;
 		return false;
+	}
+	/**
+	 * 后台模板文件
+	 */
+	public static function tpl_file($name):string
+	{
+		return self::path('view/htm/'.$name);
+	}
+	public static function tpl_link($name)
+	{
+		return plugin::parseFile(self::tpl_file($name));
+	}
+	/**
+	 * 后台页眉
+	 *
+	 * @return string
+	 */
+	public static  function tpl_header():string
+	{
+		return self::tpl_file('header.inc.htm');
+	}
+	/**
+	 * 后台页脚
+	 *
+	 * @return string
+	 */
+	public static  function tpl_footer():string
+	{
+		return self::tpl_file('footer.inc.htm');
 	}
 }
 

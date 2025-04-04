@@ -9,6 +9,8 @@
  * 		content-action:attatch/big 大文件上传
  * 单独板块字段更新
  * 全部字段更新
+ * 有一个BUG 如果权限字段不全写入用户组会产生奇怪问题,等找到问题,
+ * 理论题管理员,版主,禁止用户等不参与板块权限设置
  */
 !defined('APP_PATH') and exit('Access Denied.');
 $_fid = MyApp::value(1);;
@@ -18,21 +20,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET'):
 	MyApp::setValue('title',MyApp::Lang('forum_edit').':'.$_forum['name']);
 	// hook admin_forumupdate_get_start.php
 	#生成权限信息
-	$accesslist = MyDB::t('forum_access')->whereAll(array('fid' => $_fid), MyDB::ORDER(['gid' => 'asc']));
-	if (empty($accesslist)):
+	$list = MyDB::t('forum_access')->whereAll(array('fid' => $_fid), MyDB::ORDER(['gid' => 'asc']));
+	if (empty($list)):
 		foreach ($grouplist as $k => $v):
 			if(in_array($v['gid'],[1,2,3,4,5,7])):
-				continue;
+				//continue;
 			endif;
 			$accesslist[$k] = $v; // 字段名相同，直接覆盖。 / same field, directly overwrite
 		endforeach;
 	else:
-		$accesslist = array_column($accesslist, null, 'gid');
+		$list = array_column($list, null, 'gid');
 		foreach ($grouplist as $k => $v):
 			if(in_array($v['gid'],[1,2,3,4,5,7])):
-				continue;
+				//continue;
 			endif;
-			$accesslist[$k] = array_merge($grouplist[$k],$accesslist[$k] ?? array());
+			$accesslist[$k] = array_merge($grouplist[$k],$list[$k] ?? array());
 		endforeach;
 	endif;
 	#版主列表
@@ -42,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET'):
 		$_forum['modnames'] = implode(',', array_column(MyDB::t('user')->where(['uid' => explode(',', $_forum['moduids'])], MyDB::ORDER(['uid' => 'asc']), 2, array('username')), 0));
 	endif;
 	// hook admin_forumupdate_get_end.php
-	include _include(ADMIN_PATH . "view/htm/forum/update.htm");
+	include(route_admin::tpl_link('forum/update.htm'));
 	exit;
 elseif ($_SERVER['REQUEST_METHOD'] == 'POST'):
 	// hook admin_forumupdate_post_start.php
@@ -82,7 +84,7 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'POST'):
 		$newarr = [];
 		foreach($grouplist as $_group):
 			if(in_array($_group['gid'],[1,2,3,4,5,7])):
-				continue;
+				//continue;
 			endif;
 			$newarr[$_group['gid']]['fid'] = $_fid;
 			$newarr[$_group['gid']]['gid'] = $_group['gid'];

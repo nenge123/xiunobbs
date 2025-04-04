@@ -10,7 +10,7 @@ unset($_SERVER['conf']);
 ob_start();
 phpinfo();
 $data = ob_get_clean();
-include _include(ADMIN_PATH . "view/htm/new-header.htm");
+include plugin::parseFile(route_admin::tpl_header());
 if (preg_match('/\<body[^>]*\>(.+?)\<\/body\>/is', $data, $matches)):
 	echo $matches[1];
 	echo '<style type="text/css">
@@ -36,5 +36,5 @@ if (preg_match('/\<body[^>]*\>(.+?)\<\/body\>/is', $data, $matches)):
 .lyear-layout-content .container-fluid pre {background-color: transparent;color: currentColor;}
 </style>';
 endif;
-include _include(ADMIN_PATH . "view/htm/new-footer.htm");
+include plugin::parseFile(route_admin::tpl_footer());
 exit;

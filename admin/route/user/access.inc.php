@@ -90,4 +90,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'):
 	MyApp::message(-1, MyApp::Lang('data_not_changed'));
 endif;
 MyApp::setValue('title', MyApp::Lang('group_edit'));
-include _include(ADMIN_PATH . "view/htm/user/access.htm");
+include(route_admin::tpl_link('user/access.htm'));

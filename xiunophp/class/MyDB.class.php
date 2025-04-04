@@ -5,13 +5,13 @@ class MyDB
 	 * 主链接
 	 * @var MySQL|MyPDO
 	 */
-	public MySQL|MyPDO $wdb;  // 写连接
+	public MySQL|MyPDO $wlink;  // 写连接
 	/**
 	 * 从链接
 	 *
 	 * @var MySQL|MyPDO
 	 */
-	public MySQL|MyPDO $rdb;  // 读连接
+	public MySQL|MyPDO $rlink;  // 读连接
 	/**
 	 * 主配置
 	 *
@@ -99,16 +99,16 @@ class MyDB
 	/**
 	 * 从链接
 	 */
-	public static function rlink()
+	public static function rdb()
 	{
-		return self::app()->rdb ?? self::app()->connect_slave();
+		return self::app()->rlink ?? self::app()->connect_slave();
 	}
 	/**
 	 * 从配置
 	 */
 	public static function rconf(string $name = ''): mixed
 	{
-		if (!isset(self::app()->rdb)):
+		if (!isset(self::app()->rlink)):
 			self::app()->connect_slave();
 		endif;
 		if (!empty($name)):
@@ -119,9 +119,9 @@ class MyDB
 	/**
 	 * 主链接
 	 */
-	public static function wlink()
+	public static function wdb()
 	{
-		return self::app()->wdb ?? self::app()->connect_master();
+		return self::app()->wlink ?? self::app()->connect_master();
 	}
 	/**
 	 * 创建MyDB初始化
@@ -164,36 +164,36 @@ class MyDB
 	// 根据配置文件连接
 	public function connect()
 	{
-		$this->wdb = $this->connect_master();
-		$this->rdb = $this->connect_slave();
-		return $this->wdb && $this->rdb;
+		$this->wlink = $this->connect_master();
+		$this->rlink = $this->connect_slave();
+		return $this->wlink && $this->rlink;
 	}
 	// 连接写服务器
 	public function connect_master()
 	{
-		if (isset($this->wdb)) return $this->wdb;
-		$this->wdb = $this->real_connect($this->conf['master']);
-		return $this->wdb;
+		if (isset($this->wlink)) return $this->wlink;
+		$this->wlink = $this->real_connect($this->conf['master']);
+		return $this->wlink;
 	}
 	// 连接从服务器，如果有多台，则随机挑选一台，如果为空，则与主服务器一致。
 	public function connect_slave()
 	{
-		if (isset($this->rdb)):
-			return $this->rdb;
+		if (isset($this->rlink)):
+			return $this->rlink;
 		endif;
 		if (empty($this->conf['slaves'])):
-			if (!isset($this->wdb)):
+			if (!isset($this->wlink)):
 				$this->connect_master();
 			endif;
-			$this->rdb = &$this->wdb;
+			$this->rlink = &$this->wlink;
 			$this->rconf = $this->conf['master'];
 		else:
 			$n = array_rand($this->conf['slaves']);
 			$conf = $this->conf['slaves'][$n];
 			$this->rconf = $conf;
-			$this->rdb = $this->real_connect($conf);
+			$this->rlink = $this->real_connect($conf);
 		endif;
-		return $this->rdb;
+		return $this->rlink;
 	}
 	public function real_connect($conf)
 	{
@@ -215,27 +215,27 @@ class MyDB
 	}
 	public function close()
 	{
-		if (isset($this->wdb)):
-			if ($this->wdb instanceof MySQL):
-				$this->wdb->close();
-				$this->rdb->close();
+		if (isset($this->wlink)):
+			if ($this->wlink instanceof MySQL):
+				$this->wlink->close();
+				$this->rlink->close();
 			else:
-				unset($this->wdb, $this->rdb);
+				unset($this->wlink, $this->rlink);
 			endif;
 		endif;
 	}
 	public static function query($sql, $mode = self::MODE_ALL_ASSOC)
 	{
-		return self::rlink()->querySQL($sql, $mode);
+		return self::rdb()->querySQL($sql, $mode);
 	}
 	public static function execute(string $query, array $param, int $mode = self::MODE_ALL_ASSOC): mixed
 	{
-		return self::rlink()->executeSQL($query, $param, $mode);
+		return self::rdb()->executeSQL($query, $param, $mode);
 	}
 	public static function exec($sql, $mode = self::MODE_AFFECTED_ROWS)
 	{
 		$sql = trim($sql);
-		$wlink = self::wlink();
+		$wlink = self::wdb();
 		if (strtoupper(substr($sql, 0, 12) == 'CREATE TABLE')):
 			if (self::engine() != 'myisam'):
 				$sql = str_ireplace('MyISAM', 'InnoDB', $sql);
@@ -272,7 +272,7 @@ class MyDB
 		$offset = ($page - 1) * $pagesize;
 		$cols = $col ? implode(',', $col) : '*';
 		$where = self::xn_sql_where($cond);
-		$result =  self::rlink()->executeSQL('SELECT ' . $cols . ' FROM ' . self::tableqoute($table) . $where[0] . $orderby . ' LIMIT ' . $offset . ',' . $pagesize . PHP_EOL, $where[1]);
+		$result =  self::rdb()->executeSQL('SELECT ' . $cols . ' FROM ' . self::tableqoute($table) . $where[0] . $orderby . ' LIMIT ' . $offset . ',' . $pagesize . PHP_EOL, $where[1]);
 		if (!empty($key) && isset($result[0]) && isset($result[0][$key])):
 			return array_column($result, null, $key);
 		endif;
@@ -286,11 +286,11 @@ class MyDB
 		$orderby = self::xn_sql_order($orderby);
 		$cols = $col ? implode(',', $col) : '*';
 		$where = self::xn_sql_where($cond);
-		return self::rlink()->executeSQL('SELECT ' . $cols . ' FROM ' . self::tableqoute($table) . $where[0] . $orderby . ' LIMIT 1', $where[1], 4);
+		return self::rdb()->executeSQL('SELECT ' . $cols . ' FROM ' . self::tableqoute($table) . $where[0] . $orderby . ' LIMIT 1', $where[1], 4);
 	}
 	public static function version()
 	{
-		return self::rlink()->serverVersion();
+		return self::rdb()->serverVersion();
 	}
 	public function is_support_innodb()
 	{
@@ -308,7 +308,7 @@ class MyDB
 	public static function maxid(string $table, string $field, array $cond = array())
 	{
 		$where = self::xn_sql_where($cond);
-		return self::rlink()->executeSQL('SELECT MAX(' . $field . ') FROM ' . self::quote($table) . ' ' . $where[0], $where[1], 7);
+		return self::rdb()->executeSQL('SELECT MAX(' . $field . ') FROM ' . self::quote($table) . ' ' . $where[0], $where[1], 7);
 	}
 	// 如果为 innodb，条件为空，并且有权限读取 information_schema
 	/**
@@ -318,10 +318,10 @@ class MyDB
 	{
 		$rconf = self::app()->rconf;
 		if (empty($cond) && $rconf['engine'] == 'innodb'):
-			return self::rlink()->executeSQL('SELECT `TABLE_ROWS` FROM `information_schema`.`tables` WHERE `TABLE_SCHEMA`=? AND `TABLE_NAME`=?', array(self::rconf('name'), self::tablename($table)), 7);
+			return self::rdb()->executeSQL('SELECT `TABLE_ROWS` FROM `information_schema`.`tables` WHERE `TABLE_SCHEMA`=? AND `TABLE_NAME`=?', array(self::rconf('name'), self::tablename($table)), 7);
 		else:
 			$where = self::xn_sql_where($cond);
-			return self::rlink()->executeSQL('SELECT COUNT(*) FROM ' . self::tableqoute($table) . ' ' . $where[0], $where[1], 7);
+			return self::rdb()->executeSQL('SELECT COUNT(*) FROM ' . self::tableqoute($table) . ' ' . $where[0], $where[1], 7);
 		endif;
 	}
 	/**
@@ -971,10 +971,10 @@ class MyDB
 	public static function PROFILES(): array
 	{
 		$mydb = self::app();
-		if (isset($mydb->wdb)):
-			$querylist = $mydb->wdb->querySQL('SHOW PROFILES;', 2);
-			if (isset($mydb->rdb) && $mydb->rdb != $mydb->wdb):
-				$querylist += $mydb->rdb->querySQL('SHOW PROFILES;', 2);
+		if (isset($mydb->wlink)):
+			$querylist = $mydb->wlink->querySQL('SHOW PROFILES;', 2);
+			if (isset($mydb->rlink) && $mydb->rlink != $mydb->wlink):
+				$querylist += $mydb->rlink->querySQL('SHOW PROFILES;', 2);
 			endif;
 			return $querylist;
 		endif;
@@ -987,10 +987,10 @@ class MyDB
 	{
 
 		$mydb = self::app();
-		if (isset($mydb->wdb)):
-			$length = $mydb->wdb->length;
-			if (isset($mydb->rdb) && $mydb->rdb != $mydb->wdb):
-				$length += $mydb->rdb->length;
+		if (isset($mydb->wlink)):
+			$length = $mydb->wlink->length;
+			if (isset($mydb->rlink) && $mydb->rlink != $mydb->wlink):
+				$length += $mydb->rlink->length;
 			endif;
 			return $length;
 		endif;

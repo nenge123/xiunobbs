@@ -10,11 +10,10 @@
 // hook admin_forumlist.php
 if ($_SERVER['REQUEST_METHOD'] == 'GET'):
 	// hook admin_forumlist_get_start.php
-	$header['title']        = lang('forum_admin');
 	$newforumlist = MyDB::t('forum')->whereAll([], MyDB::ORDER(['rank' => 'desc', 'fid' => 'asc']), array('name', 'icon', 'rank', 'fid'));
 	$newforumlist = array_column($newforumlist, null, 'fid');
 	// hook admin_forumlist_get_end.php
-	include _include(ADMIN_PATH . "view/htm/forum/home.htm");
+	include(route_admin::tpl_link('forum/home.htm'));
 	exit;
 elseif ($_SERVER['REQUEST_METHOD'] == 'POST'):
 	// hook admin_forumlist_post_start.php
@@ -53,11 +52,11 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'POST'):
 			if ($row > 0):
 				forum_list_cache_delete();
 				// hook admin_forumlist_post_end.php
-				MyApp::message(0, lang('save_successfully'), array('url' => MyApp::purl('forum/list')));
+				MyApp::message(0, MyApp::Lang('save_successfully'), array('url' => MyApp::purl('forum/list')));
 			endif;
 		endif;
 	endif;
 	// hook admin_forumlist_post_end.php
-	MyApp::message(0, lang('forum_no_update'));
+	MyApp::message(0, MyApp::Lang('forum_no_update'));
 endif;
 exit;

@@ -8,39 +8,56 @@
 !defined('APP_PATH') and exit('Access Denied.');
 // 初始化插件变量 / init plugin var
 // 本地插件 local plugin list
-$pluginlist = plugin::read_plugin_data();
-foreach($pluginlist as $k=>$v):
-	//array('url'=>MyApp::url('user/create'), 'text'=>MyApp::Lang('admin_user_create')),
-	MyApp::app()->datas['menus']['plugin']['tab'][$k] = array(
-		'url'=>MyApp::purl($k),
-		'text'=>$v['name'],
-		'img'=>plugin::site($k . '/icon.png'),
-	);
-endforeach;
 $dir = MyApp::value(0);
-if(isset($pluginlist[$dir])):
+$base_action = array('disable','enable','install', 'unstall');
+if (!empty($dir)&&!in_array($dir,$base_action)):
+	#读取缓存
+	define('PLUGIN_DIR', plugin::path($dir . DIRECTORY_SEPARATOR));
+endif;
+if (defined('PLUGIN_DIR') && is_dir(PLUGIN_DIR)):
+	$nav_common = array('install', 'unstall', 'setting', 'disable', 'enable','read');
+	#读取插件信息
 	$plugin = plugin::get_plugin_json($dir);
-	$action = MyApp::value(1);
-	$name = $plugin['name'];
-	$url_icon = plugin::site($dir . '/icon.png');
-	$url_base = MyApp::purl($dir);
-	$url_install = MyApp::purl($dir.'/install');
-	$url_unstall = MyApp::purl($dir.'/unstall');
-	$url_setting = MyApp::purl($dir.'/setting');
-	$url_disable = MyApp::purl($dir.'/disable');
-	$url_enable = MyApp::purl($dir.'/enable');
-	if(in_array($action,['install','unstall','setting','disable','enable'])):
-		include _include(
-			route_admin::path(
-				'route/plugin/sub_'.$action.'.inc.php'
-			));
+	if(!empty($plugin)&&!empty($plugin['name'])):
+		#是否有效插件信息
+		$action = MyApp::value(1);
+		$name = $plugin['name'];
+		$url_icon = plugin::site($dir . '/icon.png');
+		$url_base = MyApp::purl($dir);
+		$url_install = MyApp::purl($dir . '/install');
+		$url_unstall = MyApp::purl($dir . '/unstall');
+		$url_setting = MyApp::purl($dir . '/setting');
+		$url_disable = MyApp::purl($dir . '/disable');
+		$url_enable = MyApp::purl($dir . '/enable');
+		$url_admin = plugin::path($dir . '/route.inc.php');
+		if (in_array($action,$nav_common)):
+			include \plugin::parseFile(route_admin::path('route/plugin/sub_' . $action . '.inc.php'));
+			exit;
+		endif;
+		#插件自带路由
+		if ($action != 'read' && is_file($url_admin)):
+			include($url_admin);
+			exit;
+		endif;
+		include \plugin::parseFile(route_admin::path('route/plugin/sub_read.inc.php'));
 		exit;
 	endif;
-	MyApp::setValue('title',$plugin['name']);
-	include _include(ADMIN_PATH . 'view/htm/plugin/read.htm');
-	exit;
 endif;
-$pagination = '';
-$pugin_cate_html = '';
-//$header['title']    = MyApp::Lang('local_plugin');
-include _include(ADMIN_PATH . 'view/htm/plugin/list.htm');
+$pluginlist = plugin::read_plugin_data();
+switch($dir):
+	case 'install':
+		$pluginlist = array_filter($pluginlist,fn($m)=>!empty($m['installed']));
+	break;
+	case 'unstall':
+		$pluginlist = array_filter($pluginlist,fn($m)=>empty($m['installed']));
+	break;
+	case 'disable':
+		$pluginlist = array_filter($pluginlist,fn($m)=>!empty($m['installed'])&&empty($m['enable']));
+	break;
+	case 'all':
+	break;
+	default:
+		$pluginlist = array_filter($pluginlist,fn($m)=>!empty($m['installed'])&&!empty($m['enable']));
+	break;
+endswitch;
+include(route_admin::tpl_link('plugin/list.htm'));

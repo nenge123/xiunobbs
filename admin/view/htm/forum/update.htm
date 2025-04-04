@@ -1,8 +1,8 @@
-<!--{template(ADMIN_PATH.'view/htm/new-header.htm')}-->
+<!--{template(route_admin::tpl_header())}-->
 <form action="{{ url }}" method="post" onpost="true" {{ \route_admin::js_module('forum-update') }}>
 	<div class="card">
 		<div class="card-header">
-			<h4 class="card-title">{lang admin_forum_edit}:<?= $_forum['name'] ?></h4>
+			<h4 class="card-title">{lang admin_forum_edit}:{{ $_forum['name'] }}</h4>
 		</div>
 		<div class="card-body" class="d-flex flex-column">
 			<!--{hook admin_forumupdate_htm_form.htm}-->
@@ -50,7 +50,7 @@
 							<td>
 								<div class="custom-input form-check form-switch"><!--{{ \model\tpl::checkbox() }}--></div>
 								<input type="hidden" name="gid[{{ $access['gid'] }}]" value="{{ $access['gid'] }}">
-							<td align="left"><?php echo $access['name']; ?></td>
+							<td align="left"><!--{{ $access['name'] }}--></td>
 							<!--{each $access $a $b}-->
 							<!--{if in_array($a,['allowread','allowthread','allowpost','allowattach','allowdown'])}-->
 							<td>
@@ -65,4 +65,4 @@
 		</div>
 	</div>
 </form>
-<!--{template(ADMIN_PATH.'view/htm/new-footer.htm')}-->
+<!--{template(route_admin::tpl_footer())}-->

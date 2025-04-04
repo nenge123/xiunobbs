@@ -15,12 +15,12 @@ if (MyApp::head('accept') == 'text/event-stream'):
 	$id = 1;
 	if (empty($_forum)):
 		#板块不存在
-		route_admin::eventMessage('close', $id, array('message' => lang('forum_not_exists'), 'url' => MyApp::purl('forum/index')));
+		route_admin::eventMessage('close', $id, array('message' => MyApp::Lang('forum_not_exists'), 'url' => MyApp::purl('forum/index')));
 		exit;
 	endif;
 	if (MyDB::t('forum')->selectCount() == 1):
 		#只有一个板块不允许删除
-		route_admin::eventMessage('close', $id, array('message' => lang('forum_cant_delete_system_reserved'), 'url' => MyApp::purl('forum/index')));
+		route_admin::eventMessage('close', $id, array('message' => MyApp::Lang('forum_cant_delete_system_reserved'), 'url' => MyApp::purl('forum/index')));
 		exit;
 	endif;
 	$_fid = $_forum['fid'];
@@ -28,13 +28,13 @@ if (MyApp::head('accept') == 'text/event-stream'):
 		#不能含有删除子版块 (程序本体默认不支持子版块)
 		foreach ($GLOBALS['forumlist'] as $k => $v):
 			if ($v['fup'] == $_fid):
-				route_admin::eventMessage('close', $id, array('message' => lang('forum_please_delete_sub_forum'), 'url' => MyApp::purl('forum/index')));
+				route_admin::eventMessage('close', $id, array('message' => MyApp::Lang('forum_please_delete_sub_forum'), 'url' => MyApp::purl('forum/index')));
 				exit;
 			endif;
 		endforeach;
 	endif;
 	#开始
-	route_admin::eventMessage('open', $id, array('message' => lang('forum_event_stream_start')));
+	route_admin::eventMessage('open', $id, array('message' => MyApp::Lang('forum_event_stream_start')));
 	$id++;
 	$haslist = false;
 	// hook admin_forumdelete_eventstream_getlist.php
@@ -43,16 +43,16 @@ if (MyApp::head('accept') == 'text/event-stream'):
 		$haslist = $threadlist->valid();
 	endif;
 	if ($haslist):
-		route_admin::eventMessage('progress', $id, array('message' => sprintf(lang('forum_event_stream_progress'), $size)));
+		route_admin::eventMessage('progress', $id, array('message' => sprintf(MyApp::Lang('forum_event_stream_progress'), $size)));
 		$id++;
 		#存在主题 先删除主题
 		sleep(1);
 		foreach ($threadlist as $thread):
-			route_admin::eventMessage('progress', $id, array('message' => sprintf(lang('forum_event_stream_progress_subject'), $thread['subject'])));
+			route_admin::eventMessage('progress', $id, array('message' => sprintf(MyApp::Lang('forum_event_stream_progress_subject'), $thread['subject'])));
 			$id++;
 			thread_delete($thread['tid']);
 		endforeach;
-		route_admin::eventMessage('progress', $id, array('message' => sprintf(lang('forum_event_stream_progress_success'), $size)));
+		route_admin::eventMessage('progress', $id, array('message' => sprintf(MyApp::Lang('forum_event_stream_progress_success'), $size)));
 		$id++;
 		exit;
 	endif;
@@ -60,15 +60,15 @@ if (MyApp::head('accept') == 'text/event-stream'):
 	MyDB::t('forum_access')->delete_by_where(['fid' => $_fid]);
 	forum_list_cache_delete();
 	// hook admin_forumdelete_eventstream_end.php
-	route_admin::eventMessage('close', $id, array('message' => lang('forum_event_stream_close'), 'url' => MyApp::purl('forum/index')));
+	route_admin::eventMessage('close', $id, array('message' => MyApp::Lang('forum_event_stream_close'), 'url' => MyApp::purl('forum/index')));
 	exit;
 endif;
 if ($_SERVER['REQUEST_METHOD'] == 'GET'):
-	empty($_forum) and MyApp::message(-1, lang('forum_not_exists'));
+	empty($_forum) and MyApp::message(-1, MyApp::Lang('forum_not_exists'));
 	// hook admin_forumdelete_get_start.php
-	MyApp::setValue('title',lang('forum_delete').':'.$_forum['name']);
-	include _include(ADMIN_PATH . "view/htm/forum/delete.htm");
+	MyApp::setValue('title',MyApp::Lang('forum_delete').':'.$_forum['name']);
+	include(route_admin::tpl_link('forum/delete.htm'));
 	exit;
 elseif ($_SERVER['REQUEST_METHOD'] == 'POST'):
-	MyApp::message(-1, lang('error_request'));
+	MyApp::message(-1, MyApp::Lang('error_request'));
 endif;

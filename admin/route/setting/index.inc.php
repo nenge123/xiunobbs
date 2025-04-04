@@ -8,7 +8,7 @@
 // hook admin_settingindex_start.php
 if ($_SERVER['REQUEST_METHOD'] == 'GET'):
 	// hook admin_settingindex_get.php
-	include _include(ADMIN_PATH . 'view/htm/setting/base.htm');
+	include(route_admin::tpl_link('setting/base.htm'));
 elseif ($_SERVER['REQUEST_METHOD'] == 'POST'):
 	// hook admin_settingindex_post.php
 	#防止checkbox空值问题
@@ -20,5 +20,5 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'POST'):
 	// hook admin_settingindex_post_end.php
 	file_replace_var(APP_PATH . 'conf/conf.php', $_POST);
 	// hook admin_settingindex_post_msg.php
-	MyApp::message(0, lang('modify_successfully'));
+	MyApp::message(0, MyApp::Lang('modify_successfully'));
 endif;

@@ -7,13 +7,13 @@ class plugin
 {
 	static public array $regexp = array(
 		#'subtemplate' => '/\<\!\-\-\{subtemplate\(\'(.+?)\'\)\}\-\-\>/',
-		'scss' => '/\<link\s*[^>]*?href=\"([\w\d\:\_\-]+\.scss)\"[^>]*\>/i',
-		'css' => '/\<link\s*[^>]*?href=\"css\/([\w\d\:\_\-]+)\.css\"\>/i',
-		'template' => '/\<\!\-\-\{template\((.+?)\)\}\-\-\>/',
-		'foreach1' => '/\{each ([^\s]+)\s+(\$[^\$]+)\s+(\$[^\$]+?)\}/s',
-		'foreach2' => '/\{each ([^\s]+)\s+(\$[^\$]+?)\}/s',
-		'foreach3' => '/\{each ([^\s]+)\s+(\$[^\$]+)\s*=>\s*(\$[^\$]+?)\}/s',
-		'variable' => '/\{\{ (.+?) \}\}/',
+		'scss' => '/\<link\s*[^>]*?href=\"([\w\d\:\_\-]+\.scss)\"[^>]*\>/im',
+		'css' => '/\<link\s*[^>]*?href=\"css\/([\w\d\:\_\-]+)\.css\"\>/im',
+		'template' => '/\<\!\-\-\{template\((.+?)\)\}\-\-\>/im',
+		'foreach1' => '/\{each\s+(.+?)\s+(\$\w+?)\s+(\$\w+?)\s*\}/im',
+		'foreach2' => '/\{each\s+(.+?)\s+(\$\w+?)\s*\}/im',
+		'foreach3' => '/\{each\s+(.+?)\s+(\$\w+?)\s*=>\s*(\$\w+?)\}/im',
+		'variable' => '/\{\{ (.+?) \}\}/m',
 		#'modulefunc' => '/\{:(\w+[\w\_\d]+?)\((.+?)\)\}/',
 	);
 	/**
@@ -26,6 +26,23 @@ class plugin
 		$srcfile = MyApp::convert_path($srcfile);
 		$ext = '';
 		if (empty($tmpfile)):
+			if (str_starts_with($srcfile, 'phar://')):
+				$isphar = true;
+				$temppath = preg_replace('/^.+?[\\\\\/]([\-\w]+)\.phar/is', '\\1', $srcfile);
+			else:
+				$temppath = str_replace(APP_PATH, '', $srcfile);
+			endif;
+			$temppath = trim($temppath, ' .?#\/\\');
+			$ext = pathinfo($temppath, PATHINFO_EXTENSION);
+			if ($ext != 'php'):
+				$temppath = substr($temppath, 0, strlen($temppath) - strlen($ext)) . 'php';
+			endif;
+			if (!empty($isphar)):
+				$temppath = 'phar/' . $temppath;
+			endif;
+			$tmpfile = MyApp::tmp_path($temppath);
+
+		/*
 			$file_arr = array();
 			$isphar = false;
 			if (str_starts_with($srcfile, 'phar://')):
@@ -61,8 +78,12 @@ class plugin
 			else:
 				$tmpfile = MyApp::tmp_path(implode('_', $file_arr));
 			endif;
+			*/
 		else:
 			$ext = pathinfo($srcfile, PATHINFO_EXTENSION);
+			if (!str_starts_with($tmpfile, APP_PATH)):
+				$tmpfile =  MyApp::tmp_path($tmpfile);
+			endif;
 		endif;
 		#DEBUG模式 即时编译 避免频繁的后台 更新缓存
 		if (is_file($tmpfile)):
@@ -91,13 +112,13 @@ class plugin
 		$s = self::parseHook($s);
 		if ($ext == 'htm'):
 			#附加终止访问
-			$s = '<?php !defined(\'APP_PATH\') AND exit(\'Access Denied.\');?>' . $s;
+			$s = '<?php !defined(\'APP_PATH\') AND exit(\'Access Denied.\');' . PHP_EOL . 'use model\tpl;' . PHP_EOL . ' ?>' . $s;
 			#模板语法糖
 			$s = self::parseVar($s);
 		else:
 
 		endif;
-		self::parseWrite($tmpfile, $s);
+		self::parseWrite($tmpfile, trim($s));
 		return $tmpfile;
 	}
 	/**
@@ -195,87 +216,87 @@ class plugin
 		$template = preg_replace_callback('/\{lang ([^\}]+)\}/', fn($m) => MyApp::Lang(trim($m[1])), $template);
 		#echo
 		$template = preg_replace_callback(
-			'/\{echo (.+?)\}/s',
+			'/\{echo (.+?)\}/m',
 			fn($m) => '<?=' . trim($m[1]) . '??\'\'?>',
 			$template
 		);
 		#eval
 		$template = preg_replace_callback(
-			'/\{eval ([^\}]+)\}/s',
-			fn($m) => '<?php ' . trim($m[1]) . ';?>',
+			'/\{eval ([^\}]+)\}/m',
+			fn($m) => '<?php ' . trim($m[1]) . '; ?>',
 			$template
 		);
 		#if 条件
 		$template = preg_replace_callback(
-			'/{if\s([^\}]+)\}/',
-			fn($m) => '<?php if(' . trim($m[1]) . '):?>',
+			'/{if\s([^\}]+)\}/m',
+			fn($m) => '<?php if(' . trim($m[1]) . '): ?>',
 			$template
 		);
 		$template = preg_replace_callback(
-			'/{if\(([^\}]+)\)\}/',
-			fn($m) => '<?php if(' . trim($m[1]) . '):?>',
+			'/{if\(([^\}]+)\)\}/m',
+			fn($m) => '<?php if(' . trim($m[1]) . '): ?>',
 			$template
 		);
 		#elseif 条件转折
 		$template = preg_replace_callback(
-			'/\{elseif\s(.+?)\}/',
-			fn($m) => '<?php elseif(' . trim($m[1]) . '):?>',
+			'/\{elseif\s(.+?)\}/m',
+			fn($m) => '<?php elseif(' . trim($m[1]) . '): ?>',
 			$template
 		);
 		$template = preg_replace_callback(
-			'/\{elseif\((.+?)\)\}/',
-			fn($m) => '<?php elseif(' . trim($m[1]) . '):?>',
+			'/\{elseif\((.+?)\)\}/m',
+			fn($m) => '<?php elseif(' . trim($m[1]) . '): ?>',
 			$template
 		);
 		#else 条件否
 		$template = preg_replace(
 			'/\{\/?else\}/',
-			'<?php else:?>',
+			'<?php else: ?>',
 			$template
 		);
 		#endif 结束IF
 		$template = preg_replace(
 			'/\{\/if\}/',
-			'<?php endif;?>',
+			'<?php endif; ?>',
 			$template
 		);
 		#endfor 结束for
 		$template = preg_replace(
 			'/\{\/for\}/',
-			'<?php endfor;?>',
+			'<?php endfor; ?>',
 			$template
 		);
 		#for
 		$template = preg_replace_callback(
-			'/\{for\((.+?)\)\}/is',
+			'/\{for\((.+?)\)\}/m',
 			fn($m) => '<?php for(' . trim($m[1]) . '): ?>',
 			$template
 		);
 		#each foreach 循环
 		$template = preg_replace_callback(
 			self::$regexp['foreach1'],
-			array(self::class, 'parse_fn_each'),
+			fn($m) => self::parse_fn_each($m),
 			$template
 		);
 		#each foreach 循环
 		$template = preg_replace_callback(
 			self::$regexp['foreach2'],
-			array(self::class, 'parse_fn_each'),
+			fn($m) => self::parse_fn_each($m),
 			$template
 		);
 		#each foreach 循环
 		$template = preg_replace_callback(
 			self::$regexp['foreach3'],
-			array(self::class, 'parse_fn_each'),
+			fn($m) => self::parse_fn_each($m),
 			$template
 		);
 		#end foreach 结束循环
 		$template = preg_replace(
 			'/\{\/each\}/',
-			'<?php endforeach;?>',
+			'<?php endforeach; ?>',
 			$template
 		);
-		$template = preg_replace('/\s*\?\>[\n\r\s\t]*\<\?php\s+/is', ';', $template);
+		$template = preg_replace('/[\n\r\s\t]+\?\>[\n\r\s\t]*\<\?php\s+/is', PHP_EOL, $template);
 		return $template;
 	}
 	static public function parse_fn_each($param): string
@@ -301,12 +322,12 @@ class plugin
 					return '{{ ' . trim($param1, '\'" ') . ' }}';
 					break;
 				case ':':
-					$param1 = substr($param1,1);
+					$param1 = substr($param1, 1);
 					if (ctype_alnum($param1)):
 						return '<?=MyApp::data(\'' . $param1 . '\')?>';
 					endif;
-					return '{{ '.trim($param1,'.: ').' }}';
-				break;
+					return '{{ ' . trim($param1, '.: ') . ' }}';
+					break;
 				default:
 					#纯数字或字母
 					if (ctype_alnum($param1)):
@@ -381,14 +402,22 @@ class plugin
 	public static function read_plugin_data(): array
 	{
 		if (!isset(self::$pluginlist)):
-			self::$pluginlist = array();
-			$paths = glob(self::path() . '*/conf.json', GLOB_NOSORT);
-			foreach ($paths as $file):
-				$data = self::read_plugin_json($file);
-				if (!empty($data)):
-					self::$pluginlist[basename(dirname($file))] = $data;
+			if(defined('PLUGIN_DIR')):
+				self::$pluginlist = self::get_data('plugin_data');
+			endif;
+			if(empty(self::$pluginlist)):
+				self::$pluginlist = array();
+				$paths = glob(self::path() . '*/conf.json', GLOB_NOSORT);
+				foreach ($paths as $file):
+					$data = self::read_plugin_json($file);
+					if (!empty($data)):
+						self::$pluginlist[basename(dirname($file))] = $data;
+					endif;
+				endforeach;
+				if (!empty(self::$pluginlist)):
+					self::write_data('plugin_data', self::$pluginlist);
 				endif;
-			endforeach;
+			endif;
 		endif;
 		return self::$pluginlist;
 	}
@@ -407,7 +436,7 @@ class plugin
 	public static function read_plugin_enabled()
 	{
 		$plugininfo = self::read_plugin_data() ?? array();
-		return array_filter($plugininfo, fn($m) => !empty($m['enable']));
+		return array_filter($plugininfo, fn($m) => !empty($m['enable'])&&!empty($m['installed']));
 	}
 	/**
 	 * hook文件列表
@@ -467,9 +496,9 @@ class plugin
 		$hookfiles = self::read_plugin_hook();
 		$s = '';
 		$hookname = $m[1];
-		if (!empty(self::$hooks[$hookname])):
+		if (!empty($hookfiles[$hookname])):
 			$fileext = pathinfo($hookname, PATHINFO_EXTENSION);
-			foreach ($hookfiles as $path):
+			foreach ($hookfiles[$hookname] as $path):
 				$t = file_get_contents($path);
 				if ($fileext == 'php' && preg_match('#^\s*<\?php\s+exit;#is', $t)):
 					// 正则表达式去除兼容性比较好。
@@ -521,5 +550,74 @@ class plugin
 			}
 		}
 		return file_put_contents($lockfile, $_SERVER['REQUEST_TIME'], LOCK_EX);
+	}
+	/**
+	 * 写入数据缓存
+	 */
+	public static function write_data(string $file, mixed $data)
+	{
+		$filepath = MyApp::tmp_path('data/' . $file . '.php');
+		if (is_array($data)):
+			$data = '<?php' . PHP_EOL . 'return ' . var_export($data, true) . ';';
+		endif;
+		MyApp::create_dir(dirname($filepath));
+		file_put_contents($filepath, $data);
+	}
+	/**
+	 * 返回数据缓存
+	 */
+	public static function get_data(string $file)
+	{
+		$filepath = MyApp::tmp_path('data/' . $file . '.php');
+		if (is_file($filepath)):
+			return include($filepath);
+		endif;
+		return array();
+	}
+	/**
+	 * 删除数据缓存
+	 */
+	public static function delete_data(string $file)
+	{
+		$filepath = MyApp::tmp_path('data/' . $file . '.php');
+		if (is_file($filepath)):
+			@unlink($filepath);
+		endif;
+	}
+	/**
+	 * 清空数据缓存
+	 */
+	public static function clear_data()
+	{
+		$path = MyApp::tmp_path('data/');
+		if (is_dir($path)):
+			foreach (scandir($path) as $file):
+				if (str_ends_with($file, '.php')):
+					@unlink($path . $file);
+				endif;
+			endforeach;
+		endif;
+	}
+	/**
+	 * 返回插件模板地址
+	 */
+	public static function tpl_file(string $file,?string $dir=null):string
+	{
+		if(empty($dir)):
+			if(defined('PLUGIN_DIR')):
+			$dir = PLUGIN_DIR;
+			else:
+				throw new \Exception('未知插件目录');
+				return '';
+			endif;
+		endif;
+		return self::path($dir.'/htm/'.$file);
+	}
+	/**
+	 * 返回解析后的插件模板地址
+	 */
+	public static function tpl_link(string $file,?string $dir=null,?string $tmpfile):string
+	{
+		return self::parseFile(self::tpl_file($file,$dir),$tmpfile);
 	}
 }

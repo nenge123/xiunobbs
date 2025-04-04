@@ -28,4 +28,4 @@ $stat['users'] = user_count();
 $stat['attachs'] = attach_count();
 $stat['disk_free_space'] = function_exists('disk_free_space') ? humansize(disk_free_space(APP_PATH)) : MyApp::Lang('unknown');
 // hook admin_index_empty_end.php
-include _include(ADMIN_PATH . 'view/htm/index/home.htm');
+include(route_admin::tpl_link('index/home.htm'));

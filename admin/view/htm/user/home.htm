@@ -1,4 +1,4 @@
-<!--{template(ADMIN_PATH.'view/htm/new-header.htm')}-->
+<!--{template(route_admin::tpl_header())}-->
 <form action="{{ url }}" method="post" {{ \route_admin::js_module('user-index') }}>
 	<details id="user-search-details" class="card" open>
 		<summary class="card-header"><!--{lang search_condition}--></summary>
@@ -84,4 +84,4 @@
 		<td><a href="{url}" target="_blank"><!--{lang edit}--></a></td>
 	</tr>
 </template>
-<!--{template(ADMIN_PATH.'view/htm/new-footer.htm')}-->
+<!--{template(route_admin::tpl_footer())}-->

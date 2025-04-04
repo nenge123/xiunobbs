@@ -1,4 +1,4 @@
-<!--{template(ADMIN_PATH.'view/htm/new-header.htm')}-->
+<!--{template(route_admin::tpl_header())}-->
 <form action="{{ url }}" method="post" {{ \route_admin::js_module('thread') }}>
 	<!--{hook admin_threaddelete_htm_start.htm}-->
 	<details id="thread-search-details" class="card" open>
@@ -76,4 +76,4 @@
 	</div>
 	<!--{hook admin_threaddelete_htm_page_end.htm}-->
 </template>
-<!--{template(ADMIN_PATH.'view/htm/new-footer.htm')}-->
+<!--{template(route_admin::tpl_footer())}-->

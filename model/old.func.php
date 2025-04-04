@@ -140,8 +140,8 @@ function db_errno_errstr($r, $d = NULL, $sql = '')
 {
 	#global $errno, $errstr;
 	if ($r === FALSE) { //  && $d->errno != 0
-		$errno = MyDB::rlink()->errorCode();
-		$errstr = db_errstr_safe($errno,MyDB::rlink()->errorMessage());
+		$errno = MyDB::rdb()->errorCode();
+		$errstr = db_errstr_safe($errno,MyDB::rdb()->errorMessage());
 		$s = 'SQL:' . $sql . "\r\nerrno: " . $errno . ", errstr: " . $errstr;
 		xn_log($s, 'db_error');
 	}

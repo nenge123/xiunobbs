@@ -48,7 +48,29 @@ class tpl
 		if (empty($id)):
 			$id = 'text-' . dechex(rand(1000, 9999)) . dechex(rand(1000, 9999));
 		endif;
-		return self::input($name,$value,$placeholder,$more,$inputclass,$id,'text',$labelclass);
+		return self::input($name, $value, $placeholder, $more, $inputclass, $id, 'text', $labelclass);
+	}
+	/**
+	 * 一个表单radio项
+	 *
+	 * @param string $name
+	 * @param mixed $value
+	 * @param string $placeholder
+	 * @param string $more
+	 * @param string|null $id
+	 * @return string
+	 */
+	public static function radio(
+		string $name = '',
+		mixed $value = '',
+		string $placeholder = '',
+		string $more = '',
+		?string $id = null
+	): string {
+		if (empty($id)):
+			$id = 'radio-' . dechex(rand(1000, 9999)) . dechex(rand(1000, 9999));
+		endif;
+		return self::input($name, $value, $placeholder, $more, 'form-check-input', $id, 'radio', 'form-check-label');
 	}
 	/**
 	 * 一个表单checkbox项
@@ -87,12 +109,11 @@ class tpl
 		?string $id = null,
 		string $inputclass = '',
 		string $labelclass = '',
-	):string
-	{
+	): string {
 		if (empty($id)):
 			$id = 'num-' . dechex(rand(1000, 9999)) . dechex(rand(1000, 9999));
 		endif;
-		return self::input($name, $value, $placeholder, $more, $inputclass, $id, 'number',$labelclass);
+		return self::input($name, $value, $placeholder, $more, $inputclass, $id, 'number', $labelclass);
 	}
 	/**
 	 * 一个密码表单项
@@ -105,12 +126,11 @@ class tpl
 		?string $id = null,
 		string $inputclass = '',
 		string $labelclass = '',
-	):string
-	{
+	): string {
 		if (empty($id)):
 			$id = 'pw-' . dechex(rand(1000, 9999)) . dechex(rand(1000, 9999));
 		endif;
-		return self::input($name, $value, $placeholder, $more, $inputclass, $id, 'password',$labelclass);
+		return self::input($name, $value, $placeholder, $more, $inputclass, $id, 'password', $labelclass);
 	}
 	/**
 	 * 邮件表单项
@@ -123,12 +143,11 @@ class tpl
 		?string $id = null,
 		string $inputclass = '',
 		string $labelclass = '',
-	):string
-	{
+	): string {
 		if (empty($id)):
 			$id = 'email-' . dechex(rand(1000, 9999)) . dechex(rand(1000, 9999));
 		endif;
-		return self::input($name, $value, $placeholder, $more, $inputclass, $id, 'email',$labelclass);
+		return self::input($name, $value, $placeholder, $more, $inputclass, $id, 'email', $labelclass);
 	}
 	/**
 	 * 日期表单项
@@ -141,16 +160,15 @@ class tpl
 		?string $id = null,
 		string $inputclass = '',
 		string $labelclass = '',
-	):string
-	{
+	): string {
 		if (empty($id)):
 			$id = 'date-' . dechex(rand(1000, 9999)) . dechex(rand(1000, 9999));
 		endif;
-		if(empty($placeholder)&&$name):
+		if (empty($placeholder) && $name):
 			$placeholder = MyApp::Lang($name);
 		endif;
-		$more .= ' max="'.date('Y-m-d',mktime(24,0,0,)).'"';
-		return self::input($name, $value, $placeholder, $more, $inputclass, $id, 'date',$labelclass);
+		$more .= ' max="' . date('Y-m-d', mktime(24, 0, 0,)) . '"';
+		return self::input($name, $value, $placeholder, $more, $inputclass, $id, 'date', $labelclass);
 	}
 	/**
 	 * 日期表单项
@@ -163,16 +181,15 @@ class tpl
 		?string $id = null,
 		string $inputclass = '',
 		string $labelclass = '',
-	):string
-	{
+	): string {
 		if (empty($id)):
 			$id = 'time-' . dechex(rand(1000, 9999)) . dechex(rand(1000, 9999));
 		endif;
-		if(empty($placeholder)&&$name):
+		if (empty($placeholder) && $name):
 			$placeholder = MyApp::Lang($name);
 		endif;
-		$more .= ' max="'.date('Y-m-d H:i:s').'" onmethods="datetimepicker" data-provide="datetimepicker" data-side-by-side="true" data-format="YYYY-MM-DD HH:mm:ss"';
-		return self::input($name, $value, $placeholder, $more, $inputclass, $id, 'text',$labelclass);
+		$more .= ' max="' . date('Y-m-d H:i:s') . '" onmethods="datetimepicker" data-provide="datetimepicker" data-side-by-side="true" data-format="YYYY-MM-DD HH:mm:ss"';
+		return self::input($name, $value, $placeholder, $more, $inputclass, $id, 'text', $labelclass);
 	}
 	/**
 	 * ip表单项
@@ -185,29 +202,28 @@ class tpl
 		?string $id = null,
 		string $inputclass = '',
 		string $labelclass = '',
-	):string
-	{
+	): string {
 		if (empty($id)):
 			$id = 'ipv4-' . dechex(rand(1000, 9999)) . dechex(rand(1000, 9999));
 		endif;
-		if(empty($placeholder)&&$name):
+		if (empty($placeholder) && $name):
 			$placeholder = MyApp::Lang($name);
 		endif;
 		$more .= ' pattern="^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"';
-		return self::input($name, $value, $placeholder, $more, $inputclass, $id, 'text',$labelclass);
+		return self::input($name, $value, $placeholder, $more, $inputclass, $id, 'text', $labelclass);
 	}
 	/**
 	 * 下拉表单项
 	 */
 	public static function select(
 		array $list,
-		mixed $value='',
+		mixed $value = '',
 		string $name = '',
 		string $placeholder = '',
 		string $inputclass = '',
 		string $optionclass = '',
 		?string $labelclass = null,
-	):string {
+	): string {
 		$html = '';
 		if (empty($id)):
 			$id = 'select-' . dechex(rand(1000, 9999)) . dechex(rand(1000, 9999));
@@ -246,25 +262,25 @@ class tpl
 	/**
 	 * 返回一个 设置表单text项
 	 */
-	public static function conf_char(string $name, string $more = '', ?string $lang = null,mixed $default=''): string
+	public static function conf_char(string $name, string $more = '', ?string $lang = null, mixed $default = ''): string
 	{
 
 		if (empty($lang)):
 			$lang = $name;
 		endif;
-		$value = MyApp::conf($name,$default);
-		return self::input($name,$value, MyApp::Lang($lang), $more, '', $name);
+		$value = MyApp::conf($name, $default);
+		return self::input($name, $value, MyApp::Lang($lang), $more, '', $name);
 	}
 	/**
 	 * conf配置 数字表单
 	 */
-	public static function conf_num(string $name='', string $more='', ?string $lang = null): string
+	public static function conf_num(string $name = '', string $more = '', ?string $lang = null): string
 	{
 
 		if (empty($lang)):
 			$lang = $name;
 		endif;
-		return self::number($name,MyApp::conf($name), $lang?MyApp::Lang($lang):'', $more,$name);
+		return self::number($name, MyApp::conf($name), $lang ? MyApp::Lang($lang) : '', $more, $name);
 	}
 	/**
 	 * conf配置 文本表单
@@ -319,6 +335,6 @@ class tpl
 		$list = scandir(MyApp::path('lang/'));
 		$list = array_filter($list, fn($m) => !str_contains($m, '.'));
 		$newlist = array_combine($list, array_map(fn($m) => MyApp::Lang('lang_' . str_replace('-', '_', $m)), $list));
-		return self::conf_list_key($newlist,$name);
+		return self::conf_list_key($newlist, $name);
 	}
 }

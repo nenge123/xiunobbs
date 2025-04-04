@@ -1,7 +1,8 @@
-<!--{template(ADMIN_PATH.'view/htm/new-header.htm')}-->
+<!--{template(route_admin::tpl_header())}-->
 <div class="row">
 	<div class="col-12">
 		<div class="card">
+			<div class="card-header">{lang pugin_cate_0}</div>
 			<div class="card-body">
 				<div class="d-flex" style="flex-wrap: wrap;flex-direction: column;gap: 15px;">
 					<!--{each $pluginlist $dir $plugin}-->
@@ -40,10 +41,6 @@
 				</div>
 			</div>
 		</div>
-		<!--{if $pagination}-->
-		<nav>
-			<ul class="pagination justify-content-center"><!--{{ $pagination }}--></ul>
-		</nav> <!--{/if}-->
 	</div>
 </div>
-<!--{template(ADMIN_PATH.'view/htm/new-footer.htm')}-->
+<!--{template(route_admin::tpl_footer())}-->

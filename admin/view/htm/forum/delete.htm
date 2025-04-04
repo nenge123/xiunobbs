@@ -1,4 +1,4 @@
-<!--{template(ADMIN_PATH.'view/htm/new-header.htm')}-->
+<!--{template(route_admin::tpl_header())}-->
 <form action="{{ url }}" method="post" class="mb-3" {{ \route_admin::js_module('forum-delete') }}>
 	<div class="card">
 		<div class="card-header">
@@ -15,4 +15,4 @@
 	</div>
 </form>
 <div class="mb-3" id="end-result"></div>
-<!--{template(ADMIN_PATH.'view/htm/new-footer.htm')}-->
+<!--{template(route_admin::tpl_footer())}-->

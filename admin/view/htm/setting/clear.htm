@@ -1,4 +1,4 @@
-<!--{template(ADMIN_PATH.'view/htm/new-header.htm')}-->
+<!--{template(route_admin::tpl_header())}-->
 <div class="card">
 	<div class="card-header">
 		<h4 class="card-title"><!--{lang admin_other_cache}--></h4>
@@ -6,8 +6,8 @@
 	<div class="card-body">
 		<form action="{{ url }}" method="post" onpost="true" class="d-flex flex-column">
 			<!--{hook admin_settingclear_form.htm}-->
-			<div class="form-check form-switch mb-3" style="order: 5;"><!--{{ \model\tpl::checkbox('clear_tmp',1,lang('admin_clear_tmp')) }}--></div>
-			<div class="form-check form-switch mb-3" style="order: 10;"><!--{{ \model\tpl::checkbox('clear_cache',1,lang('admin_clear_cache')) }}--></div>
+			<div class="form-check form-switch mb-3" style="order: 5;"><!--{{ \model\tpl::checkbox('clear_tmp',1,MyApp::Lang('admin_clear_tmp')) }}--></div>
+			<div class="form-check form-switch mb-3" style="order: 10;"><!--{{ \model\tpl::checkbox('clear_cache',1,MyApp::Lang('admin_clear_cache')) }}--></div>
 			<div class="mb-3 text-center" style="order: 100;">
 				<!--{hook admin_settingclear_submit.htm}-->
 				<button type="submit" class="btn btn-primary btn-block" id="submit" data-loading-text="{lang submiting}..."><!--{lang confirm}--></button>
@@ -15,4 +15,4 @@
 		</form>
 	</div>
 </div>
-<!--{template(ADMIN_PATH.'view/htm/new-footer.htm')}-->
+<!--{template(route_admin::tpl_footer())}-->

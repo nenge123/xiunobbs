@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET'):
 		$_userlist = route_admin::safe_uids($uids);
 		if (empty($_userlist)):
 			#原则上不能封禁管理员 
-			route_admin::eventMessage('close', 1, ['message' => lang('user_admin_cant_be_deleted')]);
+			route_admin::eventMessage('close', 1, ['message' => MyApp::Lang('user_admin_cant_be_deleted')]);
 		endif;
 		route_admin::eventMessage('close', 1, ['message' => '未知操作']);
 		exit;

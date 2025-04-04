@@ -10,7 +10,7 @@
 MyApp::setValue('title', MyApp::Lang('admin_login'));
 if ($_SERVER['REQUEST_METHOD'] == 'GET'):
 	// hook admin_index_login_get_start.php
-	include _include(ADMIN_PATH . "view/htm/index/login.htm");
+	include(route_admin::tpl_link('index/login.htm'));
 elseif ($_SERVER['REQUEST_METHOD'] == 'POST'):
 	// hook admin_index_login_post_start.php
 	$password = MyApp::post('password');

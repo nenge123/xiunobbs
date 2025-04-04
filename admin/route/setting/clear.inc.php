@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET'):
 	$input = array();
 	$input['clear_tmp'] = form_checkbox('clear_tmp', 1);
 	$input['clear_cache'] = form_checkbox('clear_cache', 1);
-	include _include(ADMIN_PATH . 'view/htm/setting/clear.htm');
+	include(route_admin::tpl_link('setting/clear.htm'));
 elseif ($_SERVER['REQUEST_METHOD'] == 'POST'):
 	// hook admin_settingclear_post.php
 	$clear_tmp = MyApp::post('clear_tmp',0);
@@ -25,5 +25,5 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'POST'):
 		$runtime = NULL; // 清空
 	endif;
 	// hook admin_settingclear_post_end.php
-	MyApp::message(0, lang('admin_clear_successfully'));
+	MyApp::message(0, MyApp::Lang('admin_clear_successfully'));
 endif;

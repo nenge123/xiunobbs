@@ -44,4 +44,4 @@ if($_SERVER['REQUEST_METHOD']=='POST'):
 	endif;
 	MyApp::message(-1,'添加失败');
 endif;
-include _include(ADMIN_PATH . 'view/htm/user/create.htm');
+include(route_admin::tpl_link('user/create.htm'));

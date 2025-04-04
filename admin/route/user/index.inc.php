@@ -72,4 +72,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'):
 	endif;
 	MyApp::message(-1, '无数据');
 endif;
-include _include(ADMIN_PATH . "view/htm/user/home.htm");
+include(route_admin::tpl_link('user/home.htm'));

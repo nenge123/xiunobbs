@@ -9,7 +9,7 @@
 // hook admin_settingrewrite_start.php
 if ($_SERVER['REQUEST_METHOD'] == 'GET'):
 	// hook admin_settingrewrite_get.php
-	include _include(ADMIN_PATH . 'view/htm/setting/rewrite.htm');
+	include(route_admin::tpl_link('setting/rewrite.htm'));
 elseif ($_SERVER['REQUEST_METHOD'] == 'POST'):
 	// hook admin_setting_rewrite_post.php
 	$_POST['url_rewrite_on'] = MyApp::post('url_rewrite_on', 0);
@@ -18,5 +18,5 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'POST'):
 	route_admin::format_post();
 	// hook admin_setting_rewrite_save.php
 	file_replace_var(APP_PATH . 'conf/conf.php', $_POST);
-	MyApp::message(0, lang('modify_successfully'));
+	MyApp::message(0, MyApp::Lang('modify_successfully'));
 endif;

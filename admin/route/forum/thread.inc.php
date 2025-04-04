@@ -66,11 +66,11 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'GET'):
 			endif;
 			if ($haslist):
 				#存在主题 先删除主题
-				self::eventMessage('progress', $id, array('message' => sprintf(lang('forum_event_stream_progress'), count($tids))));
+				self::eventMessage('progress', $id, array('message' => sprintf(MyApp::Lang('forum_event_stream_progress'), count($tids))));
 				$id++;
 				sleep(1);
 				foreach ($threadlist as $thread):
-					self::eventMessage('progress', $id, array('message' => sprintf(lang('forum_event_stream_progress_subject'), $thread['subject'])));
+					self::eventMessage('progress', $id, array('message' => sprintf(MyApp::Lang('forum_event_stream_progress_subject'), $thread['subject'])));
 					$id++;
 					thread_delete($thread['tid']);
 					self::eventMessage('progress', $id, array('tid' => $thread['tid']));
@@ -138,5 +138,5 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'GET'):
 	// hook admin_threaddelete_get_start.php
 	$threadlist = array();
 	// hook admin_threaddelete_get_end.php
-	include _include(ADMIN_PATH . "view/htm/forum/threaddelete.htm");
+	include(route_admin::tpl_link('forum/threaddelete.htm'));
 endif;

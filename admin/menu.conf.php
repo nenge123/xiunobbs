@@ -42,7 +42,11 @@ return array(
 		'text'=>MyApp::Lang('plugin'), 
 		'icon'=>'icon-cogs',
 		'tab'=> array (
-			'index'=>array('url'=>MyApp::url('plugin'), 'text'=>MyApp::Lang('admin_plugin_local_list')),
+			'index'=>array('url'=>MyApp::url('plugin'), 'text'=>MyApp::Lang('admin_plugin_enable')),
+			'disable'=>array('url'=>MyApp::url('plugin/disable'), 'text'=>MyApp::Lang('admin_plugin_disable')),
+			'install'=>array('url'=>MyApp::url('plugin/install'), 'text'=>MyApp::Lang('admin_plugin_install')),
+			'unstall'=>array('url'=>MyApp::url('plugin/unstall'), 'text'=>MyApp::Lang('admin_plugin_unstall')),
+			'all'=>array('url'=>MyApp::url('plugin/all'), 'text'=>MyApp::Lang('admin_plugin_all')),
 		)
 	)
 );

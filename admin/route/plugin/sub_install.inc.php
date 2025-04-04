@@ -21,7 +21,7 @@ if (str_contains($dir, 'theme')):
 					if(route_admin::plugin_save($pluginlist[$_subdir],$_subdir)):
 						$_install =  plugin::path($_subdir . '/unstall.php');
 						if (is_file($_install)):
-							include _include($_install);
+							include \plugin::parseFile($_install);
 						endif;
 					endif;
 				endforeach;
@@ -31,7 +31,7 @@ if (str_contains($dir, 'theme')):
 			if(route_admin::plugin_save($_plugin,$_dir)):
 				$_install =  plugin::path($_dir. '/unstall.php');
 				if (is_file($_install)):
-					include _include($_install);
+					include \plugin::parseFile($_install);
 				endif;
 			endif;
 		endif;
@@ -59,7 +59,7 @@ $plugin['enable'] = 1;
 if(route_admin::plugin_save($plugin,$dir)):
 	$installfile =  plugin::path($dir . '/install.php');
 	if (is_file($installfile)):
-		include _include($installfile);
+		include \plugin::parseFile($installfile);
 	endif;
 endif;
 route_admin::clear_tmp();

@@ -1,5 +1,4 @@
 <?php
-
 !defined('APP_PATH') and exit('Access Denied.');
 // 只允许管理员登陆后台
 // 管理组检查 / check admin group
@@ -15,92 +14,86 @@ if (empty($admin_token)):
 		MyApp::http_location(MyApp::url('index/login'));
 	endif;
 endif;
-$menus = include _include(ADMIN_PATH . 'menu.conf.php');
-MyApp::app()->datas['menus'] = $menus;
+$menu = include \plugin::parseFile(route_admin::path('menu.conf.php'));
 // hook admin_index_menu_after.php
+MyApp::app()->datas['menus'] = $menu;
 switch ($route):
 		#兼容旧版
 		// hook admin_index_route_case_start.php
 		// hook admin_index_route_case_end.php
 	default:
+		if (headers_sent()):
+			exit;
+		endif;
+		if (isset($menu[$route])):
+			#设置默认标题
+			if (!empty($action) && isset($menu[$route]['tab'][$action])):
+				$header['title'] = $menu[$route]['tab'][$action]['text'];
+				MyApp::setValue('title', $menu[$route]['tab'][$action]['text']);
+			elseif (isset($menu[$route]['text'])):
+				$header['title'] = $menu[$route]['text'];
+				MyApp::setValue('title', $menu[$route]['text']);
+			else:
+				$header['title'] = $menu['index']['text'];
+				MyApp::setValue('title', $menu['index']['text']);
+			endif;
+		endif;
+		$routefile = route_admin::path('route/' . $route . '/' . $action . '.inc.php');
+		// hook admin_index_route_case_default.php
+		if (is_file($routefile)):
+			include \plugin::parseFile($routefile);
+			exit;
+		endif;
+		$routefile = route_admin::path('route/' . $route . '.php');
+		if (is_file($routefile)):
+			include \plugin::parseFile($routefile);
+			exit;
+		endif;
+		$routefile = route_admin::path('route/' . $route . '/index.inc.php');
+		if (is_file($routefile)):
+			if (!empty($action) && isset($menu[$route]['tab']['index'])):
+				$header['title'] = $menu[$route]['tab']['index']['text'];
+				MyApp::setValue('title', $menu[$route]['tab']['index']['text']);
+			endif;
+			include \plugin::parseFile($routefile);
+			exit;
+		endif;
+		include \plugin::parseFile(route_admin::path('route/index/index.inc.php'));
 		break;
 endswitch;
-if (headers_sent()):
-	exit;
-endif;
-if (isset($menus[$route])):
-	#设置默认标题
-	if (!empty($action) && isset($menus[$route]['tab'][$action])):
-		$header['title'] = $menus[$route]['tab'][$action]['text'];
-		MyApp::setValue('title', $menus[$route]['tab'][$action]['text']);
-	elseif (isset($menus[$route]['text'])):
-		$header['title'] = $menus[$route]['text'];
-		MyApp::setValue('title', $menus[$route]['text']);
-	else:
-		$header['title'] = $menus['index']['text'];
-		MyApp::setValue('title', $menus['index']['text']);
-	endif;
-endif;
-$routefile = route_admin::path('route/' . $route . '/' . $action . '.inc.php');
-// hook admin_index_route_case_default.php
-if (is_file($routefile)):
-	include _include($routefile);
-	exit;
-endif;
-$routefile = route_admin::path('route/' . $route . '.php');
-if (is_file($routefile)):
-	include _include($routefile);
-	exit;
-endif;
-$routefile = route_admin::path('route/' . $route . '/index.inc.php');
-if (is_file($routefile)):
-	if (!empty($action) && isset($menus[$route]['tab']['index'])):
-		$header['title'] = $menus[$route]['tab']['index']['text'];
-		MyApp::setValue('title', $menus[$route]['tab']['index']['text']);
-	endif;
-	include _include($routefile);
-	exit;
-endif;
-include _include(ADMIN_PATH . 'route/index/index.inc.php');
 exit;
 switch ($route) {
 	// hook admin_index_route_case_start.php
 	case 'index':
-		include _include(ADMIN_PATH . 'route/index.php');
+		include \plugin::parseFile(route_admin::path('route/index.php'));
 		break;
 	case 'setting':
-		include _include(ADMIN_PATH . 'route/setting.php');
+		include \plugin::parseFile(route_admin::path('route/setting.php'));
 		break;
 	case 'forum':
-		include _include(ADMIN_PATH . 'route/forum.php');
+		include \plugin::parseFile(route_admin::path('route/forum.php'));
 		break;
 	case 'friendlink':
-		include _include(ADMIN_PATH . 'route/friendlink.php');
+		include \plugin::parseFile(route_admin::path('route/friendlink.php'));
 		break;
 	case 'group':
-		include _include(ADMIN_PATH . 'route/group.php');
+		include \plugin::parseFile(route_admin::path('route/group.php'));
 		break;
 	case 'other':
-		include _include(ADMIN_PATH . 'route/other.php');
+		include \plugin::parseFile(route_admin::path('route/other.php'));
 		break;
 	case 'user':
-		include _include(ADMIN_PATH . 'route/user.php');
+		include \plugin::parseFile(route_admin::path('route/user.php'));
 		break;
 	case 'thread':
-		include _include(ADMIN_PATH . 'route/thread.php');
+		include \plugin::parseFile(route_admin::path('route/thread.php'));
 		break;
 	case 'plugin':
-		include _include(ADMIN_PATH . 'route/plugin.php');
+		include \plugin::parseFile(route_admin::path('route/plugin.php'));
 		break;
 	// hook admin_index_route_case_end.php
 	default:
 		// hook admin_index_route_case_default.php
-		include _include(ADMIN_PATH . 'route/index.php');
+		include \plugin::parseFile(route_admin::path('route/index.php'));
 		break;
-		/*
-		!is_word($route) AND http_404();
-		$routefile = _include(ADMIN_PATH."route/$route.php");
-		!is_file($routefile) AND  http_404();
-		include $routefile;
-		*/
 }

@@ -122,6 +122,12 @@ body[data-headerbg='default'] {
 	}
 	display: flex;
 }
+.nav-drawer>li>a>i{
+	img{
+		width: 20px;
+
+	}
+}
 @media screen and (max-width: 600px) {
 	.navbar-left {
 		> .nav {

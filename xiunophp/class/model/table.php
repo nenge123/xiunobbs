@@ -71,28 +71,28 @@ class table
 	 */
 	public function start(...$arg): bool
 	{
-		return MyDB::rlink()->commitStart(...$arg);
+		return MyDB::rdb()->commitStart(...$arg);
 	}
 	/**
 	 * 回滚事务
 	 */
 	public function back(...$arg): bool
 	{
-		return MyDB::rlink()->commitBack(...$arg);
+		return MyDB::rdb()->commitBack(...$arg);
 	}
 	/**
 	 * 结束事务
 	 */
 	public function end(...$arg): bool
 	{
-		return MyDB::rlink()->commitEnd(...$arg);
+		return MyDB::rdb()->commitEnd(...$arg);
 	}
 	/**
 	 * 预处理查询(从链接)
 	 */
 	public function execute(string $query, array $param = array(), int|string $mode = 1): mixed
 	{
-		return MyDB::rlink()->executeSQL($query, $param, $mode);
+		return MyDB::rdb()->executeSQL($query, $param, $mode);
 	}
 	/**
 	 * 预处理查询(主链接)
@@ -100,21 +100,21 @@ class table
 	 */
 	public function execute_wlink(string $query, array $param = array(), int|string $mode = 1): mixed
 	{
-		return MyDB::wlink()->executeSQL($query, $param, $mode);
+		return MyDB::wdb()->executeSQL($query, $param, $mode);
 	}
 	/**
 	 * 事务批量插入
 	 */
 	public function executeCommit(string $query, array $param = array())
 	{
-		return MyDB::rlink()->executeCommit($query, $param);
+		return MyDB::rdb()->executeCommit($query, $param);
 	}
 	/**
 	 * 批量插入
 	 */
 	public function executeMap(string $query, array $param = array()): void
 	{
-		MyDB::rlink()->executeMap($query, $param);
+		MyDB::rdb()->executeMap($query, $param);
 	}
 	/**
 	 * 查询
@@ -129,21 +129,21 @@ class table
 	 */
 	public function query(string $query, int|string $mode = 1): mixed
 	{
-		return MyDB::rlink()->querySQL($query, $mode);
+		return MyDB::rdb()->querySQL($query, $mode);
 	}
 	/**
 	 * 查询返回影响行数或者insert_id
 	 */
 	public function exec(string $query, int $mode = 0): int|string
 	{
-		return MyDB::rlink()->execSQL($query, $mode) ?: 0;
+		return MyDB::rdb()->execSQL($query, $mode) ?: 0;
 	}
 	/**
 	 * 查询返回影响行数或者insert_id
 	 */
 	public function exec_wlink(string $query, int $mode = 0): int|string
 	{
-		return MyDB::wlink()->execSQL($query, $mode) ?: 0;
+		return MyDB::wdb()->execSQL($query, $mode) ?: 0;
 	}
 	/**
 	 * 更改字段
@@ -157,7 +157,7 @@ class table
 	 */
 	public function multi(string $query, int|string $mode = 0): mixed
 	{
-		$result = MyDB::rlink()->multiSQL($query, $mode);
+		$result = MyDB::rdb()->multiSQL($query, $mode);
 		return $mode === 0 ? array_sum($result) : $result;
 	}
 	/**

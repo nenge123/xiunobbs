@@ -262,6 +262,12 @@ return array(
 	'plugin_not_bought'=>'还没购买过。',
 	'plugin_wechat_qrcode_pay'=>'微信扫码支付。',
 	'plugin_service_qq'=>'客服 QQ',
+	'admin_plugin_all'=>'所有插件',
+	'admin_plugin_enable'=>'已启用',
+	'admin_plugin_disable'=>'已关闭',
+	'admin_plugin_install'=>'已安装',
+	'admin_plugin_unstall'=>'未安装',
+
 	
 	'error_request'=>'异常请求',
 	'forum_event_stream_start'=>'正在为你删除板块',
