@@ -42,11 +42,11 @@ class cache_file
 			'expiry' => $expiry,
 		);
 		$this->datas[$k] = $arr;
-		MyApp::write_data_file($k,$arr);
+		plugin::setItem($k,$arr);
 	}
 	public function getdata($k)
 	{
-		$data = MyApp::get_data_file($k);
+		$data = plugin::getItem($k);
 		if (empty($data)):
 			$this->datas[$k] = false;
 		else:
@@ -69,14 +69,14 @@ class cache_file
 	}
 	public function delete($k)
 	{
-		MyApp::delete_data_file($k);
+		plugin::removeItem($k);
 		if (!isset($this->datas[$k])):
 			unset($this->datas[$k]);
 		endif;
 	}
 	public function truncate()
 	{
-		MyApp::clear_data_file();
+		plugin::clearItem();
 		$this->datas = array();
 	}
 }

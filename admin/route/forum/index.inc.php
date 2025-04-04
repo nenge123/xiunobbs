@@ -6,7 +6,7 @@
  * 上传图片 POST DATA: $_FILES['file']  返回结果 json {url:图片地址,icon:时间}
  * 更新 POSTDATA:
  */
-!defined('APP_PATH') and exit('Access Denied.');
+!defined('ADMIN_PATH') and exit('Access Denied.');
 // hook admin_forumlist.php
 if ($_SERVER['REQUEST_METHOD'] == 'GET'):
 	// hook admin_forumlist_get_start.php

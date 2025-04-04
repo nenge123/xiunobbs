@@ -5,7 +5,7 @@
  * 用户
  * 编辑/更新用户
  */
-!defined('APP_PATH') and exit('Access Denied.');
+!defined('ADMIN_PATH') and exit('Access Denied.');
 $_uid = MyApp::value(1);
 if (empty($_uid)):
 	MyApp::message(-1, '参数不合法');

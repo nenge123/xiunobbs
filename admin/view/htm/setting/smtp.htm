@@ -3,7 +3,7 @@
 	<div class="card-header">
 		<h4 class="card-title"><!--{lang admin_setting_smtp}--></h4>
 	</div>
-	<form action="{{ url }}" method="post" class="card-body table-responsive smtp_list" onpost="true">
+	<form action="{{ url }}" method="post" class="card-body table-responsive smtp_list" onpost="true" {{ \route_admin::js_module('smtp') }}>
 		<table class="table table-info table-striped-columns">
 			<thead>
 				<tr>
@@ -15,7 +15,7 @@
 					<th><!--{lang delete}--></th>
 				</tr>
 				<thead>
-				<tbody id="smtp_body" {{ route_admin::js_module('smtp') }}>
+				<tbody id="smtp_body">
 					<!--{each $smtplist $k $v}-->
 					<tr align="center" rowid="{{ $k }}">
 						<td>

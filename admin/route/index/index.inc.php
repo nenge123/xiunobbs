@@ -5,9 +5,8 @@
  * 起始页
  * 统计信息
  */
-!defined('APP_PATH') and exit('Access Denied.');
+!defined('ADMIN_PATH') and exit('Access Denied.');
 // hook admin_index_empty_start.php
-$header['title'] = MyApp::Lang('admin_page');
 $info = array();
 $info['disable_functions'] = ini_get('disable_functions');
 $info['allow_url_fopen'] = ini_get('allow_url_fopen') ? MyApp::Lang('yes') : MyApp::Lang('no');
@@ -26,6 +25,6 @@ $stat['threads'] = thread_count();
 $stat['posts'] = post_count();
 $stat['users'] = user_count();
 $stat['attachs'] = attach_count();
-$stat['disk_free_space'] = function_exists('disk_free_space') ? humansize(disk_free_space(APP_PATH)) : MyApp::Lang('unknown');
+$stat['disk_free_space'] = function_exists('disk_free_space') ? humansize(disk_free_space(MyApp::path())) : MyApp::Lang('unknown');
 // hook admin_index_empty_end.php
 include(route_admin::tpl_link('index/home.htm'));

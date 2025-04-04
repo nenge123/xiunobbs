@@ -5,7 +5,7 @@
  * 接口  
  * GET text/event-stream
  */
-!defined('APP_PATH') and exit('Access Denied.');
+!defined('ADMIN_PATH') and exit('Access Denied.');
 $_fid = intval(MyApp::value(1));
 $_forum = MyDB::t('forum')->whereFirst(['fid' => $_fid], '', array('name', 'fid'));
 if (MyApp::head('accept') == 'text/event-stream'):

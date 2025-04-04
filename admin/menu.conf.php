@@ -1,5 +1,4 @@
 <?php
-
 return array(
 	'index'=>array(
 		'text'=>MyApp::Lang('admin_index'), 
@@ -50,5 +49,3 @@ return array(
 		)
 	)
 );
-
-?>

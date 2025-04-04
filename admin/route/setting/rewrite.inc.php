@@ -5,7 +5,7 @@
  * 设置
  * 重写相关
  */
-!defined('APP_PATH') and exit('Access Denied.');
+!defined('ADMIN_PATH') and exit('Access Denied.');
 // hook admin_settingrewrite_start.php
 if ($_SERVER['REQUEST_METHOD'] == 'GET'):
 	// hook admin_settingrewrite_get.php
@@ -17,6 +17,6 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'POST'):
 	$_POST['cdn_on'] = MyApp::post('cdn_on', 0);
 	route_admin::format_post();
 	// hook admin_setting_rewrite_save.php
-	file_replace_var(APP_PATH . 'conf/conf.php', $_POST);
+	file_replace_var(MyApp::path('conf/conf.php'), $_POST);
 	MyApp::message(0, MyApp::Lang('modify_successfully'));
 endif;

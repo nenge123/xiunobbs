@@ -4,7 +4,7 @@
  * 用户
  * 封禁 解封
  */
-!defined('APP_PATH') and exit('Access Denied.');
+!defined('ADMIN_PATH') and exit('Access Denied.');
 if ($_SERVER['REQUEST_METHOD'] == 'POST'):
 	#解封/封禁/删除
 	$posttype = MyApp::post('action-type');

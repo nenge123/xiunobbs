@@ -1,5 +1,5 @@
 <?php
-
+!defined('APP_PATH') and exit('Access Denied.');
 /*
 	XiunoPHP 4.0 只是定义了一些函数和全局变量，方便使用，并没有要求如何组织代码。
 	采用静态语言编程风格，有利于 Zend 引擎的编译和 OPCache 缓存，支持 PHP7
@@ -9,78 +9,60 @@
 	4. 尽量避免 PHP 高级特性 __call __set __get 等魔术方法，不利于错误排查
 	5. 尽量采用函数封装功能，通过前缀区分模块
 */
-
-!defined('DEBUG') AND define('DEBUG',0); // 1: 开发模式， 2: 线上调试：日志记录，0: 关闭
-if(!defined('APP_PATH')):
-	#未定义网站根目录
-	define('APP_PATH',
-	$_SERVER['DOCUMENT_ROOT'].str_replace(['//','/'],DIRECTORY_SEPARATOR,dirname($_SERVER['SCRIPT_NAME']).'/'));
-endif;
-!defined('APP_PATH') AND define('APP_PATH',$_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR);
-#为日后文件压缩处理
-define('XIUNOPHP_PATH',__DIR__.DIRECTORY_SEPARATOR);
+define('XIUNOPHP_PATH', __DIR__ . DIRECTORY_SEPARATOR);
 error_reporting(DEBUG ? E_ALL : 0);
-$starttime =$_SERVER['REQUEST_TIME_FLOAT'];
+$starttime = $_SERVER['REQUEST_TIME_FLOAT'];
 $time = $_SERVER['REQUEST_TIME'];
 $useragent = $_SERVER['HTTP_USER_AGENT'];
 if (PHP_SAPI === 'cli'):
 	echo '不允许命令行访问';
 	exit;
 endif;
-
 // hook xiunophp_include_before.php
-
 // ----------------------------------------------------------> db cache class
-include XIUNOPHP_PATH . 'class/driver/MySQL.class.php';
-include XIUNOPHP_PATH . 'class/driver/MyPDO.class.php';
-include XIUNOPHP_PATH.'class/MyDB.class.php';
-include XIUNOPHP_PATH.'class/MyApp.class.php';
-include XIUNOPHP_PATH.'class/plugin.class.php';
-
+include XIUNOPHP_PATH . 'class/MyApp.class.php';
 // ----------------------------------------------------------> 全局函数
-
-include XIUNOPHP_PATH.'db.func.php';
-include XIUNOPHP_PATH.'cache.func.php';
-include XIUNOPHP_PATH.'image.func.php';
-include XIUNOPHP_PATH.'array.func.php';
-include XIUNOPHP_PATH.'xn_encrypt.func.php';
-include XIUNOPHP_PATH.'misc.func.php';
-
+include XIUNOPHP_PATH . 'db.func.php';
+include XIUNOPHP_PATH . 'cache.func.php';
+include XIUNOPHP_PATH . 'image.func.php';
+include XIUNOPHP_PATH . 'array.func.php';
+include XIUNOPHP_PATH . 'xn_encrypt.func.php';
+include XIUNOPHP_PATH . 'misc.func.php';
 // hook xiunophp_include_after.php
-empty($conf) AND $conf = array('db'=>array(), 'cache'=>array(), 'tmp_path'=>'./', 'log_path'=>'./', 'timezone'=>'Asia/Shanghai');
-empty($conf['tmp_path']) AND $conf['tmp_path'] = 'tmp';
-$myapp = new MyApp($conf);
-
-$ip = ip();
-$longip = ip2long($ip);
-$longip < 0 AND $longip = sprintf("%u", $longip); // fix 32 位 OS 下溢出的问题
+empty($conf) and $conf = array('db' => array(), 'cache' => array(), 'tmp_path' => './', 'log_path' => './', 'timezone' => 'Asia/Shanghai');
+empty($conf['tmp_path']) and $conf['tmp_path'] = 'tmp';
+empty($conf['timezone']) and $conf['timezone'] = 'Asia/Shanghai';
+date_default_timezone_set($conf['timezone']);
 
 // 语言包变量
-!isset($lang) AND $lang = array();
+!isset($lang) and $lang = array();
 
 // 全局的错误，非多线程下很方便。
 $errno = 0;
 $errstr = '';
 
+$myapp = new MyApp($conf);
+$ip = ip();
+$longip = ip2long($ip);
+$longip < 0 and $longip = sprintf("%u", $longip); // fix 32 位 OS 下溢出的问题
 // error_handle
 // register_shutdown_function('xn_shutdown_handle');
-DEBUG AND set_error_handler('error_handle', -1);
-empty($conf['timezone']) AND $conf['timezone'] = 'Asia/Shanghai';
-date_default_timezone_set($conf['timezone']);
+DEBUG and set_error_handler('error_handle', -1);
 
 // 超级全局变量
-!empty($_SERVER['HTTP_X_REWRITE_URL']) AND $_SERVER['REQUEST_URI'] = $_SERVER['HTTP_X_REWRITE_URL'];
-!isset($_SERVER['REQUEST_URI']) AND $_SERVER['REQUEST_URI'] = '';
+!empty($_SERVER['HTTP_X_REWRITE_URL']) and $_SERVER['REQUEST_URI'] = $_SERVER['HTTP_X_REWRITE_URL'];
+!isset($_SERVER['REQUEST_URI']) and $_SERVER['REQUEST_URI'] = '';
 $_SERVER['REQUEST_URI'] = str_replace('/index.php?', '/', $_SERVER['REQUEST_URI']); // 兼容 iis6
 $_REQUEST = array_merge($_COOKIE, $_POST, $_GET, xn_url_parse($_SERVER['REQUEST_URI']));
 
 // IP 地址
-!isset($_SERVER['REMOTE_ADDR']) AND $_SERVER['REMOTE_ADDR'] = '';
-!isset($_SERVER['SERVER_ADDR']) AND $_SERVER['SERVER_ADDR'] = '';
+!isset($_SERVER['REMOTE_ADDR']) and $_SERVER['REMOTE_ADDR'] = '';
+!isset($_SERVER['SERVER_ADDR']) and $_SERVER['SERVER_ADDR'] = '';
 
 // $_SERVER['REQUEST_METHOD'] === 'PUT' ? @parse_str(file_get_contents('php://input', false , null, -1 , $_SERVER['CONTENT_LENGTH']), $_PUT) : $_PUT = array(); // 不需要支持 PUT
 $ajax = (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower(trim($_SERVER['HTTP_X_REQUESTED_WITH'])) == 'xmlhttprequest') || param('ajax');
 $method = $_SERVER['REQUEST_METHOD'];
+
 
 
 

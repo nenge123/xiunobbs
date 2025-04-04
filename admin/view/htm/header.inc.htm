@@ -40,7 +40,7 @@
                 <li class="nav-item nav-item-has-subnav{if MyApp::value('module') == $k} active open{/if}"><!--{if !empty($v['tab'])}--><a href="#"><i class="{if empty($v['icon'])}mdi mdi-card-account-details{else}{{ $v['icon'] }}{/if}"></i><span><!--{{ $v['text'] }}--></span>
                   </a>
                   <ul class="nav nav-subnav"><!--{each $v['tab'] $x $y}-->
-                    <li class="{if MyApp::value(0,'index') == $x}active{/if}"><!--{if !empty($y['img'])}--><img class="plugin-icon" src="{{ $y['img'] }}"><!--{/if}-->
+                    <li class="{if MyApp::value('module') == $k&&MyApp::value(0,'index') == $x}active{/if}"><!--{if !empty($y['img'])}--><img class="plugin-icon" src="{{ $y['img'] }}"><!--{/if}-->
                       <a href="{{ $y['url'] }}" class="icon-{{  $k }}-{{ $x }}"><!--{{ $y['text'] }}--></a>
                     </li><!--{/each}-->
                   </ul><!--{else}-->
@@ -48,7 +48,7 @@
                     <i class="{if empty($v['icon'])}mdi mdi-card-account-details{else}{{ $v['icon'] }}{/if}"></i>
                     <span><!--{{ $v['text'] }}--></span></a><!--{/if}-->
                 </li><!--{/each}-->
-                <!--{each plugin::get_data('plugin_data') $k $v}-->
+                <!--{each plugin::getItem('plugin_data') $k $v}-->
                 <!--{if !empty($v['enable'])&&!empty($v['installed'])}-->
                 <li class="nav-item">
                   <a href="{{ MyApp::url('plugin/'.$k) }}">

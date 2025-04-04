@@ -5,7 +5,7 @@
  * 用户组
  * 编辑/更新 权限
  */
-!defined('APP_PATH') and exit('Access Denied.');
+!defined('ADMIN_PATH') and exit('Access Denied.');
 $_gid = MyApp::value(1);
 if (empty($grouplist[$_gid])):
 	MyApp::message(-1, MyApp::Lang('group_not_exists'));

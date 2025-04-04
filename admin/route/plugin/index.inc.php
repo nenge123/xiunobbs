@@ -5,7 +5,7 @@
  * 插件起始页
  * 统计信息
  */
-!defined('APP_PATH') and exit('Access Denied.');
+!defined('ADMIN_PATH') and exit('Access Denied.');
 // 初始化插件变量 / init plugin var
 // 本地插件 local plugin list
 $dir = MyApp::value(0);

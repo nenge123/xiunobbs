@@ -12,7 +12,7 @@
  * 有一个BUG 如果权限字段不全写入用户组会产生奇怪问题,等找到问题,
  * 理论题管理员,版主,禁止用户等不参与板块权限设置
  */
-!defined('APP_PATH') and exit('Access Denied.');
+!defined('ADMIN_PATH') and exit('Access Denied.');
 $_fid = MyApp::value(1);;
 $_forum = MyDB::t('forum')->whereFirst(['fid' => $_fid]);
 empty($_forum) and MyApp::message(-1, MyApp::Lang('forum_not_exists'));

@@ -5,7 +5,7 @@
  * 起始页
  * 登录
  */
-!defined('APP_PATH') and exit('Access Denied.');
+!defined('ADMIN_PATH') and exit('Access Denied.');
 // hook admin_index_login_get_post.php
 MyApp::setValue('title', MyApp::Lang('admin_login'));
 if ($_SERVER['REQUEST_METHOD'] == 'GET'):

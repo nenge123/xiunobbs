@@ -1,7 +1,7 @@
 export default class smtp {
 	constructor(elm, X) {
 		this.X = X;
-		var jsmtp_body = $(elm);
+		var jsmtp_body = $('#smtp_body');
 		let maxrowid = jsmtp_body.find('tr').length;
 		var tpl = $('#smtp_tpl').html();
 		function row_add(v) {

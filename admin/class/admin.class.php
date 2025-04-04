@@ -6,10 +6,10 @@ class route_admin
 {
 	public static function plugin_exists($dir)
 	{
-		!is_word($dir) and message(-1, MyApp::Lang('plugin_name_error'));
+		!is_word($dir) and MyApp::message(-1, MyApp::Lang('plugin_name_error'));
 		$plugin = plugin::get_plugin_json($dir);
 		if (empty($plugin)):
-			message(-1, MyApp::Lang('plugin_not_exists'));
+			MyApp::message(-1, MyApp::Lang('plugin_not_exists'));
 		endif;
 		return $plugin;
 	}
@@ -88,7 +88,7 @@ class route_admin
 	{
 		$route = MyApp::value('module');
 		$action = MyApp::value(0);
-		!plugin::lock($route . '_' . $action) and message(-1, MyApp::Lang('plugin_task_locked'));
+		!plugin::lock($route . '_' . $action) and MyApp::message(-1, MyApp::Lang('plugin_task_locked'));
 	}
 	public static function plugin_unlock()
 	{

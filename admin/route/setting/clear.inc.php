@@ -6,12 +6,9 @@
  * 设置
  * 清空缓存
  */
-!defined('APP_PATH') and exit('Access Denied.');
+!defined('ADMIN_PATH') and exit('Access Denied.');
 if ($_SERVER['REQUEST_METHOD'] == 'GET'):
 	// hook admin_settingclear_get.php
-	$input = array();
-	$input['clear_tmp'] = form_checkbox('clear_tmp', 1);
-	$input['clear_cache'] = form_checkbox('clear_cache', 1);
 	include(route_admin::tpl_link('setting/clear.htm'));
 elseif ($_SERVER['REQUEST_METHOD'] == 'POST'):
 	// hook admin_settingclear_post.php
@@ -19,6 +16,7 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'POST'):
 	$clear_cache =  MyApp::post('clear_cache',0);
 	if (!empty($clear_tmp)):
 		MyApp::remove_file(MyApp::tmp_path(), 1);
+		MyApp::remove_file(MyApp::upload_path('tmp/'), 1);
 	endif;
 	if (!empty($clear_cache)):
 		cache_truncate();

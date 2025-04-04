@@ -10,6 +10,8 @@ class MyApp implements \ArrayAccess
 		self::$_app = $this;
 		#锁定主目录
 		function_exists('chdir') and chdir(APP_PATH);
+		include __DIR__ . DIRECTORY_SEPARATOR . 'MyDB.class.php';
+		include __DIR__ . DIRECTORY_SEPARATOR . 'plugin.class.php';
 		set_include_path(APP_PATH);
 		$this->datas = array(
 			'charset' => 'utf-8',
@@ -40,6 +42,9 @@ class MyApp implements \ArrayAccess
 	}
 	public function autoload_register($class)
 	{
+		if(in_array($class,['MySQL','MyPDO'])):
+			return require( __DIR__ . DIRECTORY_SEPARATOR . 'driver'.DIRECTORY_SEPARATOR.$class.'.class.php');
+		endif;
 		$arr = explode('\\', $class);
 		$path = $this->datas['path']['appclass'] . implode(DIRECTORY_SEPARATOR, $arr) . '.php';
 		switch ($arr[0]):
@@ -131,7 +136,7 @@ class MyApp implements \ArrayAccess
 			'htm' => $this->datas['path']['view/htm'],
 			'i18n' => $this->datas['path']['lang'] . $conf['lang'] . DIRECTORY_SEPARATOR,
 		);
-		$this->datas['rewrite_style'] = empty($conf['url_rewrite_style'])?false:true;
+		$this->datas['rewrite_style'] = empty($conf['url_rewrite_style']) ? false : true;
 		#定义伪静态模式
 		if (!empty($conf['url_rewrite_on'])):
 			$this->datas['rewrite_open'] = $conf['url_rewrite_on'];
@@ -593,7 +598,7 @@ class MyApp implements \ArrayAccess
 	{
 		return self::app()->language;
 	}
-	public static function setLang(mixed $data):void
+	public static function setLang(mixed $data): void
 	{
 		if (is_array($data)):
 			if (empty(self::app()->language)):
@@ -604,13 +609,13 @@ class MyApp implements \ArrayAccess
 			endif;
 		endif;
 	}
-	public static function addLang(string $file):array
+	public static function addLang(string $file): array
 	{
-		if(!str_starts_with($file,APP_PATH)):
-			$file = self::app()->datas['path']['i18n'].$file;
+		if (!str_starts_with($file, APP_PATH)):
+			$file = self::app()->datas['path']['i18n'] . $file;
 		endif;
 		$lang = include(plugin::parseFile($file));
-		if(is_array($lang)):
+		if (is_array($lang)):
 			self::setLang($lang);
 		endif;
 		return self::app()->language;
@@ -1021,7 +1026,7 @@ class MyApp implements \ArrayAccess
 					endif;
 					continue;
 				endif;
-				if (empty($value)&&!is_int($value)) continue;
+				if (empty($value) && !is_int($value)) continue;
 				$this->datas['querydata'][] = $value;
 			endforeach;
 		endif;
@@ -1039,9 +1044,9 @@ class MyApp implements \ArrayAccess
 	/**
 	 * 获取myapp中data[querydata]数据
 	 */
-	public static function value(mixed $key=null, string $defalut = ''): mixed
+	public static function value(mixed $key = null, string $defalut = ''): mixed
 	{
-		if(empty($key)&&!is_numeric($key)): 
+		if (empty($key) && !is_numeric($key)):
 			return self::app()->datas['querydata'];
 		endif;
 		return self::app()->datas['querydata'][$key] ?? $defalut;
@@ -1094,10 +1099,12 @@ class MyApp implements \ArrayAccess
 	 * 输出JSON信息
 	 * 第三参数 array('url'=>'',delay=>'')
 	 */
-	public static function message($code, $message, $extra = array())
+	public static function message($code, $message, string|array $extra = array())
 	{
 		@ob_clean();
-		//$header['title'] = self::conf('sitename');
+		if (is_string($extra)):
+			$extra['url'] = $extra;
+		endif;
 		if (empty(self::head('ajax-fetch'))):
 			if (empty($extra['url']) && !empty($extra['delay'])):
 				$url = 'javascript:history.back()';
@@ -1146,7 +1153,7 @@ class MyApp implements \ArrayAccess
 		#是否为 xxx/index.php
 		$this->datas['rewriteroot'] = $_SERVER['SCRIPT_NAME'];
 		$this->datas['isIndexPath'] = str_ends_with($_SERVER['SCRIPT_NAME'], 'index.php');
-		if (!$this->datas['rewrite_style']&& $this->datas['isIndexPath']):
+		if (!$this->datas['rewrite_style'] && $this->datas['isIndexPath']):
 			#当脚本为index.php 且使用 index.php/xxx/gg
 			$this->datas['rewriteroot'] = substr($_SERVER['SCRIPT_NAME'], 0, -9);
 		endif;
@@ -1157,7 +1164,7 @@ class MyApp implements \ArrayAccess
 	public function get_url_href(string|array $router = 'index', string|array $param = array(), bool $width = false, $top = false): string
 	{
 
-		if(!isset($this->datas['rewriteroot'])):
+		if (!isset($this->datas['rewriteroot'])):
 			$this->setRewriteRoot();
 		endif;
 		if (empty($router)):

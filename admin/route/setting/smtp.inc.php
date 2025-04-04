@@ -5,36 +5,43 @@
  * 设置
  * SMTP信息
  */
-!defined('APP_PATH') and exit('Access Denied.');
-include \plugin::parseFile(APP_PATH . 'model/smtp.func.php');
-$smtplist = smtp_init(APP_PATH . 'conf/smtp.conf.php');
+!defined('ADMIN_PATH') and exit('Access Denied.');
+$smtp_path = MyApp::path('conf/smtp.conf.php');
 // hook admin_settingsmtp_start.php
 if ($_SERVER['REQUEST_METHOD'] == 'GET'):
 	// hook admin_settingsmtp_get.php
-	$smtplist = smtp_find();
-	$maxid = smtp_maxid();
-	$importjs[] = route_admin::site('view/js/smtp.js');
+	if(is_file($smtp_path)):
+		$smtplist = include($smtp_path);
+	else:
+		$smtplist = array(
+			array(
+			'email'=>'',
+			'host'=>'',
+			'port'=>'',
+			'user'=>'',
+			'pass'=>'',
+		));
+	endif;
 	// hook admin_settingsmtp_get_end.php
 	include(route_admin::tpl_link('setting/smtp.htm'));
 elseif ($_SERVER['REQUEST_METHOD'] == 'POST'):
 	// hook admin_settingsmtp_post.php
-	$email = param('email', array(''));
-	$host = param('host', array(''));
-	$port = param('port', array(0));
-	$user = param('user', array(''));
-	$pass = param('pass', array(''));
-	$smtplist = array();
-	foreach ($email as $k => $v):
-		$smtplist[$k] = array(
-			'email' => $email[$k],
-			'host' => $host[$k],
-			'port' => $port[$k],
-			'user' => $user[$k],
-			'pass' => $pass[$k],
-		);
-	endforeach;
-	$r = file_put_contents_try(APP_PATH . 'conf/smtp.conf.php', "<?php\r\nreturn " . var_export($smtplist, true) . ";\r\n?>");
-	!$r and MyApp::message(-1, MyApp::Lang('conf/smtp.conf.php', array('file' => 'conf/smtp.conf.php')));
-	// hook admin_settingsmtp_post_end.php
-	MyApp::message(0, MyApp::Lang('save_successfully'));
+	if(!empty($_POST)&&!empty($_POST['email'])):
+		foreach($_POST['email']  as $k=>$v):
+			$smtplist[$k] = array(
+				'email' => $v,
+				'host' => $_POST['host'][$k],
+				'port' => $_POST['port'][$k],
+				'user' => $_POST['user'][$k],
+				'pass' => $_POST['pass'][$k],
+			);
+		endforeach;
+		if(!empty($smtplist)):
+			$r = file_put_contents_try(MyApp::path('conf/smtp.conf.php'), "<?php\r\nreturn " . var_export($smtplist, true) . ";\r\n?>");
+			!$r and MyApp::message(-1, MyApp::Lang('conf/smtp.conf.php', array('file' => 'conf/smtp.conf.php')));
+			// hook admin_settingsmtp_post_end.php
+			MyApp::message(0, MyApp::Lang('save_successfully'));
+		endif;
+	endif;
+	MyApp::message(-1, MyApp::Lang('data_not_changed'));
 endif;

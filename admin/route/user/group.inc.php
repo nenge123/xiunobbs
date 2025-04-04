@@ -5,15 +5,15 @@
  * 用户组
  * 编辑/更新
  */
-!defined('APP_PATH') and exit('Access Denied.');
+!defined('ADMIN_PATH') and exit('Access Denied.');
 // hook admin_group_list_get_post.php
 $system_group = array(0, 1, 2, 4, 5, 6, 7, 101);
-if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+if ($_SERVER['REQUEST_METHOD'] == 'GET'):
 	// hook admin_group_list_get_start.php
 	MyApp::setValue('title', MyApp::Lang('group_admin'));
 	// hook admin_group_list_get_end.php
 	include(route_admin::tpl_link('user/grouplist.htm'));
-} elseif ($_SERVER['REQUEST_METHOD'] == 'POST') {
+elseif ($_SERVER['REQUEST_METHOD'] == 'POST'):
 	if(!empty($_POST['system'])):
 		$update = [];
 		foreach($system_group as $v):
@@ -103,40 +103,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 		group_list_cache_delete();
 		MyApp::message(0,implode('<br>',$_result),array('url'=>MyApp::purl('group')));
 	endif;
-	$gidarr = param('_gid', array(0));
-	$namearr = param('name', array(''));
-	$creditsfromarr = param('creditsfrom', array(0));
-	$creditstoarr = param('creditsto', array(0));
-	$arrlist = array();
-
-	// hook admin_group_list_post_start.php
-
-	foreach ($gidarr as $k => $v) {
-		$arr = array(
-			'gid' => $k,
-			'name' => $namearr[$k],
-			'creditsfrom' => $creditsfromarr[$k],
-			'creditsto' => $creditstoarr[$k],
-		);
-		if (!isset($grouplist[$k])) {
-			// 添加 / add
-			group_create($arr);
-		} else {
-			// 编辑 / edit
-			group_update($k, $arr);
-		}
-	}
-
-	// 删除 / delete
-	$deletearr = array_diff_key($grouplist, $gidarr);
-	foreach ($deletearr as $k => $v) {
-		if (in_array($k, $system_group)) continue;
-		group_delete($k);
-	}
-
-	group_list_cache_delete();
-
-	// hook admin_group_list_post_end.php
-
-	message(0, MyApp::Lang('save_successfully'));
-}
+endif;

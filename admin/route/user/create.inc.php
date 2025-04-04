@@ -4,7 +4,7 @@
  * 用户
  * 批量删除
  */
-!defined('APP_PATH') and exit('Access Denied.');
+!defined('ADMIN_PATH') and exit('Access Denied.');
 MyApp::setValue('title',MyApp::Lang('admin_user_create'));
 if($_SERVER['REQUEST_METHOD']=='POST'):
 	$_username = MyApp::post('username');

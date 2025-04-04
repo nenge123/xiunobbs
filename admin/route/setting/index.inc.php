@@ -4,7 +4,7 @@
  * 设置
  * 网站信息
  */
-!defined('APP_PATH') and exit('Access Denied.');
+!defined('ADMIN_PATH') and exit('Access Denied.');
 // hook admin_settingindex_start.php
 if ($_SERVER['REQUEST_METHOD'] == 'GET'):
 	// hook admin_settingindex_get.php
@@ -18,7 +18,7 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'POST'):
 	$_POST['runlevel'] = MyApp::post('runlevel',0);
 	route_admin::format_post();
 	// hook admin_settingindex_post_end.php
-	file_replace_var(APP_PATH . 'conf/conf.php', $_POST);
+	file_replace_var(MyApp::path('conf/conf.php'), $_POST);
 	// hook admin_settingindex_post_msg.php
 	MyApp::message(0, MyApp::Lang('modify_successfully'));
 endif;

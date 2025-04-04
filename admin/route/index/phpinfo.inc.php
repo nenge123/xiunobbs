@@ -5,7 +5,7 @@
  * 起始页
  * phpinfo信息
  */
-!defined('APP_PATH') and exit('Access Denied.');
+!defined('ADMIN_PATH') and exit('Access Denied.');
 unset($_SERVER['conf']);
 ob_start();
 phpinfo();

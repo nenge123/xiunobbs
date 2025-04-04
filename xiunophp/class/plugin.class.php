@@ -403,7 +403,7 @@ class plugin
 	{
 		if (!isset(self::$pluginlist)):
 			if(defined('PLUGIN_DIR')):
-				self::$pluginlist = self::get_data('plugin_data');
+				self::$pluginlist = self::getItem('plugin_data');
 			endif;
 			if(empty(self::$pluginlist)):
 				self::$pluginlist = array();
@@ -415,7 +415,7 @@ class plugin
 					endif;
 				endforeach;
 				if (!empty(self::$pluginlist)):
-					self::write_data('plugin_data', self::$pluginlist);
+					self::setItem('plugin_data', self::$pluginlist);
 				endif;
 			endif;
 		endif;
@@ -552,11 +552,11 @@ class plugin
 		return file_put_contents($lockfile, $_SERVER['REQUEST_TIME'], LOCK_EX);
 	}
 	/**
-	 * 写入数据缓存
+	 * 写入文件数据缓存
 	 */
-	public static function write_data(string $file, mixed $data)
+	public static function setItem(string $name, mixed $data)
 	{
-		$filepath = MyApp::tmp_path('data/' . $file . '.php');
+		$filepath = MyApp::tmp_path('data/' . $name . '.php');
 		if (is_array($data)):
 			$data = '<?php' . PHP_EOL . 'return ' . var_export($data, true) . ';';
 		endif;
@@ -564,22 +564,22 @@ class plugin
 		file_put_contents($filepath, $data);
 	}
 	/**
-	 * 返回数据缓存
+	 * 返回文件数据缓存
 	 */
-	public static function get_data(string $file)
+	public static function getItem(string $name)
 	{
-		$filepath = MyApp::tmp_path('data/' . $file . '.php');
+		$filepath = MyApp::tmp_path('data/' . $name . '.php');
 		if (is_file($filepath)):
 			return include($filepath);
 		endif;
 		return array();
 	}
 	/**
-	 * 删除数据缓存
+	 * 删除文件数据缓存
 	 */
-	public static function delete_data(string $file)
+	public static function removeItem(string $name)
 	{
-		$filepath = MyApp::tmp_path('data/' . $file . '.php');
+		$filepath = MyApp::tmp_path('data/' . $name . '.php');
 		if (is_file($filepath)):
 			@unlink($filepath);
 		endif;
@@ -587,7 +587,7 @@ class plugin
 	/**
 	 * 清空数据缓存
 	 */
-	public static function clear_data()
+	public static function clearItem()
 	{
 		$path = MyApp::tmp_path('data/');
 		if (is_dir($path)):

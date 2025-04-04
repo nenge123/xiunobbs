@@ -1,5 +1,5 @@
 <?php
-!defined('APP_PATH') and exit('Access Denied.');
+!defined('ADMIN_PATH') and exit('Access Denied.');
 // 只允许管理员登陆后台
 // 管理组检查 / check admin group
 if ($gid != 1):
@@ -28,13 +28,10 @@ switch ($route):
 		if (isset($menu[$route])):
 			#设置默认标题
 			if (!empty($action) && isset($menu[$route]['tab'][$action])):
-				$header['title'] = $menu[$route]['tab'][$action]['text'];
 				MyApp::setValue('title', $menu[$route]['tab'][$action]['text']);
 			elseif (isset($menu[$route]['text'])):
-				$header['title'] = $menu[$route]['text'];
 				MyApp::setValue('title', $menu[$route]['text']);
 			else:
-				$header['title'] = $menu['index']['text'];
 				MyApp::setValue('title', $menu['index']['text']);
 			endif;
 		endif;
@@ -52,7 +49,6 @@ switch ($route):
 		$routefile = route_admin::path('route/' . $route . '/index.inc.php');
 		if (is_file($routefile)):
 			if (!empty($action) && isset($menu[$route]['tab']['index'])):
-				$header['title'] = $menu[$route]['tab']['index']['text'];
 				MyApp::setValue('title', $menu[$route]['tab']['index']['text']);
 			endif;
 			include \plugin::parseFile($routefile);

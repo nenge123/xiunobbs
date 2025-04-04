@@ -4,7 +4,7 @@
  * 用户
  * 批量删除
  */
-!defined('APP_PATH') and exit('Access Denied.');
+!defined('ADMIN_PATH') and exit('Access Denied.');
 if ($_SERVER['REQUEST_METHOD'] == 'GET'):
 	if (MyApp::head('accept') == 'text/event-stream'):
 		#报文文件头

@@ -7,7 +7,7 @@
  * 批量关闭/打开/封禁/解封POST:url,DATA:{'action-type':'操作标识',tids:[]} 返回结果json
  * 默认接口 POST:url,DATA:any 返回结果json:{list:主题列表,pagelist:分页列表,page:页码,maxpage:最大页面,total:结果数量}
  */
-!defined('APP_PATH') and exit('Access Denied.');
+!defined('ADMIN_PATH') and exit('Access Denied.');
 // hook admin_threaddelete_start.php
 if ($_SERVER['REQUEST_METHOD'] == 'POST'):
 	// hook admin_threaddelete_post_any_start.php
@@ -50,7 +50,7 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'GET'):
 		route_admin::eventStart();
 		// hook admin_threaddelete_eventstream_start.php
 		if (isset($_GET['tids'])):
-			#批量删除主题接口		$tids = MyApp::param('tids');
+			#批量删除主题接口
 			$id = 1;
 			if (empty($tids)):
 				self::eventMessage('close', $id, array('message' => '没有勾选主题!!', 'url' => MyApp::purl('forum/list')));
