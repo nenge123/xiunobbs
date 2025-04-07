@@ -100,6 +100,9 @@ class route_admin
 	{
 		return ADMIN_SITE . $dir;
 	}
+	/**
+	 * 加载后台中的esm
+	 */
 	public static function js_module($name)
 	{
 		return ' onmethods="loadmodule" module-url="' . route_admin::site('view/js/module/' . $name . '.js') . '"';
@@ -166,9 +169,8 @@ class route_admin
 	public static function admin_token_set()
 	{
 		$admin_token = $_SERVER['REQUEST_TIME'];
-		$admin_hash = MyApp::encrypt($admin_token);
 		// hook admin_token_set_start.php
-		MyApp::cookies('admin_token', '**' . $admin_hash, $_SERVER['REQUEST_TIME'] + 3600);
+		MyApp::cookies_encrypt('admin_token', $admin_token, $_SERVER['REQUEST_TIME'] + 3600);
 		// hook admin_token_set_end.php
 		return $admin_token;
 	}

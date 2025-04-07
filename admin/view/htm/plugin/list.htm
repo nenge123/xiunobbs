@@ -5,25 +5,25 @@
 			<div class="card-header">{lang pugin_cate_0}</div>
 			<div class="card-body">
 				<div class="d-flex" style="flex-wrap: wrap;flex-direction: column;gap: 15px;">
-					<!--{each $pluginlist $dir $plugin}-->
-					<!--{eval $url_base = MyApp::purl($dir)}-->
-					<!--{eval $url_install = MyApp::purl($dir.'/install')}-->
-					<!--{eval $url_unstall = MyApp::purl($dir.'/unstall')}-->
-					<!--{eval $url_setting = MyApp::purl($dir.'/setting')}-->
-					<!--{eval $url_disable = MyApp::purl($dir.'/disable')}-->
-					<!--{eval $url_enable = MyApp::purl($dir.'/enable')}-->
+					<!--{each $pluginlist $plugin_dir $plugin}-->
+					<!--{eval $url_base = MyApp::purl($plugin_dir)}-->
+					<!--{eval $url_install = MyApp::purl($plugin_dir.'/install')}-->
+					<!--{eval $url_unstall = MyApp::purl($plugin_dir.'/unstall')}-->
+					<!--{eval $url_setting = MyApp::purl($plugin_dir.'/setting')}-->
+					<!--{eval $url_disable = MyApp::purl($plugin_dir.'/disable')}-->
+					<!--{eval $url_enable = MyApp::purl($plugin_dir.'/enable')}-->
 					<div style="display: grid;grid-template-columns:64px 3fr 1fr;gap: 10px;border-bottom: 1px solid currentColor;padding-bottom: 10px;">
-						<img src="{{ plugin::site($dir . '/icon.png') }}" style="max-width: 64px;" />
+						<img src="{{ plugin::site($plugin_dir . '/icon.png') }}" style="max-width: 64px;" />
 						<div class="plugin-brief">
 							<div style="display: flex;align-items: center;justify-content:space-between;gap:5px">
 								<a href="{{ $url_base }}" class="m-1"><b><!--{{ $plugin['name'] }}--></b>(v<!--{{ $plugin['version'] }}-->)</a>
-								<p class="plugin-root m-1"><!--{{ $dir }}--></p>
+								<p class="plugin-root m-1"><!--{{ $plugin_dir }}--></p>
 							</div>
 							<!--{{ $plugin['brief'] }}-->
 						</div>
 						<div style="display: flex;align-items: center;justify-content: flex-end;gap: 5px;">
 							<!--{if $plugin['installed']}-->
-							<!--{if is_file(plugin::path($dir . '/setting.php'))}-->
+							<!--{if is_file(plugin::path($plugin_dir . '/setting.php'))}-->
 							<a role="button" class="btn btn-primary btn-sm setting" href="{{ $url_setting }}"><!--{lang setting}--></a>
 							<!--{/if}-->
 							<!--{if $plugin['enable']}-->

@@ -1,5 +1,5 @@
 <!--{template(route_admin::tpl_header())}-->
-<div class="card" data-url="{echo $plugin['update_url']}" data-site="{{ plugin::siteid() }}" data-name="{{ $dir }}" {{ \route_admin::js_module('plugin-read') }}>
+<div class="card" data-url="{echo $plugin['update_url']}" data-site="{{ plugin::siteid() }}" data-name="{{ $plugin_dir }}" {{ \route_admin::js_module('plugin-read') }}>
 	<div class="card-body">
 		<div class="media">
 			<div>
@@ -13,7 +13,7 @@
 		<hr />
 		<div class="row line-height-3">
 			<div class="col-md-6">
-				<span class="text-muted"><!--{lang plugin_dir}--></span>： <!--{{ $dir }}-->
+				<span class="text-muted"><!--{lang plugin_dir}--></span>： <!--{{ $plugin_dir }}-->
 			</div>
 			<div class="col-md-6">
 				<span class="text-muted"><!--{lang plugin_bbs_version}--></span>： <!--{{ $plugin['bbs_version'] }}-->
@@ -40,7 +40,7 @@
 		<hr />
 		<p class="text-center">
 			<!--{if $plugin['installed']}-->
-			<!--{if is_file(plugin::path($dir . '/setting.php'))}-->
+			<!--{if is_file(plugin::path($plugin_dir . '/setting.php'))}-->
 			<a role="button" class="btn btn-primary setting" href="{{ $url_setting }}"><!--{lang setting}--></a>
 			<!--{/if}-->
 			<!--{if $plugin['enable']}-->
@@ -64,7 +64,7 @@
 		<details>
 			<summary class="card-title">注入文件列表</summary>
 			<ul class="list-group">
-				<!--{if !empty($hooklist = route_admin::plugin_hook($dir))}-->
+				<!--{if !empty($hooklist = route_admin::plugin_hook($plugin_dir))}-->
 				<!--{each $hooklist $filename}-->
 				<li class="list-group-item"><!--{{ $filename }}--></li>
 				<!--{/each}-->
@@ -75,7 +75,7 @@
 		</details>
 		<details>
 			<summary class="card-title">覆盖列表</summary>
-			<ul class="list-group"><!--{if !empty($overwritelist = route_admin::plugin_overwrite($dir))}-->
+			<ul class="list-group"><!--{if !empty($overwritelist = route_admin::plugin_overwrite($plugin_dir))}-->
 				<!--{each $overwritelist $filename}-->
 				<li class="list-group-item"><!--{{ $filename }}--></li> 
 				<!--{/each}-->
@@ -87,7 +87,7 @@
 		<details>
 			<summary class="card-title">route列表</summary>
 			<ul class="list-group">
-				<!--{if !empty($overwritelist = route_admin::plugin_route($dir))}-->
+				<!--{if !empty($overwritelist = route_admin::plugin_route($plugin_dir))}-->
 				<!--{each $overwritelist $filename}-->
 				<li class="list-group-item"><!--{{ $filename }}--></li>
 				<!--{/each}-->

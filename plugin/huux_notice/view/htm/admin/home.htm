@@ -1,0 +1,14 @@
+<!--{template(route_admin::tpl_header())}-->
+<!--{{ model\tpl::btngroup($plugin_menus) }}-->
+<div class="card">
+	<div class="card-body">
+		<form action="{{ url }}" method="post" id="form" onpost="true" {{ plugin::js_module('send-pm',$plugin_dir) }}>
+			<div class="form-floating mb-3" style="order: 5;"><!--{{ \model\tpl::textarea('message','',MyApp::Lang('notice_admin_send_notice_message'),'style="min-height:250px" required') }}--></div>
+			<div class="form-floating mb-3" style="order: 10;"><!--{{ \model\tpl::char('recvuid','',MyApp::Lang('notice_admin_send_notice_uid'),'required') }}--></div>
+			<div class="form-group">
+				<button type="submit" class="btn btn-primary btn-block" id="submit" data-loading-text="<?php echo lang('submiting');?>..."><?php echo lang('confirm'); ?></button>
+			</div>
+		</form>
+	</div>
+</div>
+<!--{template(route_admin::tpl_footer())}-->

@@ -20,7 +20,7 @@ if (PHP_SAPI === 'cli'):
 endif;
 // hook xiunophp_include_before.php
 // ----------------------------------------------------------> db cache class
-include XIUNOPHP_PATH . 'class/MyApp.class.php';
+include XIUNOPHP_PATH . 'class/MyApp.php';
 // ----------------------------------------------------------> 全局函数
 include XIUNOPHP_PATH . 'db.func.php';
 include XIUNOPHP_PATH . 'cache.func.php';
@@ -42,8 +42,8 @@ $errno = 0;
 $errstr = '';
 
 $myapp = new MyApp($conf);
-$ip = ip();
-$longip = ip2long($ip);
+$ip = MyApp::data('ip');
+$longip = MyApp::data('longip');
 $longip < 0 and $longip = sprintf("%u", $longip); // fix 32 位 OS 下溢出的问题
 // error_handle
 // register_shutdown_function('xn_shutdown_handle');

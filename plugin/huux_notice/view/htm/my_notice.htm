@@ -4,7 +4,7 @@
 			<?php if($user['notices'] != 0) { ?>
 				<div class="d-flex justify-content-between">					
 					<div>
-						<?php foreach ($notice_menu as $k=>$v) { 
+						<?php foreach (huux_notice::notice_menu() as $k=>$v) { 
 							if(!isset($v['url']) || !isset($v['name'])) continue; //不安接入规范些直接不显示
 						?>
 						<a class="btn btn-sm btn-<?php echo $type == $k ? 'primary active' : 'light';?>" href="<?php echo $v['url'];?>"><?php echo $v['name'];?></a>

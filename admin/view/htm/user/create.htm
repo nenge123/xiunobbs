@@ -4,6 +4,8 @@
 		<h3 class="card-title"><!--{lang admin_user_create}--></h3>
 	</div>
 	<form class="card-body" action="{{ url }}" method="post" onpost="true">
+		<div class="form-floating mb-3"><!--{{ \model\tpl::number('uid',$maxuid+1,MyApp::Lang('uid'),'autocomplete="off" required') }}--></div>
+		<div class="alert alert-danger"><!--{lang user-create-uid-msg}--></div>
 		<div class="form-floating mb-3"><!--{{ \model\tpl::char('email','abc@qq.com',MyApp::Lang('email'),'autocomplete="off" required') }}--></div>
 		<div class="form-floating mb-3"><!--{{ \model\tpl::char('username','',MyApp::Lang('username'),'autocomplete="off" required') }}--></div>
 		<div class="form-floating mb-3"><!--{{ \model\tpl::password('password','',MyApp::Lang('password'),'autocomplete="off" required') }}--></div>

@@ -92,7 +92,7 @@ return array(
 	'online_update_span'=>'session更新频率',
 	'url_rewrite_on'=>'启用伪静态 /thread-1.html',
 	'url_rewrite_style'=>'PATH静态 /index.php/thread-1.html',
-	'url_rewrite_style_msg'=>'同时启用,只有伪静态生效!<br>但是伪静态必须设置重写规则!<br>重写规则还可以防御用户而已访问内部文件,从而窃取信息!',
+	'url_rewrite_style_msg'=>'同时启用,只有伪静态生效!<br>但是伪静态必须设置重写规则!<br>重写规则还可以防御用户而已访问内部文件,从而窃取信息!<br>伪静态规则 /abc/cdf/hjk.html 和 /abc-cdf-hjk.html结果一致,但与/abc/cdf-hjk.html不一致会被理解成abc cdf-hjk',
 	'cdn_on'=>'cdn访问(可能废弃)',
 	'conf_view_url'=>'view目录的网络HTTP地址',
 	'conf_upload_url'=>'upload目录的网络HTTP地址',
@@ -180,6 +180,7 @@ return array(
 	'user-key-realname'=>'真实名字',
 	'user-key-idnumber'=>'身份id',
 	'user-key-password_sms'=>'短信密码',
+	'user-create-uid-msg'=>'UID若非必要,留空,或者默认值.如果你添加了一个UID=1000,往后网站用户注册将以1001开始!',
 	
 	// 用户组
 	'group_list'=>'用户组列表',

@@ -9,10 +9,10 @@
 		if(forum_access_mod($fid, $gid, 'allowtop')) {
 			// notice send
 			if($top != $thread['top']) {
-				$thread['subject'] = notice_substr($thread['subject'], 20);
+				$thread['subject'] = huux_notice::notice_substr($thread['subject'], 20);
 				$todo = lang('notice_template_yourtopic_top'.$top);
 				$thread_top_notice_message = lang('notice_admin').'<span class="handle mx-1">'.$todo.'</span>'.lang('notice_template_yourtopic').'<a href="'.url("thread-$thread[tid]").'">《'.$thread['subject'].'》</a>';
-				$notice_nid = notice_send($user['uid'], $thread['uid'], $thread_top_notice_message, 3);
+				$notice_nid = huux_notice::notice_send($user['uid'], $thread['uid'], $thread_top_notice_message, 3);
 			}
 			// end notice send
 		}

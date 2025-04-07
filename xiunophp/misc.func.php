@@ -1299,7 +1299,7 @@ function xn_debug_info() {
 		$s .= '<fieldset class="fieldset small debug break-all">';
 		$querylist = MyDB::PROFILES();
 		$s .= '<p>Processed Time:'.ceil((microtime(1) - $_SERVER['REQUEST_TIME_FLOAT'])*1000).'ms</p>';
-		$s .= PHP_EOL.'<h3>SQL分析</h3><div class="table-responsive"><table class="table table-dark table-striped text-keepall text-start" style="white-space: nowrap;"><thead><tr><th>ID</th><th>耗时</th><th>语句</th></tr></thead><tbody>'.PHP_EOL;
+		$s .= PHP_EOL.'<h3>SQL分析('.number_format(array_sum(array_column($querylist,1))*1000,2).')ms</h3><div class="table-responsive"><table class="table table-dark table-striped text-keepall text-start" style="white-space: nowrap;"><thead><tr><th>ID</th><th>耗时</th><th>语句</th></tr></thead><tbody>'.PHP_EOL;
 		foreach($querylist as $sql) {
 			$s .= sprintf('<tr><td>%d</td><td>%.2fms</td><td>%s</td></tr>'.PHP_EOL,$sql[0],$sql[1]*1000,$sql[2]);
 		}

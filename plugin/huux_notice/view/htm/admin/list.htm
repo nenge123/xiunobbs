@@ -1,0 +1,36 @@
+<!--{template(route_admin::tpl_header())}-->
+<!--{{ model\tpl::btngroup($plugin_menus) }}-->
+<!--{if !empty($noticelist)}-->
+<!--{{ $pagination }}-->
+<div class="list-unstyled postlist-admin mb-0" {{ plugin::js_module('list-pm',$plugin_dir) }}>
+	<!--{each $noticelist $_notice}-->
+	<!--{eval $notice_isread = ($_notice['isread'] == 1 ? lang('notice_my_update_readed') : lang('notice_my_update_unread')) }-->
+	<div class="card">
+		<div class="card-body p-2"> {{ $_notice['message'] }} </div>
+		<div class="card-footer text-muted d-flex justify-content-between align-items-center p-1">
+			<div class="user-from">
+				<a target="_blank" href="{{ $_notice['from_url'] }}">
+					<img class="avatar-sm" src="{{ $_notice['from_user_avatar_url'] }}">
+					<span><!--{{ $_notice['from_username'] }}--></span>
+				</a>
+				<a class="badge bg-pink" href="{{ MyApp::purl(sprintf($_user_only,'fromuid',$_notice['fromuid'])) }}">只看他发的</a>
+			</div>
+			<div>
+				<span><!--{{ $_notice['create_date_fmt'] }}-->&gt;&gt;<!--{{ $_notice['name'] }}-->(<!--{{ $notice_isread }}-->)</span>
+				<button type="button" class="badge bg-dark" data-nid="{{ $_notice['nid'] }}" data-recvuid="{{ $_notice['recvuid'] }}" onpost="true"><span aria-hidden="true">&times;</span></button>
+			</div>
+			<div class="user-recv">
+				<a target="_blank" href="{{ $_notice['recv_url'] }}">
+					<img class="avatar-sm" src="{{ $_notice['recv_user_avatar_url'] }}">
+					<span><!--{{ $_notice['recv_username'] }}--></span>
+				</a>
+				<a class="badge bg-purple" href="{{ MyApp::purl(sprintf($_user_only,'recvuid',$_notice['recvuid'])) }}">只看他收的</a>
+			</div>
+		</div>
+	</div>
+	<!--{/each}-->
+</div>
+<!--{else}-->
+<div class="alert alert-danger"><!--{lang none}--></div>
+<!--{/if}-->
+<!--{template(route_admin::tpl_footer())}-->

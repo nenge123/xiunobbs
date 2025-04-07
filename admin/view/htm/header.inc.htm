@@ -12,8 +12,14 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.bootcdn.net/ajax/libs/MaterialDesign-Webfont/7.4.47/css/materialdesignicons.min.css">
     <!--{hook admin_header_bootstrap_before.htm}-->
     <link rel="stylesheet" type="text/css" href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.3/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="{{ MyApp::view_site('css/bootstrap-icon.css') }}" />
     <!--{hook admin_header_admin_css_before.htm}-->
     <link rel="stylesheet" type="text/css" href="{{ \route_admin::site('view/css/style.min.css') }}" />
+    <!--{if !empty($header_css)}-->
+    <!--{each $header_css $k $v}-->
+    <link rel="stylesheet" type="text/css" href="{{ $v }}" />
+    <!--{/each}-->
+    <!--{/if}-->
     <!--{{ \route_admin::scss('admin') }}-->
     <!--{hook admin_header_admin_css_after.htm}-->
     <!--{hook admin_header_css_after.htm}-->
@@ -36,28 +42,7 @@
           <div class="lyear-layout-sidebar-info lyear-scroll">
             <nav class="sidebar-main">
               <ul class="nav-drawer">
-                <!--{each MyApp::data('menus') $k $v}-->
-                <li class="nav-item nav-item-has-subnav{if MyApp::value('module') == $k} active open{/if}"><!--{if !empty($v['tab'])}--><a href="#"><i class="{if empty($v['icon'])}mdi mdi-card-account-details{else}{{ $v['icon'] }}{/if}"></i><span><!--{{ $v['text'] }}--></span>
-                  </a>
-                  <ul class="nav nav-subnav"><!--{each $v['tab'] $x $y}-->
-                    <li class="{if MyApp::value('module') == $k&&MyApp::value(0,'index') == $x}active{/if}"><!--{if !empty($y['img'])}--><img class="plugin-icon" src="{{ $y['img'] }}"><!--{/if}-->
-                      <a href="{{ $y['url'] }}" class="icon-{{  $k }}-{{ $x }}"><!--{{ $y['text'] }}--></a>
-                    </li><!--{/each}-->
-                  </ul><!--{else}-->
-                  <a href="{{ $v['url'] }}">
-                    <i class="{if empty($v['icon'])}mdi mdi-card-account-details{else}{{ $v['icon'] }}{/if}"></i>
-                    <span><!--{{ $v['text'] }}--></span></a><!--{/if}-->
-                </li><!--{/each}-->
-                <!--{each plugin::getItem('plugin_data') $k $v}-->
-                <!--{if !empty($v['enable'])&&!empty($v['installed'])}-->
-                <li class="nav-item">
-                  <a href="{{ MyApp::url('plugin/'.$k) }}">
-                    <i class="mdi"><img class="plugin-icon" src="{{ plugin::site($k . '/icon.png') }}"></i>
-                    <span><!--{{ $v['name'] }}--></span>
-                  </a>
-                </li>
-                <!--{/if}-->
-                <!--{/each}-->
+                <!--{template(route_admin::tpl_link('header-aside-menu.htm'))}-->
               </ul>
             </nav>
             <div class="sidebar-footer">
@@ -135,7 +120,7 @@
               </li>
               <!--{/if}-->
               <li>
-                <a href="{{ \MyApp::url('index/logout') }}">
+                <a href="{{ \MyApp::url('logout') }}">
                   <i class="mdi-logout-variant"></i>
                   <span><!--{lang logout}--></span>
                 </a>

@@ -1,0 +1,39 @@
+<!--{each MyApp::data('menus') $menu_key $menu_value}-->
+<!--{eval $menu_icon = $menu_value['icon'] ?? 'mdi mdi-card-account-details'}-->
+<!--{eval $menu_active = MyApp::value('module') == $menu_key ? 'active open':''}-->
+<!--{if !empty($menu_value['tab'])}-->
+<li class="nav-item nav-item-has-subnav {{ $menu_active }}">
+	<a href="javascript:void(0)">
+		<i class="{{ $menu_icon }}"></i>
+		<span><!--{{ $menu_value['text'] }}--></span>
+	</a>
+	<ul class="nav nav-subnav">
+		<!--{each $menu_value['tab'] $submenu_key $submenu_value}-->
+		<!--{eval $submenu_active = MyApp::value('module') == $menu_key&&MyApp::value(0,'index') == $submenu_key ? 'active':''}-->
+		<li class="{{ $submenu_active }}">
+			<!--{if !empty($submenu_value['img'])}--><i><img class="plugin-icon" src="{{ $submenu_value['img'] }}"></i><!--{/if}-->
+			<a href="{{ $submenu_value['url'] }}" class="icon-{{  $menu_key }}-{{ $submenu_key }}"><!--{{ $submenu_value['text'] }}--></a>
+		</li>
+		<!--{/each}-->
+	</ul>
+</li>
+<!--{else}-->
+<li class="nav-item {{ $menu_active }}">
+	<a href="{{ $menu_value['url'] }}">
+		<i class="{{ $menu_icon }}"></i>
+		<span><!--{{ $menu_value['text'] }}--></span>
+	</a>
+</li>
+<!--{/if}-->
+<!--{/each}-->
+<!--{each plugin::getItem('plugin_data') $menu_key $menu_value}-->
+<!--{if !empty($menu_value['enable'])&&!empty($menu_value['installed'])}-->
+<!--{eval $menu_active =  MyApp::value('module') == 'plugin'&&MyApp::value(0) == $menu_key ? 'active':''}-->
+<li class="nav-item {{ $menu_active }}">
+	<a href="{{ MyApp::url('plugin/'.$menu_key) }}">
+		<i class="mdi"><img alt="{{ $menu_value['name'] }}" src="{{ plugin::site($menu_key . '/icon.png') }}"></i>
+		<span><!--{{ $menu_value['name'] }}--></span>
+	</a>
+</li>
+<!--{/if}-->
+<!--{/each}-->

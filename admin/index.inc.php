@@ -9,10 +9,12 @@ $admin_token = route_admin::admin_token_check();
 $route = MyApp::value('module', 'index');
 $action = MyApp::value(0, 'index');
 if (empty($admin_token)):
-	if ($route != 'index' || $action != 'login'):
+	if ($route != 'login'):
 		#改为跳转 避免误用接口
-		MyApp::http_location(MyApp::url('index/login'));
+		MyApp::http_location(MyApp::url('login'));
 	endif;
+elseif($route=='login'):
+	MyApp::http_location(MyApp::url());
 endif;
 $menu = include \plugin::parseFile(route_admin::path('menu.conf.php'));
 // hook admin_index_menu_after.php
@@ -41,21 +43,19 @@ switch ($route):
 			include \plugin::parseFile($routefile);
 			exit;
 		endif;
-		$routefile = route_admin::path('route/' . $route . '.php');
+		if (isset($menu[$route]['tab']['index'])):
+			MyApp::setValue('title', $menu[$route]['tab']['index']['text']);
+		endif;
+		$routefile = route_admin::path('route/' . $route . '.inc.php');
 		if (is_file($routefile)):
 			include \plugin::parseFile($routefile);
 			exit;
 		endif;
 		$routefile = route_admin::path('route/' . $route . '/index.inc.php');
 		if (is_file($routefile)):
-			if (!empty($action) && isset($menu[$route]['tab']['index'])):
-				MyApp::setValue('title', $menu[$route]['tab']['index']['text']);
-			endif;
 			include \plugin::parseFile($routefile);
 			exit;
 		endif;
-		include \plugin::parseFile(route_admin::path('route/index/index.inc.php'));
-		break;
 endswitch;
 exit;
 switch ($route) {

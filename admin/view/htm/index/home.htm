@@ -3,58 +3,47 @@
 <div class="row line-height-3">
 	<div class="col-12">
 		<!--{hook admin_index_site_stat_before.htm}-->
-		<h3><!--{lang admin_index}--></h3>
 		<div class="card">
+			<h5 class="card-header"><!--{lang site_stat_info}--></h5>
 			<div class="card-body">
-				<h5 class="card-title"><!--{lang site_stat_info}--></h5>
 				<div class="row">
 					<div class="col-md-4"><span class="text-muted"><!--{lang threads}-->：</span><!--{{ $stat['threads'] }}--></div>
 					<div class="col-md-4"><span class="text-muted"><!--{lang posts}-->：</span><!--{{ $stat['posts'] }}--></div>
 					<div class="col-md-4"><span class="text-muted"><!--{lang users}-->：</span><!--{{ $stat['users'] }}--></div>
-					
 					<div class="col-md-4"><span class="text-muted"><!--{lang attachs}-->：</span><!--{{ $stat['attachs'] }}--></div>
 					<div class="col-md-4"><span class="text-muted"><!--{lang disk_free_space}-->：</span><!--{{ $stat['disk_free_space'] }}--></div>
 					<div class="col-md-4"><span class="text-muted"><!--{lang onlines}-->：</span><!--{{ $runtime['onlines'] }}--></div>
-					
 				</div>
 			</div>
 		</div>
 		<!--{hook admin_index_server_info_before.htm}-->
 		<div class="card">
+			<h5 class="card-header"><!--{lang server_info}--> <a href="{{ \MyApp::purl('phpinfo') }}"><small>[PHPINFO]</small></a></h5>
 			<div class="card-body">
-				<h5><!--{lang server_info}--> <a href="{{ \MyApp::purl('phpinfo') }}"><small>[PHPINFO]</small></a></h5>
 				<div class="row">
 					<div class="col-md-6"><span class="text-muted"><!--{lang os}-->：</span><!--{{ \PHP_OS }}--></div>
 					<div class="col-md-6"><span class="text-muted">Web Server：</span><!--{{ $info['SERVER_SOFTWARE'] }}--></div>
 					<div class="col-md-6"><span class="text-muted">PHP：</span><!--{{ \PHP_VERSION }}--></div>
-					
 					<div class="col-md-6"><span class="text-muted"><!--{lang database}-->：</span><!--{{ $conf['db']['type'] }}--><small> (<!--{{ $info['dbversion'] }}-->)</small></div>
 					<div class="col-md-6"><span class="text-muted"><!--{lang post_max_size}-->：</span><!--{{ $info['post_max_size'] }}--></div>
 					<div class="col-md-6"><span class="text-muted"><!--{lang upload_max_filesize}-->：</span><!--{{ $info['upload_max_filesize'] }}--></div>
-					
 					<div class="col-md-6"><span class="text-muted"><!--{lang allow_url_fopen}-->：</span><!--{{ $info['allow_url_fopen'] }}--></div>
 					<div class="col-md-6"><span class="text-muted"><!--{lang safe_mode}-->：</span><!--{{ $info['safe_mode'] }}--></div>
 					<div class="col-md-6"><span class="text-muted"><!--{lang max_execution_time}-->：</span><!--{{ $info['max_execution_time'] }}--></div>
-					
 					<div class="col-md-6"><span class="text-muted"><!--{lang memory_limit}-->：</span><!--{{ $info['memory_limit'] }}--></div>
 					<div class="col-md-6"><span class="text-muted"><!--{lang client_ip}-->：</span><!--{{ $ip }}--></div>
 					<div class="col-md-6"><span class="text-muted"><!--{lang server_ip}-->：</span><!--{{ $_SERVER['SERVER_ADDR'] }}--></div>
-					
 				</div>
 			</div>
 		</div>
-		
 		<!--{hook admin_index_team_before.htm}-->
-		
 		<div class="card">
+			<h5 class="card-header"><!--{lang dev_team_info}--></h5>
 			<div class="card-body">
-				<h5><!--{lang dev_team_info}--></h5>
 				<div>Official Site: <a href="http://www.xiuno.com" target="_blank">http://www.xiuno.com/</a></div>
-				<div>Dev Team:  
-					<a href="http://bbs.xiuno.com/" target="_blank">axiuno</a>
+				<div>Dev Team: <a href="http://bbs.xiuno.com/" target="_blank">axiuno</a>
 				</div>
-				<div>Thanks For: 
-					<a href="http://www.discuz.net/" target="_blank">cnteacher@discuz</a>
+				<div>Thanks For: <a href="http://www.discuz.net/" target="_blank">cnteacher@discuz</a>
 					<a href="http://www.discuz.net/" target="_blank">Discuz! Team</a>
 					<a href="http://artery.cn/" target="_blank">Artery</a>
 					<a href="http://www.wooyun.org/" target="_blank">剑心@wooyun</a>
@@ -66,9 +55,7 @@
 				</div>
 			</div>
 		</div>
-		
 		<!--{hook admin_index_team_after.htm}-->
-		
 	</div>
 </div>
 <!--{hook admin_index_end.htm}-->

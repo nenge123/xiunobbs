@@ -1,4 +1,4 @@
-<?php include _include(ADMIN_PATH.'view/htm/header.inc.htm');?>
+<!--{template(route_admin::tpl_header())}-->
 
 <?php $forumselect1 = form_options($forumarr, 0); ?>
 <?php $forumselect2 = $forumselect1; ?>
@@ -47,7 +47,7 @@
 
 <!--{hook admin_forum_merge_end.htm}-->
 
-<?php include _include(ADMIN_PATH.'view/htm/footer.inc.htm');?>
+<!--{template(route_admin::tpl_footer())}-->
 
 <script>
 

@@ -1,12 +1,9 @@
 <?php
 return array(
 	'index'=>array(
-		'text'=>MyApp::Lang('admin_index'), 
-		'icon'=>'mdi-home-analytics', 
-		'tab'=> array (
-			'index'=>array('url'=>MyApp::url('index'), 'text'=>MyApp::Lang('site_stat_info')),
-			'phpinfo'=>array('url'=>MyApp::url('index/phpinfo'), 'text'=>MyApp::Lang('server_info')),
-		)
+		'url'=>MyApp::url('index'),
+		'text'=>MyApp::Lang('site_stat_info'), 
+		'icon'=>'mdi-home-analytics',
 	),
 	'setting' => array(
 		'text'=>MyApp::Lang('setting'), 

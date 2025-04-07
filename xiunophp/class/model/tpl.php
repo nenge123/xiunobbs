@@ -337,4 +337,33 @@ class tpl
 		$newlist = array_combine($list, array_map(fn($m) => MyApp::Lang('lang_' . str_replace('-', '_', $m)), $list));
 		return self::conf_list_key($newlist, $name);
 	}
+	/**
+	 * 生成一个修罗风格的链接按钮组
+	 * @param type $list
+	 */
+	public static function btngroup(array $list):string
+	{
+		$html = '<div class="btn-group mb-3" role="group">';
+		$path = MyApp::value('path');
+		foreach($list as $k=>$v):
+			$url = MyApp::purl($k);
+			$active = str_ends_with($url,$path) ?' active':'';
+			$html .= '<a role="button" class="btn btn-secondary'.$active.'" href="'.$url.'">'.MyApp::Lang($v).'</a>';
+		endforeach;
+		$html .='</div>';
+		return $html;
+	}
+	public static function pagination($url,int|float $maxpage, int $page = 1, int $maxnum = 8):string
+	{
+		$pagination = MyApp::pagination($maxpage,$page,$maxnum);
+		if(empty($pagination)) return '';
+		$html = '<nav class="pagination">';
+		foreach($pagination as $nowpage):
+			$pagename = $nowpage;
+			$active = $nowpage==$page ?' active':'';
+			$html .= '<div class="page-item'.$active.'"><a class="page-link focus-ring focus-ring-info" href="'.MyApp::url(sprintf($url,$nowpage)).'">'.$pagename.'</a></div>';
+		endforeach;
+		$html .='</nav>';
+		return $html;
+	}
 }

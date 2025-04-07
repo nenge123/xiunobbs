@@ -1,21 +1,11 @@
-import LANG from './tinymce7_langs.js';
 export class editor {
 	cdn_unpkg_path = 'https://lf6-unpkg.zstaticcdn.com/';
 	webp_wasm_path = this.cdn_unpkg_path + 'wasm-webp@0.0.2/dist/esm/';
 	wasm_js = this.webp_wasm_path+'webp-wasm.js';
 	wasm_buf = this.webp_wasm_path+'webp-wasm.wasm';
-	base_url = 'https://cdn.bootcdn.net/ajax/libs/tinymce/7.6.0/';
 	zip_js = this.cdn_unpkg_path + '@zip.js/zip.js@2.7.53/dist/zip.min.js';
 	form_js = this.cdn_unpkg_path + 'formdata-polyfill@4.0.10/formdata.min.js';
 	//skin_url = 'https://cdn.tiny.cloud/1/qagffr3pkuv17a8on1afax661irst1hbr4e6tbv888sz91jc/tinymce/7.7.1-150/skins/ui/fluent';
-	plugins = [
-		"accordion", "advlist", "anchor", "autolink", "autoresize", "autosave", 
-		"charmap", "code", "codesample", "directionality", "fullscreen", 
-		"image", "importcss", "insertdatetime", "link", "lists", "media", "nonbreaking", 
-		"pagebreak", "quickbars", "save", "searchreplace", 
-		"table", "visualblocks", "visualchars", "wordcount", 
-		"preview"
-	];
 	csstext = [
 		'.tox .tox-menu{z-index:99999999999;}',
 		'.tox-statusbar .tox-statusbar__branding{display:none !important;}',
@@ -23,63 +13,18 @@ export class editor {
 	];
 	datas = new Map;
 	constructor(elm) {
-		if (!self.loaderTinymce) self.loaderTinymce = this.loader();
 		this.elm = elm;
 		this.form = elm.form;
 		this.name = elm.getAttribute('name');
 		elm.removeAttribute('name');
 		this.init();
 	}
-	loader() {
-		return new Promise(async back => {
-			const files = [
-				'tinymce.min.js',
-				'themes/silver/theme.min.js',
-				'icons/default/icons.min.js',
-				'models/dom/model.min.js'
-			].map(f=>this.base_url+f);
-			//files.push('https://cdn.tiny.cloud/1/qagffr3pkuv17a8on1afax661irst1hbr4e6tbv888sz91jc/tinymce/7.7.1-150/themes/silver/theme.min.js');
-			for (let link of this.plugins) {
-				files.push(this.base_url + 'plugins/' + link + '/plugin.min.js');
-			}
-			for (let file of files) {
-				if (!file) continue;
-				await import(file);
-			}
-			if (this.csstext.length) {
-				document.body.appendChild(document.createElement('style')).append(this.csstext.join(''));
-			}
-			self.tinyMCE.addI18n('en', LANG);
-			return back(self.tinyMCE);
-		});
-		//https://cdn.tiny.cloud/1/qagffr3pkuv17a8on1afax661irst1hbr4e6tbv888sz91jc/tinymce/7.7.1-150/themes/silver/theme.min.js
-	}
 	async init() {
 		const E = this;
-		(await self.loaderTinymce).init({
+		const tinyMCE = await X.callMethod('tinymce7');
+		tinyMCE.init({
 			target: this.elm,
-			plugins: this.plugins,
-			toolbar_mode: 'floating',
-			suffix: '.min',
-			base_url: E.base_url,
-			skin_url:E.skin_url||undefined,
-			promotion: false,
-			license_key: 'gpl',
-			contextmenu: false,
-			quickbars_insert_toolbar: true,
-			min_height: 500, // 最小高度
-			max_height: 800,
-			content_style: "img{max-width:90%}video{object-fit: fill;}",
-			paste_data_images: true, // 粘贴图片必须开启
-			mobile: {
-				menubar: true,
-				toolbar_mode: 'floating',
-			},
 			toolbar: ['myattach viewattach savedata'], // 界面按钮
-			//automatic_uploads:true,
-			image_default_type:'absolute',
-			block_unsupported_drop: false,
-			images_reuse_filename:true,
 			image_urlconvertor_callback(url){
 				console.log(url);
 				return url.replace(/^[\.\/]+\/(.+?)\/forum\//ig,'/$1/forum/');
